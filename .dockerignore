@@ -1,0 +1,120 @@
+# Git files
+.git
+.gitignore
+
+# Node.js / Nx specific
+node_modules/
+**/node_modules/
+# dist/ - Keep dist/ for Docker builds that need built artifacts
+coverage/
+.nx/cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+.installed.cfg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+.pytest_cache/
+cover/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Virtual environments
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+__pypackages__/
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+.pypirc
+
+# OS / System files
+.DS_Store
+Icon?
+.Spotlight-V100
+.Trashes
+._*
+Thumbs.db
+
+# Editor / IDE settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.cproject
+.settings/
+
+# Notebooks & Documentation
+.ipynb_checkpoints
+docs/_build/
+site/
+
+# Logs & temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.pid
+
+# Docker-specific overrides
+docker-compose.override.yml
+
+# Ruff cache
+.ruff_cache/
+
+# Specific app/package build outputs if not covered by dist/
+apps/*/dist
+apps/*/build
+packages/*/dist
+packages/*/build
+
+# Test reports
+junit.xml

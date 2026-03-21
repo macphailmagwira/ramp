@@ -1,0 +1,93 @@
+services:
+  # === Backend API (Python FastAPI) ===
+  api-main:
+    build:
+      context: ./apps/api-main
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: stitchsense-api-main
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./apps/api-main/src:/app/src
+    ports:
+      - '8000:8000'
+    env_file:
+      - apps/api-main/.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - stitchsense_network
+
+    # === Background Worker (Celery) ===
+  celery-worker-main:
+    build:
+      context: ./apps
+      dockerfile: worker-main/Dockerfile
+    container_name: stitchsense-worker-main
+    command: celery -A src.core.celery_app:app worker -l INFO
+    volumes:
+      - ./apps/worker-main/src:/app/src
+    depends_on:
+      - api-main # May depend on API models or configs
+      - redis
+      - db
+    env_file:
+      - apps/api-main/.env
+    networks:
+      - stitchsense_network
+
+  celery-beat-main:
+    build:
+      context: ./apps
+      dockerfile: worker-main/Dockerfile
+    container_name: stitchsense-beat-main
+    # Beat uses the SAME Celery app, but runs the beat scheduler
+    command: celery -A src.core.celery_app:app beat -l INFO
+    # or just: command: celery -A src.core.celery_app:app beat -l INFO
+    volumes:
+      - ./apps/worker-main/src:/app/src
+    env_file:
+      - apps/api-main/.env
+    depends_on:
+      - redis
+      - db
+    networks:
+      - stitchsense_network
+
+  # === Database (PostgreSQL) ===
+  db:
+      image: postgres:17
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: dbname
+      healthcheck:
+        test: ['CMD', 'pg_isready', '-q', '-d', 'dbname', '-U', 'user']
+        interval: 10s
+        timeout: 2s
+        retries: 60
+        start_period: 2s
+      ports:
+        - '5432:5432'
+      restart: always
+      networks:
+        - stitchsense_network
+
+  # === Redis (Caching & Message Broker) ===
+  redis:
+    image: redis:7-alpine
+    container_name: stitchsense-redis
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    networks:
+      - stitchsense_network
+
+volumes:
+  postgres_data:
+
+networks:
+  stitchsense_network:
+    driver: bridge

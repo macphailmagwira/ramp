@@ -1,0 +1,71 @@
+#!/bin/bash
+set -e
+
+# Injected by Terraform templatefile()
+IMAGE_TAG="${IMAGE_TAG}"
+ENVIRONMENT="${ENVIRONMENT}"
+AWS_REGION="${AWS_REGION}"
+ECR_REGISTRY="${ECR_REGISTRY}"
+
+# Log all output
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+echo "Starting user data execution at $(date) for env=${ENVIRONMENT}"
+
+# Ensure base directory exists
+mkdir -p /opt/stitchsense
+chown ec2-user:ec2-user /opt/stitchsense || true
+
+# Export environment variables for the current shell
+export IMAGE_TAG ENVIRONMENT AWS_REGION ECR_REGISTRY
+
+# Update system
+yum update -y
+
+# Install Docker (Amazon Linux 2023)
+yum install -y docker
+
+# Start and enable Docker
+systemctl start docker
+systemctl enable docker
+
+# Add ec2-user to docker group
+usermod -a -G docker ec2-user || true
+
+# Install Docker Compose
+curl -L "https://github.com/docker/compose/releases/download/v2.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# Create directory structure
+mkdir -p /home/ec2-user/stitchsense/{api,worker,data/uploads,data/redis}
+chown -R ec2-user:ec2-user /home/ec2-user/stitchsense
+
+# Install CloudWatch Agent
+wget -q https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+rm -f ./amazon-cloudwatch-agent.rpm
+
+# Configure automatic security updates (Amazon Linux 2023 uses dnf-automatic)
+yum install -y dnf-automatic
+sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
+sed -i 's/upgrade_type = default/upgrade_type = security/' /etc/dnf/automatic.conf
+systemctl enable dnf-automatic.timer
+systemctl start dnf-automatic.timer
+
+# Set up log rotation for Docker container logs
+cat > /etc/logrotate.d/docker-containers << 'EOF'
+/var/lib/docker/containers/*/*.log {
+    rotate 7
+    daily
+    compress
+    missingok
+    delaycompress
+    copytruncate
+}
+EOF
+
+# Marker file to indicate successful initialization
+touch /home/ec2-user/.ec2-initialized
+chown ec2-user:ec2-user /home/ec2-user/.ec2-initialized
+
+echo "User data execution completed at $(date)"

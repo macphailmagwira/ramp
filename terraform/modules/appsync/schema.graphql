@@ -1,0 +1,2276 @@
+##############################################
+# Enums
+##############################################
+
+enum FactoryCategory {
+  APPAREL
+  HOME_AND_DECOR
+  TEXTILES
+  OTHER
+  FOOTWEAR_AND_ACCESSORIES
+}
+
+enum BuyerType {
+  BRAND
+  RETAILER
+  BUYING_HOUSE
+  SOURCING_AGENT
+  DISTRIBUTOR
+  TRADING_COMPANY
+  SUBCONTRACTOR
+  BRAND_LICENSEE
+  SELF
+  OTHER
+}
+
+enum BuyerContactType {
+  PRIMARY
+  SECONDARY
+}
+
+enum BrandType {
+  DIRECT
+  RETAILER
+  WHOLESALER
+  DIGITAL
+  LICENSED
+}
+
+enum RoleType {
+  SUPERADMIN
+  ADMIN
+  DIRECTOR
+  ADVISOR
+  MERCHANDISING_HEAD
+  MERCHANDISING_MANAGER
+  MERCHANDISING_ASSOCIATE
+  ENGINEERING_HEAD
+  ENGINEERING_MANAGER
+  ENGINEERING_ASSOCIATE
+  OPERATIONS_HEAD
+  OPERATIONS_MANAGER
+}
+
+enum DepartmentType {
+  STITCHSENSE
+  GENERAL
+  MERCHANDISING
+  INDUSTRIAL_ENGINEERING
+  OPERATIONS
+}
+
+enum SectorOperationalStatusEnum {
+  all_active
+  active
+  idle
+  planned_downtime
+  temporarily_closed
+  closed
+}
+
+enum LineOperationalStatusEnum {
+  ACTIVE
+  CHANGEOVER
+  IDLE
+  CLOSED
+}
+
+enum MachineCategory {
+  LOCKSTITCH_MACHINE
+  CHAINSTITCH_MACHINES
+  OVERLOCK_SERGER_MACHINES
+  FLATLOCK_FLATSEAM_MACHINES
+  AUTOMATIC_SEWING_MACHINES
+  ZIGZAG_BLINDSTITCH_MACHINES
+  BUTTON_BUTTONHOLE_MACHINES
+  BUTTON_ATTACHING_MACHINES
+  SPECIALIZED_MACHINES
+  COVERSTITCH_MACHINES
+  FABRIC_CUTTING_MACHINES
+  SPREADING_RELAXING_MACHINES
+  FUSING_HEAT_APPLICATION
+  PRESSING_FINISHING
+  EMBELLISHMENT_MACHINES
+  PLEATING
+  SMOCKING
+  QUILTING
+  PADDING
+  TACKING_REINFORCEMENT_MACHINES
+  CAD_CAM_SYSTEMS
+  AUTOMATED_SEWING_SYSTEMS
+}
+
+enum MachineConfig {
+  AUTO
+  MANUAL
+  VERTICAL
+  ANGULAR
+  FOLDER
+  JIG
+}
+
+enum ShiftTypeEnum {
+    default
+    holiday
+    custom
+}
+
+enum UploadCategory {
+  RAW_UPLOADS
+  QC_EVENTS
+}
+
+enum UploadSubcategory {
+  BUYERS
+  RAW_EVENTS
+}
+
+enum UploadType {
+  CREATE_BUYER
+  CREATE_BUYER_WITH_SIZE_PROFILE
+  CREATE_BUYER_WITH_CONTACTS
+  CREATE_BUYER_WITH_BRAND
+  CREATE_BUYER_WITH_ACCOUNT_MANAGER
+  BATCH_PARQUET
+}
+
+enum OrderStatus {
+  INQUIRY
+  QUOTE_ISSUED
+  CONFIRMED
+  PLANNING
+  PRODUCTION_READY
+  PRODUCTION_LIVE
+  PRODUCTION_COMPLETE
+  PACKING
+  DELIVERED
+  CANCELLED
+  FACTORY_WITHDRAWN
+  BUYER_DECLINED
+}
+
+enum CostCategory {
+  CM
+  FABRIC
+  TRIM
+  L_AND_P
+  THREAD
+  COMMERCIAL
+}
+
+enum DeviceType {
+  TV_DISPLAY
+  TABLET
+}
+
+enum UserType {
+  DISPLAY
+  OPERATOR
+  MANAGEMENT
+}
+
+enum OperationalStatus {
+  ACTIVE
+  SCHEDULED
+  INACTIVE
+  MAINTENANCE
+  DECOMMISSIONED
+}
+
+enum ConnectivityStatus {
+  ONLINE
+  OFFLINE
+}
+
+enum StyleReadiness {
+  STYLE_CREATED
+  BULLETIN_REQUESTED
+  COSTING
+  READY
+}
+
+enum MaterialType {
+  TRIM
+  FABRIC
+  THREAD
+}
+
+enum OperationType {
+  MAIN
+  HELPER
+}
+
+enum ProductionPlanStatus {
+  DRAFT
+  SCHEDULED
+  LIVE
+  COMPLETE
+}
+
+enum ProductionPlanVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum StationType {
+  QC_STATION
+  MACHINE_STATION
+}
+
+enum OrientationType {
+  ASCENDING
+  DESCENDING
+}
+
+##############################################
+# TENANT TYPES
+##############################################
+
+type Tenant {
+  id: ID!
+  name: String!
+  description: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postal_code: String
+  phone_number: String
+  country_code: String
+  email: String
+  is_active: Boolean!
+}
+
+input TenantProvisionInput {
+  name: String!
+  description: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postal_code: String
+  phone_number: String
+  country_code: String
+  email: String
+  is_active: Boolean = true
+}
+
+input TenantUpdateInput {
+  name: String
+  description: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postal_code: String
+  phone_number: String
+  country_code: String
+  email: String
+  is_active: Boolean
+}
+
+##############################################
+# FACTORY TYPES
+##############################################
+
+type Process {
+  id: ID!
+  name: String!
+  description: String
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type Factory {
+  id: ID!
+  name: String!
+  categories: [FactoryCategory!]!
+  address: String
+  city: String
+  state: String
+  country: String
+  postal_code: String
+  country_code: String
+  parent_id: ID
+  material_line_gap: Int
+  contact_name: String
+  contact_email: String
+  contact_phone_number: String
+  preferred_currency: String
+  tenant_id: ID!
+  processes: [Process!]
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+input FactoryCreateInput {
+  name: String!
+  categories: [FactoryCategory!]! = [APPAREL]
+  address: String
+  city: String
+  state: String
+  country: String
+  postal_code: String
+  country_code: String
+  parent_id: ID
+  material_line_gap: Int
+  contact_name: String
+  contact_email: String
+  contact_phone_number: String
+  tenant_id: ID!
+  process_ids: [ID!]
+}
+
+input FactoryUpdateInput {
+  name: String
+  categories: [FactoryCategory!]
+  address: String
+  city: String
+  state: String
+  country: String
+  postal_code: String
+  country_code: String
+  parent_id: ID
+  material_line_gap: Int
+  contact_name: String
+  contact_email: String
+  contact_phone_number: String
+  preferred_currency: String
+  process_ids: [ID!]
+}
+
+##############################################
+# SECTOR TYPES
+##############################################
+
+type SectorProcess {
+  id: ID!
+  name: String!
+  description: String
+}
+
+type Sector {
+  id: ID!
+  name: String!
+  description: String
+  sector_code: String!
+  effective_start_date: AWSDateTime!
+  effective_end_date: AWSDateTime!
+  floor_level: Int
+  operational_status: SectorOperationalStatusEnum!
+  factory_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+  lines: [Line!]
+  processes: [SectorProcess!]
+}
+
+input LineInlineCreateInput {
+  name: String!
+  sequence_order: Int!
+}
+
+input SectorCreateInput {
+  name: String!
+  description: String
+  sector_code: String!
+  effective_start_date: AWSDateTime
+  effective_end_date: AWSDateTime
+  floor_level: Int
+  lines: [LineInlineCreateInput!]
+  operational_status: SectorOperationalStatusEnum!
+  factory_id: ID!
+  tenant_id: ID
+  process_ids: [ID!]!
+}
+
+input SectorUpdateInput {
+  name: String
+  description: String
+  sector_code: String
+  effective_start_date: AWSDateTime
+  effective_end_date: AWSDateTime
+  floor_level: Int
+  operational_status: SectorOperationalStatusEnum
+  factory_id: ID
+  process_ids: [ID!]
+}
+
+##############################################
+# MACHINE TYPES
+##############################################
+
+type GenericMachine {
+  id: ID!
+  name: String!
+  machine_code: String!
+  min_rpm: Int
+  max_rpm: Int
+  min_spi: Float
+  max_spi: Float
+  category: MachineCategory!
+  configuration: MachineConfig
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type FactoryMachine {
+  id: ID!
+  name: String!
+  machine_code: String!
+  factory_rpm: Int!
+  factory_spi: Float!
+  base_machine_id: ID
+  tenant_id: ID!
+  factory_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+  notes: String
+  manufacturer: String
+  model: String
+}
+
+input GenericMachineCreateInput {
+  name: String!
+  machine_code: String!
+  min_rpm: Int!
+  max_rpm: Int!
+  min_spi: Float!
+  max_spi: Float!
+  category: MachineCategory!
+  configuration: MachineConfig
+}
+
+input FactoryMachineCreateInput {
+  name: String!
+  machine_code: String!
+  factory_rpm: Int!
+  factory_spi: Float!
+  base_machine_id: ID!
+  tenant_id: ID
+  factory_id: ID!
+  notes: String
+  manufacturer: String
+  model: String
+}
+
+input FactoryMachineUpdateInput {
+  name: String
+  machine_code: String
+  factory_rpm: Int
+  factory_spi: Float
+  notes: String
+  base_machine_id: ID
+  manufacturer: String
+  model: String
+}
+
+##############################################
+# LINE TYPES
+##############################################
+
+type Line {
+  id: ID!
+  name: String!
+  line_code: String!
+  sequence_order: Int!
+  effective_start_date: AWSDateTime!
+  effective_end_date: AWSDateTime!
+  operational_status: LineOperationalStatusEnum!
+  sector_id: ID!
+  factory_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+input LineCreateInput {
+  name: String!
+  sequence_order: Int!
+  effective_start_date: AWSDateTime!
+  effective_end_date: AWSDateTime!
+  operational_status: LineOperationalStatusEnum!
+  sector_id: ID!
+  factory_id: ID
+  tenant_id: ID
+}
+
+input LineUpdateInput {
+  name: String
+  line_code: String
+  sequence_order: Int
+  effective_start_date: AWSDateTime
+  effective_end_date: AWSDateTime
+  operational_status: LineOperationalStatusEnum
+  sector_id: ID
+}
+
+##############################################
+# SHIFT TYPES
+##############################################
+
+type Break {
+  id: ID!
+  name: String!
+  description: String
+  start_time: AWSTime!
+  end_time: AWSTime!
+  shift_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type DayOfWeek {
+  name: String!
+}
+
+type Shift {
+  id: ID!
+  name: String!
+  description: String
+  start_time: AWSTime!
+  end_time: AWSTime!
+  total_hours: Int!
+  factory_id: ID!
+  tenant_id: ID!
+  days: [DayOfWeek!]!
+  breaks: [Break!]!
+  lines: [Line!]
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+  type: ShiftTypeEnum
+}
+
+input BreakCreateInput {
+  name: String!
+  description: String
+  start_time: AWSTime!
+  end_time: AWSTime!
+  shift_id: ID!
+  tenant_id: ID
+}
+
+input BreakUpdateInput {
+  name: String
+  description: String
+  start_time: AWSTime
+  end_time: AWSTime
+}
+
+input LineShiftCreateInput {
+  line_id: ID!
+  tenant_id: ID
+  effective_start_date: AWSDateTime!
+  effective_end_date: AWSDateTime!
+}
+
+input ShiftCreateInput {
+  name: String!
+  description: String
+  start_time: AWSTime!
+  end_time: AWSTime!
+  total_hours: Int!
+  tenant_id: ID
+  factory_id: ID!
+  days: [String!]!
+  type: ShiftTypeEnum
+  lines: [LineShiftCreateInput!]
+}
+
+input ShiftUpdateInput {
+  name: String
+  description: String
+  start_time: AWSTime
+  end_time: AWSTime
+  total_hours: Int
+  days: [String!]
+  breaks: [ID!]
+  type: ShiftTypeEnum
+  lines: [LineShiftCreateInput!]
+}
+
+##############################################
+# BUYER TYPES
+##############################################
+
+type Size {
+  id: ID!
+  name: String!
+  profile_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type SizeProfile {
+  id: ID!
+  name: String!
+  buyer_id: ID!
+  tenant_id: ID!
+  sizes: [Size!]!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type BuyerContact {
+  id: ID!
+  contact_name: String!
+  contact_email: String!
+  contact_phone: String
+  country_code: String
+  job_title: String!
+  type: BuyerContactType
+  buyer_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type Brand {
+  id: ID!
+  name: String!
+  code: String!
+  type: BrandType
+  tenant_id: ID!
+  factory_id: ID!
+  buyer_id: ID!
+  master_brand_id: ID
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type Buyer {
+  id: ID!
+  name: String!
+  code: String!
+  tier: Int
+  type: BuyerType!
+  address_line_1: String
+  address_line_2: String
+  city: String
+  state: String
+  postal_code: String
+  country: String
+  tenant_id: ID!
+  factory_id: ID!
+  master_buyer_id: ID
+  account_manager_id: ID
+  size_profiles: [SizeProfile!]!
+  contacts: [BuyerContact!]!
+  brands: [Brand!]!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+input BuyerCreateInput {
+  name: String!
+  code: String!
+  tier: Int
+  type: BuyerType!
+  address_line_1: String
+  address_line_2: String
+  city: String
+  state: String
+  postal_code: String
+  country: String
+  tenant_id: ID!
+  factory_id: ID!
+  master_buyer_id: ID
+  account_manager_id: ID
+}
+
+input BuyerUpdateInput {
+  name: String
+  code: String
+  tier: Int
+  type: BuyerType
+  address_line_1: String
+  address_line_2: String
+  city: String
+  state: String
+  postal_code: String
+  country: String
+  master_buyer_id: ID
+  account_manager_id: ID
+}
+
+input BuyerContactCreateInput {
+  contact_name: String!
+  contact_email: String!
+  contact_phone: String
+  country_code: String
+  job_title: String!
+  type: BuyerContactType
+  buyer_id: ID!
+}
+
+input BuyerContactUpdateInput {
+  contact_name: String
+  contact_email: String
+  contact_phone: String
+  country_code: String
+  job_title: String
+  type: BuyerContactType
+}
+
+input BrandCreateInput {
+  name: String!
+  code: String!
+  type: BrandType
+  tenant_id: ID!
+  factory_id: ID!
+  buyer_id: ID!
+  master_brand_id: ID
+}
+
+input BrandUpdateInput {
+  name: String
+  code: String
+  type: BrandType
+  master_brand_id: ID
+}
+
+input SizeProfileCreateInput {
+  name: String!
+  buyer_id: ID!
+  tenant_id: ID!
+  sizes: [String!]
+}
+
+input SizeCreateInput {
+  name: String!
+  profile_id: ID!
+}
+
+input SizeProfileUpdateInput {
+  name: String
+  buyer_id: ID
+  sizes: [String!]
+
+}
+
+##############################################
+# USER TYPES
+##############################################
+
+type UserCredentials {
+  email: String!
+  temporary_password: String!
+  cognito_sub: String!
+}
+
+type UserInviteResponse {
+  user: User!
+  credentials: UserCredentials!
+}
+
+type UserRole {
+  id: ID!
+  user_id: ID!
+  tenant_id: ID!
+  factory_id: ID!
+  factory: Factory
+  title: String
+  role: RoleType!
+  department: DepartmentType
+  is_active: Boolean!
+  lines: [Line!]!
+  sectors: [Sector!]!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type User {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  profile_photo_url: String
+  cognito_sub: String
+  country_code: String
+  phone_number: String
+  is_active: Boolean!
+  tenant_id: ID!
+  factory_id: ID!
+  tenant: Tenant
+  factory: Factory
+  manager: User
+  user_roles: [UserRole!]!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type S3Upload {
+  id: ID!
+  file_name: String!
+  file_key: String!
+  content_type: String!
+  file_size: Int
+  status: String!
+  category: String!
+  subcategory: String!
+  upload_type: String!
+  uploaded_at: AWSDateTime
+  created_at: AWSDateTime!
+  user: User
+}
+
+type RoleTypeList {
+  roles: [String!]!
+}
+
+type DepartmentTypeList {
+  departments: [String!]!
+}
+
+type RoleDepartmentMapping {
+  role: String!
+  department: String!
+}
+
+type RoleDepartmentMapList {
+  mappings: [RoleDepartmentMapping!]!
+}
+
+input UserCreateInput {
+  first_name: String!
+  last_name: String!
+  email: String!
+  cognito_sub: String!
+  country_code: String
+  phone_number: String
+  is_active: Boolean = true
+  tenant_id: ID!
+  factory_id: ID!
+  manager_id: ID
+}
+
+input UserInviteInput {
+  first_name: String!
+  last_name: String!
+  email: String!
+  country_code: String
+  phone_number: String
+  is_active: Boolean = true
+  tenant_id: ID!
+  factory_id: ID!
+  manager_id: ID
+  role: RoleType!
+  department: DepartmentType
+  title: String
+}
+
+input UserUpdateInput {
+  first_name: String
+  last_name: String
+  email: String
+  country_code: String
+  phone_number: String
+  is_active: Boolean
+  factory_id: ID
+  manager_id: ID
+}
+
+input UserRoleCreateInput {
+  user_id: ID!
+  tenant_id: ID!
+  factory_id: ID!
+  title: String
+  role: RoleType!
+  department: DepartmentType
+  is_active: Boolean = true
+  line_ids: [ID!]
+  sector_ids: [ID!]
+}
+
+input UserRoleUpdateInput {
+  title: String
+  role: RoleType
+  department: DepartmentType
+  is_active: Boolean
+  line_ids: [ID!]
+  sector_ids: [ID!]
+}
+
+##############################################
+# S3 UPLOAD TYPES
+##############################################
+
+type PresignedUrlResponse {
+  presigned_url: String!
+  file_key: String!
+  file_name: String!
+  expiration: Int!
+  upload_id: ID!
+  created_at: AWSDateTime!
+  category: String!
+  subcategory: String!
+  upload_type: String!
+}
+
+input GeneratePresignedUrlInput {
+  file_name: String!
+  content_type: String = "application/octet-stream"
+  expiration: Int = 3600
+  category: UploadCategory!
+  subcategory: UploadSubcategory!
+  upload_type: UploadType!
+}
+
+
+##############################################
+# STYLE TYPES
+##############################################
+
+type MaterialDetail {
+  id: ID!
+  name: String!
+  type: MaterialType!
+  reference_number: String
+  origin: String!
+  fabric_type: String
+  consumption_per_unit: Float
+  unit_price: Float!
+}
+
+type OrderReference {
+  id: ID!
+  code: String!
+  name: String
+  total_order_quantity: Int
+  total_order_value: Float
+  first_due_date: AWSDate
+  last_due_date: AWSDate
+}
+
+type Style {
+  id: ID!
+  style_name: String!
+  style_code: String
+  reference_id: String
+  buyer_id: ID!
+  brand_id: ID
+  parent_style_id: ID
+  garment_type: String
+  garment_color: String
+  thread_color: String
+  process_cost: Float
+  size_profile_id: ID!
+  factory_id: ID!
+  tenant_id: ID!
+  style_readiness: StyleReadiness!
+  is_active: Boolean!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+  materials: [MaterialDetail!]
+  orders: [OrderReference!]
+  unit_total_cost: Float
+  unit_cutting_making_cost: Float
+  buyer_name: String
+  preferred_line_layout_id: ID
+}
+
+type StyleReadinessStats {
+  readiness: StyleReadiness!
+  count: Int!
+}
+
+type StyleProfile {
+  id: ID!
+  style_id: String
+  style_name: String!
+  buyer_name: String
+  brand_name: String
+  garment_type: String
+  colour: String
+  sizes: [String!]
+}
+
+type Operation {
+  id: ID
+  name: String
+  type: OperationType
+  code: String
+  machine: GenericMachine
+}
+
+type BulletinOperation {
+  id: ID!
+  style_part: String!
+  operation_id: ID
+  operation_count: Int!
+  smv: Float
+  sam: Float
+  hourly_target: Float
+  machine_id: ID
+}
+
+type StyleBulletin {
+  id: ID!
+  style_id: ID!
+  bulletin_id: ID!
+  operations: [BulletinOperation!]!
+}
+
+type StyleMachineSummary {
+  machine_type: String!
+  code: [String!]!
+  config: String
+  count: Int!
+  smv: Float!
+}
+
+type StyleMaterialCost {
+  material_name: String!
+  unit_price: Float!
+  consumption: Float!
+  cost_per_piece: Float!
+  total_cost_for_order: Float!
+}
+
+type StyleSummary {
+  station_count: Int!
+  operation_count: Int!
+  machine_count: Int!
+  total_operator_count: Int!
+  machine_operator_count: Int!
+  helper_operator_count: Int!
+  total_man_level: Float!
+  machines_smv: Float!
+  machines_sam: Float!
+  helper_smvs: Float!
+  helper_sam: Float!
+  total_smv: Float!
+  total_sam: Float!
+  target_smv_per_hour: Float!
+  target_sam_per_hour: Float!
+  machines: [StyleMachineSummary!]
+  default_quantity: Int!
+  material_costs: [StyleMaterialCost!]
+  total_material_cost: Float!
+}
+
+type Station {
+  id: ID!
+  name: String!
+  code: String
+  sequence: Int!
+  total_target_smv: Float
+  type: StationType!
+  machine_id: ID
+  device_id: ID
+  operations: [StationOperation!]
+}
+
+type StationOperation {
+  id: ID!
+  operation: Operation!
+  smv_estimate: Float
+  target_smv: Float
+}
+
+type LineLayout {
+  id: ID!
+  name: String!
+  orientation: OrientationType!
+  number_of_columns: Int!
+  sam: Float
+  man_level: Float
+  factory_id: ID!
+  tenant_id: ID!
+  stations: [Station!]
+  total_stations: Int!
+  total_operator_count: Int!
+  machine_operator_count: Int!
+  total_machine_count: Int!
+  helper_operator_count: Int!
+  total_operation_count: Int!
+  machine_smv_sum: Float!
+  helper_smv_sum: Float!
+  smv_estimate: Float
+  sam_efficiency_level: Float!
+  sam_hourly_production_target: Float!
+}
+
+input MaterialDetailCreateInput {
+  reference: String!
+  supplier: String!
+  consumption_per_unit: Float
+  unit_price: Float
+  type: MaterialType
+}
+
+input StyleCreateInput {
+  style_name: String!
+  buyer_id: ID!
+  brand_id: ID
+  parent_style_id: ID
+  garment_type: String
+  size_profile_id: ID!
+  garment_color: String
+  reference_id: String
+  thread_color: String
+  process_cost: Float
+  material_details: [MaterialDetailCreateInput!]
+  factory_id: ID!
+  tenant_id: ID!
+  preferred_line_layout_id: ID
+}
+
+input BulletinOperationBreakdownCreateInput {
+  bulletin_id: ID!
+  style_part: String!
+  operation_id: ID
+  operation_type: OperationType
+  operation_name: String
+  machine_id: ID!
+  man_level: Float!
+  operation_count: Int
+  smv_estimate: Float
+  sam_estimate: Float
+  tenant_id: ID!
+}
+
+input BulkDeleteBreakDownInput {
+  ids: [ID!]!
+}
+
+input BulkCreateBreakDownInput {
+  breakdowns: [BulletinOperationBreakdownCreateInput!]!
+}
+
+input BulletinOperationUpdateInput {
+  id: ID!
+  style_part: String
+  operation_name: String
+  operation_type: OperationType
+  operation_id: ID
+  machine_id: ID
+  operation_count: Int
+  smv_estimate: Float
+  sam_estimate: Float
+  man_level: Float
+}
+
+input BulkBulletinOperationUpdateInput {
+  operations: [BulletinOperationUpdateInput!]!
+}
+
+input StyleUpdateInput {
+  style_name: String
+  buyer_id: ID
+  brand_id: ID
+  garment_type: String
+  size_profile_id: ID
+  reference_id: String
+  garment_color: String
+  thread_color: String
+  process_cost: Float
+  is_active: Boolean
+  style_readiness: StyleReadiness
+  preferred_line_layout_id: ID
+}
+
+input MaterialCreateInput {
+  name: String!
+  type: MaterialType!
+  reference_number: String
+  origin: String
+  fabric_type: String
+  consumption_per_unit: Float
+  unit_price: Float
+  style_id: ID!
+  tenant_id: ID!
+}
+
+input MaterialUpdateInput {
+  name: String
+  type: MaterialType
+  reference_number: String
+  origin: String
+  fabric_type: String
+  consumption_per_unit: Float
+  unit_price: Float
+  style_id: ID
+}
+
+input StationCreateInput {
+  name: String!
+  code: String
+  sequence: Int!
+  total_target_smv: Float
+  type: StationType!
+  machine_id: ID
+  device_id: ID
+  operations: [StationOperationInput!]
+}
+
+input StationOperationInput {
+  operation_id: ID!
+  smv_estimate: Float
+  target_smv: Float
+}
+
+input LineLayoutCreateInput {
+  name: String!
+  orientation: OrientationType
+  number_of_columns: Int
+  sam: Float
+  man_level: Float
+  factory_id: ID!
+  tenant_id: ID!
+  stations: [StationCreateInput!]!
+}
+
+input StationUpdateInput {
+  name: String
+  code: String
+  sequence: Int
+  total_target_smv: Float
+  type: StationType
+  machine_id: ID
+  device_id: ID
+  operations: [StationOperationInput!]
+}
+
+input LineLayoutUpdateInput {
+  name: String
+  orientation: OrientationType
+  number_of_columns: Int
+  sam: Float
+  man_level: Float
+  stations: [StationCreateInput!]
+}
+
+##############################################
+# ORDER TYPES
+##############################################
+
+type DeliveryDate {
+  date: AWSDate!
+  quantity: Int!
+}
+
+type Costing {
+  id: ID!
+  name: String!
+  category: CostCategory!
+  ref: String!
+  origin: String!
+  consumption_per_unit: Float!
+  quantity_used: Float!
+  unit_price: Float!
+  total_amount: Float!
+  order_style_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type OrderGarmentSize {
+  id: ID!
+  size: String!
+  ratio: Int!
+  order_destination_style_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type DestinationDueDate {
+  id: ID!
+  quantity: Int!
+  due_date: AWSDate
+  extension_date: AWSDate
+  delivered_date: AWSDate
+  is_active: Boolean!
+  destination_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type OrderDestinationStyle {
+  id: ID!
+  order_destination_id: ID!
+  order_style_id: ID!
+  total_quantity: Int!
+  ratio_total: Int!
+  tenant_id: ID!
+  due_dates: [DestinationDueDate!]!
+  sizes: [OrderGarmentSize!]!
+  order_destination: OrderDestination!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type OrderDestination {
+  id: ID!
+  code: String!
+  delivery_city: String
+  delivery_state_province: String
+  delivery_country: String
+  delivery_address: String
+  delivery_zip: String
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type OrderStyle {
+  id: ID!
+  style_id: ID!
+  order_id: ID!
+  tenant_id: ID!
+  status: OrderStatus!
+  total_quantity: Int
+  unit_cost: Float
+  revenue: Float
+  destinations: [OrderDestinationStyle!]!
+  costings: [Costing!]!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type Order {
+  id: ID!
+  code: String!
+  name: String
+  description: String
+  confirmation_date: AWSDate
+  total_order_quantity: Int
+  total_order_value: Float
+  currency: String!
+  number_of_styles: Int
+  buyer_id: ID
+  brand_id: ID
+  factory_id: ID!
+  tenant_id: ID!
+  is_active: Boolean!
+  order_styles: [OrderStyle!]!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type StatusCount {
+  status: OrderStatus!
+  count: Int!
+}
+
+type OrdersCountSummary {
+  total_orders: Int!
+  by_status: [StatusCount!]!
+}
+
+input DeliveryDateInput {
+  date: AWSDate!
+  quantity: Int!
+}
+
+input DestinationInput {
+  destination_code: String!
+  destination_city: String
+  destination_state: String
+  destination_country: String
+  delivery_dates: [DeliveryDateInput!]
+  quantity: Int
+  destination_address: String
+  destination_zip: String
+}
+
+input CostingInput {
+  name: String
+  category: CostCategory!
+  material_id: String
+  reference_id: String
+  supplier: String
+  unit_price: Float
+  consumption_per_unit: Float
+}
+
+input OrderStyleInput {
+  style_id: ID!
+  costings: [CostingInput!]
+  destinations: [DestinationInput!]
+}
+
+input OrderCreateInput {
+  buyer_id: ID!
+  factory_id: ID!
+  order_data: [OrderStyleInput!]!
+  order_code: String
+  order_name: String
+  description: String
+  brand_id: ID
+}
+
+input OrderUpdateInput {
+  order_name: String
+  description: String
+  buyer_id: ID
+  brand_id: ID
+  factory_id: ID
+  status: OrderStatus
+}
+
+input OrderStyleUpdateInput {
+  style_id: ID
+  status: OrderStatus
+  unit_cost: Float
+}
+
+input CostingUpdateInput {
+  name: String
+  category: CostCategory
+  ref: String
+  origin: String
+  consumption_per_unit: Float
+  quantity_used: Float
+  unit_price: Float
+  total_amount: Float
+}
+
+# ---- NEW: destination management inputs ----
+
+input OrderGarmentSizeInput {
+  size: String!
+  ratio: Int!
+}
+
+input OrderDestinationStyleAddInput {
+  destination_code: String!
+  destination_city: String
+  destination_state: String
+  destination_country: String
+  destination_address: String
+  destination_zip: String
+  total_quantity: Int
+  ratio_total: Int
+  due_dates: [DeliveryDateInput!]
+  sizes: [OrderGarmentSizeInput!]
+}
+
+input OrderDestinationStyleUpdateInput {
+  total_quantity: Int
+  ratio_total: Int
+  delivery_city: String
+  delivery_state_province: String
+  delivery_country: String
+  delivery_address: String
+  delivery_zip: String
+  due_dates: [DeliveryDateInput!]  
+}
+
+##############################################
+# DEVICE TYPES
+##############################################
+
+type LineBasicInfo {
+  id: ID!
+  name: String!
+  line_code: String!
+}
+
+type SectorBasicInfo {
+  id: ID!
+  name: String!
+  sector_code: String!
+}
+
+type Device {
+  id: ID!
+  device_name: String!
+  device_id: String!
+  device_type: DeviceType!
+  user_type: UserType!
+  operational_status: OperationalStatus!
+  connectivity_status: ConnectivityStatus!
+  confirmation_code: String!
+  factory_id: ID!
+  sector_id: ID!
+  tenant_id: ID!
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+  sector: SectorBasicInfo!
+  lines: [LineBasicInfo!]!
+}
+
+type DeviceList {
+  id: ID!
+  device_name: String!
+  device_id: String!
+  device_type: DeviceType!
+  user_type: UserType!
+  operational_status: OperationalStatus!
+  connectivity_status: ConnectivityStatus!
+  sector_id: ID!
+  factory_id: ID!
+  created_at: AWSDateTime!
+}
+
+input DeviceCreateInput {
+  device_name: String!
+  device_type: DeviceType!
+  user_type: UserType!
+  factory_id: ID!
+  sector_id: ID!
+  line_ids: [ID!]!
+  operational_status: OperationalStatus = ACTIVE
+  connectivity_status: ConnectivityStatus = OFFLINE
+}
+
+input DeviceUpdateInput {
+  device_name: String
+  device_type: DeviceType
+  user_type: UserType
+  connectivity_status: ConnectivityStatus
+}
+
+input DeviceOperationalStatusUpdateInput {
+  operational_status: OperationalStatus!
+}
+
+input DeviceReassignmentInput {
+  sector_id: ID!
+  line_ids: [ID!]!
+}
+
+##############################################
+# PRODUCTION PLAN TYPES
+##############################################
+
+type DailyTargetResponse {
+  id: ID!
+  start_date: AWSDate!
+  end_date: AWSDate!
+  target_units_per_day: Float!
+  sam_efficiency: Float!
+  total_units: Int!
+  target_units_per_hour: Float!
+}
+
+type PlanLineResponse {
+  id: ID!
+  line_id: ID!
+  start_date: AWSDate!
+  end_date: AWSDate!
+  quantity: Int!
+  sam_target: Float!
+  smv_target: Float!
+  dhu: Int!
+  daily_targets: [DailyTargetResponse!]!
+}
+
+type ProductionPlanResponse {
+  id: ID!
+  name: String
+  code: String!
+  status: ProductionPlanStatus
+  visibility: ProductionPlanVisibility
+  factory_id: ID
+  tenant_id: ID
+  style_id: ID
+  plan_start_date: AWSDate
+  plan_end_date: AWSDate
+  plan_lines: [PlanLineResponse!]
+  buyer: String
+  brand: String
+  style_name: String
+  order_count: Int
+  total_quantity: Int
+  allocated_lines: Int
+  planned_start: AWSDate
+  planned_end: AWSDate
+  updated_at: AWSDateTime
+  contributors: [String!]
+}
+
+type PlanProfileCollaboratorResponse {
+  user_id: ID!
+  first_name: String
+  last_name: String
+  profile_photo_url: String
+  is_owner: Boolean!
+}
+
+type PlanProfileLineResponse {
+  line_name: String!
+  associated_orders: [String!]!
+  allocated_qty: Int!
+  plan_start: AWSDate!
+  prod_start: AWSDate
+  plan_end: AWSDate!
+  prod_end: AWSDate
+  sam_efficiency: Float!
+  sam_target: Float
+  dhu: Int!
+}
+
+type ProductionPlanProfileResponse {
+  plan_name: String!
+  plan_code: String!
+  style_name: String!
+  style_code: String!
+  buyer_name: String
+  brand_name: String
+  status: ProductionPlanStatus!
+  visibility: ProductionPlanVisibility!
+  collaborators: [PlanProfileCollaboratorResponse!]!
+  plan_summary: [PlanProfileLineResponse!]!
+}
+
+type PlanSummaryDailyTarget {
+  date: AWSDate!
+  target: Float
+}
+
+type PlanSummaryDailyTargetRow {
+  plan_code: String!
+  order_codes: String!
+  factory_name: String!
+  sector_name: String
+  line_name: String!
+  targets: [PlanSummaryDailyTarget!]!
+}
+
+type PlanSummaryMachineBreakdown {
+  machine_type: String!
+  code: String!
+  config: String
+  count: Int!
+  smv: Float!
+}
+
+type PlanSummaryOperation {
+  operation_name: String!
+  smv_estimate: Float
+  target_smv: Float
+}
+
+type PlanSummaryStation {
+  sequence: Int!
+  station_name: String!
+  machine_type: String
+  machine_config: String
+  total_target_smv: Float!
+  operations: [PlanSummaryOperation!]!
+}
+
+type PlanSummaryPerformance {
+  total_smv: Float!
+  total_sam: Float!
+  machine_smv: Float!
+  machine_sam: Float!
+  helper_smv: Float!
+  helper_sam: Float!
+  target_per_hour: Float!
+  target_per_hour_sam: Float!
+  sam_efficiency_target: Float!
+}
+
+type PlanSummaryLayoutDetails {
+  station_count: Int!
+  machine_count: Int!
+  operator_count: Int!
+  machine_operator_count: Int!
+  helper_operator_count: Int!
+  total_man_level: Float!
+  operation_count: Int!
+  performance: PlanSummaryPerformance!
+  machine_breakdown: [PlanSummaryMachineBreakdown!]!
+  stations: [PlanSummaryStation!]!
+}
+
+type ProductionPlanSummaryResponse {
+  daily_targets_table: [PlanSummaryDailyTargetRow!]!
+  layout_details: PlanSummaryLayoutDetails
+}
+
+##############################################
+# CAPACITY UTILIZATION TYPES
+##############################################
+
+type CapacityUtilizationMonthData {
+  month: String!
+  lines_occupied: Int!
+  units_produced: Int!
+  booked_capacity_hours: Float!
+}
+
+type CapacityUtilizationBuyer {
+  buyer_name: String!
+  months: [CapacityUtilizationMonthData!]!
+}
+
+type CapacityUtilizationTotal {
+  month: String!
+  total_lines_occupied: Int!
+  total_units_produced: Int!
+  total_capacity_utilization_percentage: Float!
+  total_line_gap_hours: Float!
+  total_booked_capacity_hours: Float!
+  total_available_capacity_hours: Float!
+  material_line_gap_percentage: Float!
+  consecutive_material_gap_hours: Float!
+  total_available_lines: Int!
+}
+
+type CapacityUtilizationSummaryResponse {
+  buyers: [CapacityUtilizationBuyer!]!
+  totals: [CapacityUtilizationTotal!]!
+}
+
+##############################################
+# PRODUCTION PLAN INPUT TYPES
+##############################################
+
+input OrderAllocationInput {
+  order_id: ID!
+  quantity: Int!
+}
+
+input DailyTargetInput {
+  sam_efficiency: Float!
+  hourly_target: Float!
+  daily_target: Float!
+  start_date: AWSDate!
+  end_date: AWSDate!
+  total_units: Int!
+}
+
+input ProductionPlanCreateInput {
+  name: String!
+  style_id: ID!
+  allocations: [OrderAllocationInput!]!
+  line_id: ID!
+  line_layout_id: ID
+  sam_efficiency_target: Float!
+  smv_target: Float
+  dhu_target: Float
+  visibility: ProductionPlanVisibility!
+  owner_user_id: ID!
+  plan_start_date: AWSDate!
+  plan_end_date: AWSDate!
+  factory_id: ID!
+  tenant_id: ID!
+  daily_targets: [DailyTargetInput!]!
+  status: ProductionPlanStatus
+}
+
+input ProductionPlanUpdateInput {
+  name: String
+  plan_start_date: AWSDateTime
+  plan_end_date: AWSDateTime
+  visibility: ProductionPlanVisibility
+  status: ProductionPlanStatus
+}
+
+##############################################
+# LINE CHANGEOVER TYPES
+##############################################
+
+type LineChangeoverEvent {
+  id: ID!
+  line_id: ID
+  style_id: ID
+  production_plan_id: ID!
+  station_code: String
+  plan_start_date: AWSDate
+  plan_end_date: AWSDate
+  batch_id: ID
+  device_events: [LineChangeoverDeviceEvent!]
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type LineChangeoverDeviceEvent {
+  id: ID!
+  changeover_event_id: ID!
+  device_id: ID
+  initiated_at: AWSDateTime
+  confirmed_at: AWSDateTime
+  created_at: AWSDateTime!
+  updated_at: AWSDateTime!
+}
+
+type LineChangeoverEventBatchResponse {
+  batch_id: ID!
+  event_count: Int!
+  inserted_count: Int!
+  failed_count: Int!
+  status: String!
+  errors: [ChangeoverBatchError]
+}
+
+type ChangeoverBatchError {
+  event_index: Int
+  error_message: String
+}
+
+input LineChangeoverEventCreateInput {
+  line_id: ID
+  style_id: ID
+  production_plan_id: ID!
+  station_code: String
+  plan_start_date: AWSDate
+  plan_end_date: AWSDate
+  batch_id: ID
+}
+
+input LineChangeoverEventUpdateInput {
+  line_id: ID
+  style_id: ID
+  station_code: String
+  plan_start_date: AWSDate
+  plan_end_date: AWSDate
+  batch_id: ID
+}
+
+input LineChangeoverEventBatchInput {
+  events: [LineChangeoverEventCreateInput!]!
+}
+
+input LineChangeoverDeviceEventCreateInput {
+  changeover_event_id: ID!
+  device_id: ID
+  initiated_at: AWSDateTime
+  confirmed_at: AWSDateTime
+}
+
+input LineChangeoverDeviceEventUpdateInput {
+  initiated_at: AWSDateTime
+  confirmed_at: AWSDateTime
+}
+
+##############################################
+# QC DATA COLLECTION TYPES
+##############################################
+
+type QcEventResponse {
+  id: ID!
+  factory_id: ID
+  device_id: ID
+  plan_id: ID
+  qc_categorisation: String
+  retry_count: Int
+  batch_id: ID
+  created_at: AWSDateTime!
+}
+
+type QcEventBatchResponse {
+  batch_id: ID!
+  factory_id: ID!
+  tenant_id: ID!
+  event_count: Int!
+  inserted_count: Int!
+  failed_count: Int!
+  batch_timestamp: AWSDateTime!
+  processing_time_ms: Int
+  status: String!
+  errors: [BatchError]
+}
+
+input QcEventInput {
+  event_id: ID
+  factory_id: ID!
+  device_id: ID!
+  plan_id: ID
+  qc_categorisation: String
+  retry_count: Int
+  qc_event_timestamp: AWSDateTime!
+}
+
+input QcEventBatchInput {
+  events: [QcEventInput!]!
+}
+
+##############################################
+# QC DEFECTS COLLECTION TYPES
+##############################################
+
+type QcDefectResponse {
+  id: ID!
+  factory_id: ID
+  parent_qc_event_id: ID
+  defect_type: String
+  defect_coordinates: AWSJSON
+  batch_id: ID
+  created_at: AWSDateTime!
+}
+
+type QcDefectBatchResponse {
+  batch_id: ID!
+  factory_id: ID!
+  tenant_id: ID!
+  event_count: Int!
+  inserted_count: Int!
+  failed_count: Int!
+  batch_timestamp: AWSDateTime!
+  processing_time_ms: Int
+  status: String!
+  errors: [BatchError]
+}
+
+type BatchError {
+  event_index: Int
+  error_code: String
+  error_message: String
+  field: String
+}
+
+input DefectCoordinatesInput {
+  x: Float
+  y: Float
+  width: Float
+  height: Float
+  zone: String
+  region: String
+  coordinate_system: String
+}
+
+input QcDefectEventInput {
+  factory_id: ID!
+  parent_qc_event_id: ID
+  defect_type: String
+  defect_coordinates: DefectCoordinatesInput
+  qc_event_timestamp: AWSDateTime!
+}
+
+input QcDefectBatchInput {
+  events: [QcDefectEventInput!]!
+}
+
+##############################################
+# QUERIES
+##############################################
+
+type Query {
+  # Tenant
+  getTenant(tenant_id: ID!): Tenant @aws_cognito_user_pools
+
+  # Factory
+  getFactory(factory_id: ID!): Factory @aws_cognito_user_pools
+
+  # Process
+  getProcesses: [Process!] @aws_cognito_user_pools
+
+  # Sector
+  getSector(sector_id: ID!): Sector @aws_cognito_user_pools
+  getFactorySectors(factory_id: ID!): [Sector!] @aws_cognito_user_pools
+  listSectorProcesses: [SectorProcess!] @aws_cognito_user_pools
+
+  # Machine
+  getGenericMachines: [GenericMachine!] @aws_cognito_user_pools
+  getFactoryMachines(factory_id: ID!): [FactoryMachine!] @aws_cognito_user_pools
+  getFactoryMachine(machine_id: ID!): FactoryMachine @aws_cognito_user_pools
+
+  # Line
+  getLine(line_id: ID!): Line @aws_cognito_user_pools
+  getSectorLines(sector_id: ID!): [Line!] @aws_cognito_user_pools
+
+  # Shift
+  getFactoryShifts(factory_id: ID!): [Shift!] @aws_cognito_user_pools
+  getShift(shift_id: ID!): Shift @aws_cognito_user_pools
+  getLineShifts(line_id: ID!): [Shift!]! @aws_cognito_user_pools
+  getShiftBreaks(shift_id: ID!): [Break!] @aws_cognito_user_pools
+
+  # Buyer
+  getBuyer(buyer_id: ID!): Buyer @aws_cognito_user_pools
+  listBuyers(factory_id: ID!): [Buyer!]! @aws_cognito_user_pools
+
+  # Buyer Contact
+  getBuyerContact(contact_id: ID!): BuyerContact @aws_cognito_user_pools
+
+  # Brand
+  getBrand(brand_id: ID!): Brand @aws_cognito_user_pools
+  listBrands(factory_id: ID!): [Brand!]! @aws_cognito_user_pools
+
+  # Size Profile
+  getSizeProfile(profile_id: ID!): SizeProfile @aws_cognito_user_pools
+
+  # Size
+  getSize(size_id: ID!): Size @aws_cognito_user_pools
+
+  # User
+  getUser(user_id: ID!): User @aws_cognito_user_pools
+  getUserByEmail(email: String!): User @aws_cognito_user_pools
+  getUserByCognitoSub(cognito_sub: String!): User @aws_cognito_user_pools
+  listUsers(factory_id: ID, tenant_id: ID, is_active: Boolean): [User!]! @aws_cognito_user_pools
+
+  # User Role
+  getUserRole(role_id: ID!): UserRole @aws_cognito_user_pools
+  getUserRoleByUserAndFactory(user_id: ID!, factory_id: ID!): UserRole @aws_cognito_user_pools
+  listUserRoles(user_id: ID, factory_id: ID): [UserRole!]! @aws_cognito_user_pools
+
+  # Reference Data
+  getRoleTypes: RoleTypeList @aws_cognito_user_pools
+  getDepartmentTypes: DepartmentTypeList @aws_cognito_user_pools
+  getRoleDepartmentMappings: RoleDepartmentMapList @aws_cognito_user_pools
+
+  # Style
+  getOperations: [Operation!] @aws_cognito_user_pools
+  getStyle(style_id: ID!): Style @aws_cognito_user_pools
+  listStyles(factory_id: ID!, readiness: [StyleReadiness!]): [Style!] @aws_cognito_user_pools
+  getStyleReadinessStats(factory_id: ID!): [StyleReadinessStats!] @aws_cognito_user_pools
+  getStyleProfile(style_id: ID!): StyleProfile @aws_cognito_user_pools
+  getStyleBulletin(style_id: ID!): StyleBulletin @aws_cognito_user_pools
+  getStyleSummary(style_id: ID!): StyleSummary @aws_cognito_user_pools
+  getRelatedStyles(style_id: ID!): [Style!] @aws_cognito_user_pools
+  getRelatedOrders(style_id: ID!): [OrderReference!] @aws_cognito_user_pools
+
+  # Order
+  getOrder(order_id: ID!): Order @aws_cognito_user_pools
+  listOrders: [Order!]! @aws_cognito_user_pools
+  getOrdersByStatus(status: OrderStatus!): [Order!]! @aws_cognito_user_pools
+  getOrdersByFactory(factory_id: ID!): [Order!]! @aws_cognito_user_pools
+  getOrdersByBuyer(buyer_id: ID!): [Order!]! @aws_cognito_user_pools
+  getOrdersCountByStatus(factory_id: ID!): OrdersCountSummary @aws_cognito_user_pools
+  getOrderStyle(order_style_id: ID!): OrderStyle @aws_cognito_user_pools
+  getCosting(costing_id: ID!): Costing @aws_cognito_user_pools
+  getDestinationAssociation(order_destination_style_id: ID!): OrderDestinationStyle @aws_cognito_user_pools
+
+  # Production Plans
+  getProductionPlan(plan_id: ID!): ProductionPlanResponse @aws_cognito_user_pools
+  getProductionPlans(factory_id: ID!, status: ProductionPlanStatus): [ProductionPlanResponse!]! @aws_cognito_user_pools
+  getProductionPlanProfile(plan_id: ID!): ProductionPlanProfileResponse @aws_cognito_user_pools
+  getProductionPlanSummary(plan_id: ID!): ProductionPlanSummaryResponse @aws_cognito_user_pools
+  getCapacityUtilizationSummary(
+    factory_id: ID!,
+    start_date: AWSDate!,
+    end_date: AWSDate!,
+    sectors: [ID!],
+    lines: [ID!],
+    buyers: [ID!],
+    styles: [ID!],
+    order_statuses: [String!],
+    orders: [ID!]
+  ): CapacityUtilizationSummaryResponse @aws_cognito_user_pools
+
+  # Devices
+  getDevice(device_id: ID!): Device @aws_cognito_user_pools
+  getDevicesByFactory(factory_id: ID!): [DeviceList!]! @aws_cognito_user_pools
+  getDevicesBySector(sector_id: ID!): [DeviceList!]! @aws_cognito_user_pools
+  getDevicesByLine(line_id: ID!): [DeviceList!]! @aws_cognito_user_pools
+  getDevicesByStatus(factory_id: ID!, operational_status: OperationalStatus!): [DeviceList!]! @aws_cognito_user_pools
+  getDeviceByDeviceId(device_id: String!): Device @aws_cognito_user_pools
+
+  # QC Data Collection
+  getQcEvent(event_id: ID!): QcEventResponse @aws_cognito_user_pools
+  getBatchEvents(
+    batch_id: ID!
+    limit: Int = 100
+    offset: Int = 0
+  ): [QcEventResponse!]! @aws_cognito_user_pools
+  getPlanEvents(
+    plan_id: ID!
+    limit: Int = 100
+    offset: Int = 0
+  ): [QcEventResponse!]! @aws_cognito_user_pools
+  listQcEvents(
+    start_date: AWSDateTime
+    end_date: AWSDateTime
+    plan_id: ID
+    qc_categorisation: String
+    device_id: ID
+    limit: Int = 100
+    offset: Int = 0
+  ): [QcEventResponse!]! @aws_cognito_user_pools
+
+  # QC Defects Collection
+  getQcDefect(defect_id: ID!): QcDefectResponse @aws_cognito_user_pools
+  getBatchDefects(
+    batch_id: ID!
+    limit: Int = 100
+    offset: Int = 0
+  ): [QcDefectResponse!]! @aws_cognito_user_pools
+  getParentEventDefects(
+    parent_qc_event_id: ID!
+    limit: Int = 100
+    offset: Int = 0
+  ): [QcDefectResponse!]! @aws_cognito_user_pools
+  listQcDefects(
+    start_date: AWSDateTime
+    end_date: AWSDateTime
+    defect_type: String
+    parent_qc_event_id: ID
+    limit: Int = 100
+    offset: Int = 0
+  ): [QcDefectResponse!]! @aws_cognito_user_pools
+
+  # Line Layout
+  getLineLayout(line_layout_id: ID!): LineLayout @aws_cognito_user_pools
+  listLineLayoutsByFactory(factory_id: ID!): [LineLayout!]! @aws_cognito_user_pools
+
+  # Line Changeover Events
+  getLineChangeoverEvent(event_id: ID!): LineChangeoverEvent @aws_cognito_user_pools
+  getLineChangeoverEventsByLine(line_id: ID!): [LineChangeoverEvent!]! @aws_cognito_user_pools
+  getLineChangeoverEventsByProductionPlan(production_plan_id: ID!): [LineChangeoverEvent!]! @aws_cognito_user_pools
+  getLineChangeoverEventsByBatch(batch_id: ID!): [LineChangeoverEvent!]! @aws_cognito_user_pools
+
+  # Line Changeover Device Events
+  getLineChangeoverDeviceEvent(record_id: ID!): LineChangeoverDeviceEvent @aws_cognito_user_pools
+  getDeviceEventsByChangeoverEvent(changeover_event_id: ID!): [LineChangeoverDeviceEvent!]! @aws_cognito_user_pools
+  getDeviceEventsByDevice(device_id: ID!): [LineChangeoverDeviceEvent!]! @aws_cognito_user_pools
+}
+
+##############################################
+# MUTATIONS
+##############################################
+
+type Mutation {
+  # Tenant CRUD
+  provisionTenant(input: TenantProvisionInput!): Tenant @aws_cognito_user_pools
+  updateTenant(tenant_id: ID!, input: TenantUpdateInput!): Tenant @aws_cognito_user_pools
+  deleteTenant(tenant_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Factory CRUD
+  createFactory(input: FactoryCreateInput!): Factory @aws_cognito_user_pools
+  updateFactory(factory_id: ID!, input: FactoryUpdateInput!): Factory @aws_cognito_user_pools
+
+  # Sector CRUD
+  createSector(input: SectorCreateInput!): Sector @aws_cognito_user_pools
+  updateSector(sector_id: ID!, input: SectorUpdateInput!): Sector @aws_cognito_user_pools
+  deleteSector(sector_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Machine CRUD
+  createGenericMachine(input: GenericMachineCreateInput!): GenericMachine @aws_cognito_user_pools
+  createFactoryMachine(input: FactoryMachineCreateInput!): FactoryMachine @aws_cognito_user_pools
+  updateFactoryMachine(machine_id: ID!, input: FactoryMachineUpdateInput!): FactoryMachine @aws_cognito_user_pools
+  deleteFactoryMachine(machine_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Line CRUD
+  createLine(input: LineCreateInput!): Line @aws_cognito_user_pools
+  updateLine(line_id: ID!, input: LineUpdateInput!): Line @aws_cognito_user_pools
+  deleteLine(line_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Shift CRUD
+  createShift(input: ShiftCreateInput!): Shift @aws_cognito_user_pools
+  updateShift(shift_id: ID!, input: ShiftUpdateInput!): Shift @aws_cognito_user_pools
+  deleteShift(shift_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Break CRUD
+  createBreak(input: BreakCreateInput!): Break @aws_cognito_user_pools
+  updateBreak(break_id: ID!, input: BreakUpdateInput!): Break @aws_cognito_user_pools
+  deleteBreak(break_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Buyer CRUD
+  createBuyer(input: BuyerCreateInput!): Buyer @aws_cognito_user_pools
+  updateBuyer(buyer_id: ID!, input: BuyerUpdateInput!): Buyer @aws_cognito_user_pools
+  deleteBuyer(buyer_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Buyer Contact CRUD
+  createBuyerContact(input: BuyerContactCreateInput!): BuyerContact @aws_cognito_user_pools
+  updateBuyerContact(contact_id: ID!, input: BuyerContactUpdateInput!): BuyerContact @aws_cognito_user_pools
+  deleteBuyerContact(contact_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Brand CRUD
+  createBrand(input: BrandCreateInput!): Brand @aws_cognito_user_pools
+  updateBrand(brand_id: ID!, input: BrandUpdateInput!): Brand @aws_cognito_user_pools
+  deleteBrand(brand_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Size Profile
+  createSizeProfile(input: SizeProfileCreateInput!): SizeProfile @aws_cognito_user_pools
+  updateSizeProfile(profile_id: ID!, input: SizeProfileUpdateInput!): SizeProfile @aws_cognito_user_pools
+  deleteSizeProfile(profile_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Size
+  createSize(input: SizeCreateInput!): Size @aws_cognito_user_pools
+
+  # User CRUD
+  createUser(input: UserCreateInput!): User @aws_cognito_user_pools
+  updateUser(user_id: ID!, input: UserUpdateInput!): User @aws_cognito_user_pools
+  deleteUser(user_id: ID!): Boolean @aws_cognito_user_pools
+  inviteUser(input: UserInviteInput!): UserInviteResponse @aws_cognito_user_pools
+
+  # User Role CRUD
+  createUserRole(input: UserRoleCreateInput!): UserRole @aws_cognito_user_pools
+  updateUserRole(role_id: ID!, input: UserRoleUpdateInput!): UserRole @aws_cognito_user_pools
+  deleteUserRole(role_id: ID!): Boolean @aws_cognito_user_pools
+
+  # S3 Upload
+  generatePresignedUrl(input: GeneratePresignedUrlInput!): PresignedUrlResponse @aws_cognito_user_pools
+
+  # Order CRUD
+  createOrder(input: OrderCreateInput!): Order @aws_cognito_user_pools
+  updateOrder(order_id: ID!, input: OrderUpdateInput!): Order @aws_cognito_user_pools
+  deleteOrder(order_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Order Style CRUD
+  createOrderStyle(order_id: ID!, input: OrderStyleInput!): OrderStyle @aws_cognito_user_pools
+  updateOrderStyle(order_style_id: ID!, input: OrderStyleUpdateInput!): OrderStyle @aws_cognito_user_pools
+  deleteOrderStyle(order_style_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Destination CRUD
+  addDestinationToOrderStyle(order_style_id: ID!, input: OrderDestinationStyleAddInput!): OrderStyle @aws_cognito_user_pools
+  updateDestinationOnOrderStyle(order_destination_style_id: ID!, input: OrderDestinationStyleUpdateInput!): OrderDestinationStyle @aws_cognito_user_pools
+  deleteDestinationFromOrderStyle(order_destination_style_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Costing CRUD
+  addCostingsToOrderStyle(order_style_id: ID!, costings: [CostingInput!]!): OrderStyle @aws_cognito_user_pools
+  updateCosting(costing_id: ID!, input: CostingUpdateInput!): Costing @aws_cognito_user_pools
+  deleteCosting(costing_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Production Plan CRUD
+  createProductionPlan(input: ProductionPlanCreateInput!): ProductionPlanResponse @aws_cognito_user_pools
+  updateProductionPlan(plan_id: ID!, input: ProductionPlanUpdateInput!): ProductionPlanResponse @aws_cognito_user_pools
+  deleteProductionPlan(plan_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Style CRUD
+  createStyle(input: StyleCreateInput!): Style @aws_cognito_user_pools
+  updateStyle(style_id: ID!, input: StyleUpdateInput!): Style @aws_cognito_user_pools
+  deleteStyle(style_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Material CRUD
+  createMaterial(input: MaterialCreateInput!): MaterialDetail @aws_cognito_user_pools
+  updateMaterial(material_id: ID!, input: MaterialUpdateInput!): MaterialDetail @aws_cognito_user_pools
+  deleteMaterial(material_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Bulletin Breakdown
+  bulkCreateBulletinBreakdown(input: BulkCreateBreakDownInput!): Boolean @aws_cognito_user_pools
+  bulkUpdateBulletinBreakdown(input: BulkBulletinOperationUpdateInput!): Boolean @aws_cognito_user_pools
+  bulkDeleteBulletinBreakdowns(input: BulkDeleteBreakDownInput!): Boolean @aws_cognito_user_pools
+
+  # Devices
+  createDevice(input: DeviceCreateInput!): Device @aws_cognito_user_pools
+  updateDevice(device_id: ID!, input: DeviceUpdateInput!): Device @aws_cognito_user_pools
+  updateDeviceOperationalStatus(device_id: ID!, input: DeviceOperationalStatusUpdateInput!): Device @aws_cognito_user_pools
+  reassignDevice(device_id: ID!, input: DeviceReassignmentInput!): Device @aws_cognito_user_pools
+  deleteDevice(device_id: ID!): Boolean @aws_cognito_user_pools
+
+  # QC Data Collection
+  submitQcEventBatch(input: QcEventBatchInput!): QcEventBatchResponse @aws_cognito_user_pools
+
+  # QC Defects Collection
+  submitQcDefectBatch(input: QcDefectBatchInput!): QcDefectBatchResponse @aws_cognito_user_pools
+
+  # Line Layout
+  createLineLayout(input: LineLayoutCreateInput!): LineLayout @aws_cognito_user_pools
+  updateLineLayout(line_layout_id: ID!, input: LineLayoutUpdateInput!): LineLayout @aws_cognito_user_pools
+  deleteLineLayout(line_layout_id: ID!): Boolean @aws_cognito_user_pools
+  deleteStationsByLineLayout(line_layout_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Station
+  updateStation(station_id: ID!, input: StationUpdateInput!): Station @aws_cognito_user_pools
+  deleteStation(station_id: ID!): Boolean @aws_cognito_user_pools
+
+  # Line Changeover Events
+  createLineChangeoverEvent(input: LineChangeoverEventCreateInput!): LineChangeoverEvent @aws_cognito_user_pools
+  updateLineChangeoverEvent(event_id: ID!, input: LineChangeoverEventUpdateInput!): LineChangeoverEvent @aws_cognito_user_pools
+  deleteLineChangeoverEvent(event_id: ID!): Boolean @aws_cognito_user_pools
+  submitLineChangeoverEventBatch(input: LineChangeoverEventBatchInput!): LineChangeoverEventBatchResponse @aws_cognito_user_pools
+
+  # Line Changeover Device Events
+  createLineChangeoverDeviceEvent(input: LineChangeoverDeviceEventCreateInput!): LineChangeoverDeviceEvent @aws_cognito_user_pools
+  updateLineChangeoverDeviceEvent(record_id: ID!, input: LineChangeoverDeviceEventUpdateInput!): LineChangeoverDeviceEvent @aws_cognito_user_pools
+  deleteLineChangeoverDeviceEvent(record_id: ID!): Boolean @aws_cognito_user_pools
+}
+
+##############################################
+# ROOT
+##############################################
+
+schema {
+  query: Query
+  mutation: Mutation
+}

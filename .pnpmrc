@@ -1,0 +1,14 @@
+audit=false
+fund=false
+# optional=false  # Commented out to avoid conflicts with optional dependencies
+progress=false
+timing=false
+# Optimize for CI environments
+registry=https://registry.npmjs.org/
+cache-max=3600
+# prefer-offline=false  # Commented out to avoid conflicts with --prefer-offline flag in CI
+
+# React Native configuration
+shamefully-hoist=true
+auto-install-peers=true
+strict-peer-dependencies=false

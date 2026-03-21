@@ -1,0 +1,249 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'terraform/**'
+      - 'docker-compose*.yml'
+      - '.github/workflows/**'
+      - 'Dockerfile*'
+      - 'pnpm-lock.yaml'
+      - 'pyproject.toml'
+      - 'poetry.lock'
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+  CI: true
+  NX_CLOUD_NO_TIMEOUTS: true
+  NX_SKIP_NX_CLOUD: true
+  S3_BUCKET_NAME: test-qc-bucket
+  AWS_ACCESS_KEY_ID: test-access-key
+  AWS_SECRET_ACCESS_KEY: test-secret-key
+  AWS_REGION: us-east-1
+  COGNITO_USER_POOL_ID: "us-east-1_testpool"
+  COGNITO_CLIENT_ID: "test-client-id"
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [api-main, web-dashboard, pwa-display-app, celery-worker-main]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install root dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set up Python
+        if: matrix.app == 'api-main' || matrix.app == 'celery-worker-main'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        if: matrix.app == 'api-main' || matrix.app == 'celery-worker-main'
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry dependencies
+        if: matrix.app == 'api-main' || matrix.app == 'celery-worker-main'
+        uses: actions/cache@v4
+        with:
+          path: apps/${{ matrix.app }}/.venv
+          key: ${{ runner.os }}-poetry-${{ matrix.app }}-${{ hashFiles(format('apps/{0}/poetry.lock', matrix.app)) }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-${{ matrix.app }}-
+
+      - name: Check for Python project
+        if: matrix.app == 'api-main' || matrix.app == 'celery-worker-main'
+        id: check-python
+        run: |
+          if [ -f "apps/${{ matrix.app }}/pyproject.toml" ]; then
+            echo "has_python=true" >> $GITHUB_OUTPUT
+            echo "Found pyproject.toml for ${{ matrix.app }}"
+          else
+            echo "has_python=false" >> $GITHUB_OUTPUT
+            echo "No pyproject.toml found for ${{ matrix.app }}"
+          fi
+
+      - name: Install Python dependencies
+        if: steps.check-python.outputs.has_python == 'true'
+        run: |
+          cd apps/${{ matrix.app }}
+          echo "Installing dependencies for ${{ matrix.app }}..."
+          poetry install --no-interaction --no-root
+
+      - name: Check for Alembic Branching
+        if: matrix.app == 'api-main'
+        run: |
+          cd apps/api-main
+          # The checkout action defaults to the merge commit (PR + Base),
+          # so we just need to check for multiple heads in the current workspace.
+
+          echo "Checking for multiple heads..."
+          HEADS_COUNT=$(poetry run alembic heads | grep -v "^\s*$" | wc -l | xargs)
+          echo "Found $HEADS_COUNT head(s)"
+
+          if [ "$HEADS_COUNT" -ne "1" ]; then
+            echo "::error::Found branching Alembic migrations! You have $HEADS_COUNT heads."
+            poetry run alembic heads
+            echo "Please merge/rebase '${{ github.base_ref }}' and resolve migration history."
+            exit 1
+          fi
+          echo "Migration history is linear."
+
+      # ========= START GRAPHQL SERVER FOR API-MAIN TESTS =========
+      - name: Install GraphQL Server Dependencies
+        if: matrix.app == 'api-main'
+        run: |
+          echo "Installing GraphQL server dependencies..."
+          cd apps/api-main/graphql
+          npm install
+
+      - name: Start GraphQL Server
+        if: matrix.app == 'api-main'
+        run: |
+          echo "Starting GraphQL server..."
+          cd apps/api-main/graphql
+
+          # Start server in background
+          node server.js > /tmp/graphql-server.log 2>&1 &
+
+          # Store the PID
+          echo $! > /tmp/graphql-server.pid
+          echo "GraphQL server started with PID: $(cat /tmp/graphql-server.pid)"
+
+          # Wait for server to be ready (max 30 seconds)
+          echo "Waiting for GraphQL server to be ready on http://localhost:4000/graphql..."
+          for i in {1..30}; do
+            if curl -s -f http://localhost:4000/graphql -H "Content-Type: application/json" -d '{"query":"{ __typename }"}' > /dev/null 2>&1; then
+              echo "GraphQL server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "GraphQL server failed to start within 30 seconds"
+              echo "Server logs:"
+              cat /tmp/graphql-server.log || echo "No logs available"
+              exit 1
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 1
+          done
+
+      # ========= TESTS & LINT FOR ALL APPS =========
+      - name: Run tests & lint
+        env:
+          DATABASE_URL: postgresql+asyncpg://testuser:testpass@localhost:5432/testdb
+          GRAPHQL_URL: http://localhost:4000/graphql
+        run: |
+          case "${{ matrix.app }}" in
+            "api-main"|"celery-worker-main")
+              if [ -f "apps/${{ matrix.app }}/pyproject.toml" ]; then
+                cd apps/${{ matrix.app }}
+                echo "Running pytest for ${{ matrix.app }}..."
+                poetry run pytest
+
+                echo "Running flake8 lint..."
+                poetry run flake8 . || echo "Lint failed but continuing"
+              else
+                echo "Skipping tests for ${{ matrix.app }} (no pyproject.toml found)"
+              fi
+              ;;
+            "web-dashboard"|"pwa-display-app")
+              echo "Running Nx tests for ${{ matrix.app }}..."
+              pnpm nx test ${{ matrix.app }} --passWithNoTests || echo "Tests failed but continuing"
+
+              echo "Running Nx lint..."
+              pnpm nx lint ${{ matrix.app }} || echo "sint failed but continuing"
+              ;;
+          esac
+
+      # ========= STOP GRAPHQL SERVER =========
+      - name: Stop GraphQL Server
+        if: matrix.app == 'api-main' && always()
+        run: |
+          if [ -f /tmp/graphql-server.pid ]; then
+            echo "Stopping GraphQL server..."
+            PID=$(cat /tmp/graphql-server.pid)
+            kill $PID 2>/dev/null || true
+            sleep 2
+            kill -9 $PID 2>/dev/null || true
+            rm /tmp/graphql-server.pid
+            echo "GraphQL server stopped"
+          fi
+
+      - name: Upload GraphQL Server Logs
+        if: matrix.app == 'api-main' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: graphql-server-logs
+          path: /tmp/graphql-server.log
+          retention-days: 7
+
+      - name: Docker build (backend only)
+        if: matrix.app == 'api-main' || matrix.app == 'worker-main'
+        run: |
+          echo "Docker build for ${{ matrix.app }}..."
+
+          if [ "${{ matrix.app }}" == "worker-main" ]; then
+            # Build worker from monorepo root since it needs api-main
+            docker build -t pr-check-${{ matrix.app }} -f apps/worker-main/Dockerfile .
+          else
+            # Build api-main from its own directory
+            cd apps/${{ matrix.app }}
+            docker build -t pr-check-${{ matrix.app }} -f docker/Dockerfile .
+          fi

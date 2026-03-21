@@ -1,0 +1,3 @@
+"""
+Background tasks for StitchSense
+"""

@@ -1,0 +1,97 @@
+services:
+  api-main:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: ramp-api-main
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload --reload-delay 1 
+    volumes:
+      - .:/app
+      - /app/.venv
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - ramp_network
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: workers/Dockerfile
+    container_name: ramp-worker
+    command: celery -A src.core.celery_app:app worker --queues=s3-events,default,celery -l INFO
+    volumes:
+      - ./src:/usr/src/app/src
+    depends_on:
+      api-main:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
+    networks:
+      - ramp_network
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: workers/Dockerfile
+    container_name: ramp-beat
+    command: celery -A src.core.celery_app:app beat -l INFO
+    volumes:
+      - ./src:/usr/src/app/src
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - ramp_network
+
+  db:
+    image: postgres:17
+    container_name: ramp-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d dbname"]
+      interval: 10s
+      timeout: 2s
+      retries: 60
+      start_period: 2s
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - ramp_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ramp-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - ramp_network
+
+volumes:
+  postgres_data:
+
+networks:
+  ramp_network:
+    driver: bridge
+    name: ramp_network
