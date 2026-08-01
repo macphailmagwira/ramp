@@ -1,5 +1,4 @@
 """
-
 Generates a narrative flow story from a raw function call graph.
 Mirrors the architecture story pattern — uses Qwen via Bedrock,
 validates the response, and retries if steps are malformed.
@@ -17,10 +16,10 @@ from src.features.ai.schema import FlowStoryRequest, FlowStoryResponse, FlowStor
 logger = logging.getLogger("api-main.ai.flow_story_service")
 
 SYSTEM_PROMPT = """You are a senior software engineer writing developer documentation for a new joiner.
-You will be given a raw function call graph extracted from a real codebase.
+You will be given a raw function call graph extracted from a real codebase, including the actual source code for each function.
 Your job is to turn it into a clear, engaging, step-by-step execution narrative.
-Be specific — use the real function names, file paths, and line numbers you are given.
-Explain WHY each step happens, not just what it does.
+Be specific — use the real function names, file paths, line numbers, and reference actual logic from the source code you are given.
+Explain WHY each step happens, not just what it does. Point out non-obvious logic, side effects, or tricky edge cases you see in the code.
 Always respond with valid JSON only. No markdown fences, no explanation outside the JSON."""
 
 
@@ -30,16 +29,24 @@ Always respond with valid JSON only. No markdown fences, no explanation outside 
 def _build_node_lines(nodes: list[dict]) -> str:
     lines = []
     for n in nodes:
-        parts = [f"  [{n['id']}] {n['label']} ({n['node_type']}"]
+        header_parts = [f"  [{n['id']}] {n['label']} ({n['node_type']}"]
         if n.get("is_async"):
-            parts.append(", async")
+            header_parts.append(", async")
         if n.get("file_path"):
-            parts.append(f") — {n['file_path']}")
+            header_parts.append(f") — {n['file_path']}")
             if n.get("line_start"):
-                parts[-1] += f":{n['line_start']}"
+                header_parts[-1] += f":{n['line_start']}"
         else:
-            parts.append(")")
-        lines.append("".join(parts))
+            header_parts.append(")")
+        lines.append("".join(header_parts))
+
+        # Append source code snippet if present
+        source = n.get("source_code")
+        if source:
+            # Indent the snippet so it reads as belonging to the function entry
+            indented = "\n".join(f"    {l}" for l in source.splitlines())
+            lines.append(f"    [SOURCE]\n{indented}\n    [/SOURCE]")
+
     return "\n".join(lines)
 
 
@@ -57,11 +64,22 @@ def build_flow_prompt(request: FlowStoryRequest) -> str:
     edges = [e.model_dump() for e in request.function_edges]
     node_map = {n["id"]: n for n in nodes}
 
+    has_source = any(n.get("source_code") for n in nodes)
     node_lines = _build_node_lines(nodes)
     edge_lines = _build_edge_lines(edges, node_map)
     feature = request.feature_name or "repository overview"
 
+    source_instruction = (
+        "Each function above includes its actual source code between [SOURCE] and [/SOURCE] tags. "
+        "Read it carefully — your descriptions must reference specific logic, variable names, "
+        "conditions, or patterns you observe in the code. Do not write generic descriptions."
+        if has_source else
+        "No source code was available for these functions. Write descriptions based on names and context."
+    )
+
     return f"""Feature / entry point being traced: "{feature}"
+
+{source_instruction}
 
 FUNCTIONS IN THIS FLOW ({len(nodes)} total):
 {node_lines}
@@ -76,11 +94,14 @@ Respond with this exact JSON structure and nothing else:
 {{
   "name": "short title for this flow (max 6 words)",
   "description": "one sentence describing what this entire flow accomplishes",
+  "risks": [
+    "a specific risk, gotcha, or non-obvious behaviour you spotted in the source code — be concrete, not generic"
+  ],
   "steps": [
     {{
       "id": "step-1",
       "name": "the exact function name",
-      "description": "2-3 sentences: what this function does, why it is called here, and what would break if it was removed",
+      "description": "2-4 sentences: what this function does, why it is called here, and — if source was provided — call out one specific line or pattern worth noting",
       "type": "function|service|database|external",
       "file": "relative/file/path.ts or null",
       "line": 42,
@@ -102,8 +123,9 @@ Rules for steps:
 - Keep step names equal to the function name (do not rename)
 - File paths and line numbers must match the input exactly — do not invent them
 - If a function has no file path in the input, set file to null
-- Descriptions must be specific to THIS codebase, not generic
+- Descriptions must be specific to THIS codebase — reference actual variable names, conditions, or patterns from the source
 - The insight field must be a short label (3-6 words max), not a sentence
+- The risks array should contain 1-5 items. Only include risks you can actually see in the source code — do not fabricate generic risks
 """
 
 
@@ -125,6 +147,7 @@ Do not repeat functions already covered. Return JSON with the same structure:
 {{
   "name": "unchanged",
   "description": "unchanged",
+  "risks": [],
   "steps": [
     {{
       "id": "step-N",
@@ -195,11 +218,20 @@ async def generate_flow_story(
             name="Empty Flow",
             description="No functions were found for this feature.",
             entry_point=request.feature_name,
+            risks=[],
             steps=[],
         )
 
     expected_ids = {n.id for n in request.function_nodes}
     id_to_label = {n.id: n.label for n in request.function_nodes}
+
+    has_source = any(getattr(n, "source_code", None) for n in request.function_nodes)
+    logger.info(
+        "Flow story request | feature=%s nodes=%d has_source=%s",
+        request.feature_name,
+        len(request.function_nodes),
+        has_source,
+    )
 
     # ── Initial generation ────────────────────────────────────────────────────
     prompt = build_flow_prompt(request)
@@ -241,6 +273,9 @@ async def generate_flow_story(
         raw = invoke_qwen(prompt=retry_prompt, system=SYSTEM_PROMPT, max_tokens=2000)
         retry_data = parse_raw(raw)
         story_data["steps"].extend(retry_data.get("steps", []))
+        # Merge any additional risks from retry
+        story_data.setdefault("risks", [])
+        story_data["risks"].extend(retry_data.get("risks", []))
 
         logger.info(
             "Flow story retry %d merged | total_steps=%d",
@@ -268,5 +303,6 @@ async def generate_flow_story(
         name=story_data.get("name", request.feature_name or "Flow"),
         description=story_data.get("description", ""),
         entry_point=request.feature_name,
+        risks=story_data.get("risks", []),
         steps=steps,
     )

@@ -17,6 +17,10 @@ from src.config.constants import API_MAIN_LOGGER_NAME_PREFIX
 
 logger = logging.getLogger(f"{API_MAIN_LOGGER_NAME_PREFIX}.symbol_extractor")
 
+# Maximum number of source lines stored per function.
+# Functions longer than this are trimmed and a truncation comment is appended.
+MAX_FUNCTION_LINES = 150
+
 # ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
@@ -28,7 +32,7 @@ def extract_symbols(file_path: str, content: str) -> list[dict[str, Any]]:
 
     Each dict has the keys expected by RepositoryFunctionRepository.replace_for_repo:
         name, qualified_name, symbol_type, parameters (JSON str), return_type,
-        docstring, line_start, line_end, class_name, is_async
+        docstring, line_start, line_end, class_name, is_async, source_code
     """
     ext = Path(file_path).suffix.lower()
     try:
@@ -39,6 +43,34 @@ def extract_symbols(file_path: str, content: str) -> list[dict[str, Any]]:
     except Exception:
         logger.debug("Symbol extraction failed | file=%s", file_path, exc_info=True)
     return []
+
+
+# ---------------------------------------------------------------------------
+# Shared source-code extraction helper
+# ---------------------------------------------------------------------------
+
+
+def _slice_source(content: str, line_start: int | None, line_end: int | None) -> str | None:
+    """
+    Return the source lines for a symbol, trimmed to MAX_FUNCTION_LINES.
+    Lines are 1-indexed (matching AST / regex line numbers).
+    Returns None when line positions are unavailable.
+    """
+    if line_start is None:
+        return None
+
+    all_lines = content.splitlines()
+    # Convert to 0-indexed, clamp to actual file length
+    start_idx = max(0, line_start - 1)
+    end_idx = len(all_lines) if line_end is None else min(line_end, len(all_lines))
+
+    selected = all_lines[start_idx:end_idx]
+
+    if len(selected) > MAX_FUNCTION_LINES:
+        selected = selected[:MAX_FUNCTION_LINES]
+        selected.append(f"# ... (truncated at {MAX_FUNCTION_LINES} lines)")
+
+    return "\n".join(selected) if selected else None
 
 
 # ---------------------------------------------------------------------------
@@ -53,7 +85,7 @@ def _extract_python(content: str) -> list[dict[str, Any]]:
         return []
 
     symbols: list[dict[str, Any]] = []
-    _visit_python_node(tree, symbols, class_name=None)
+    _visit_python_node(tree, symbols, class_name=None, content=content)
     return symbols
 
 
@@ -61,6 +93,7 @@ def _visit_python_node(
     node: ast.AST,
     symbols: list[dict[str, Any]],
     class_name: str | None,
+    content: str,
 ) -> None:
     for child in ast.iter_child_nodes(node):
         if isinstance(child, ast.ClassDef):
@@ -77,9 +110,10 @@ def _visit_python_node(
                     line_end=child.end_lineno,
                     class_name=class_name,
                     is_async=False,
+                    source_code=_slice_source(content, child.lineno, child.end_lineno),
                 )
             )
-            _visit_python_node(child, symbols, class_name=child.name)
+            _visit_python_node(child, symbols, class_name=child.name, content=content)
 
         elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
             is_async = isinstance(child, ast.AsyncFunctionDef)
@@ -99,13 +133,14 @@ def _visit_python_node(
                     line_end=child.end_lineno,
                     class_name=class_name,
                     is_async=is_async,
+                    source_code=_slice_source(content, child.lineno, child.end_lineno),
                 )
             )
             # Nested functions (closures) — recurse without changing class_name
-            _visit_python_node(child, symbols, class_name=class_name)
+            _visit_python_node(child, symbols, class_name=class_name, content=content)
 
         else:
-            _visit_python_node(child, symbols, class_name=class_name)
+            _visit_python_node(child, symbols, class_name=class_name, content=content)
 
 
 def _py_docstring(node: ast.AST) -> str | None:
@@ -256,6 +291,7 @@ def _extract_js_ts(content: str) -> list[dict[str, Any]]:
                 line_end=None,
                 class_name=None,
                 is_async=False,
+                source_code=_slice_source(content, line, None),
             )
         )
 
@@ -276,6 +312,7 @@ def _extract_js_ts(content: str) -> list[dict[str, Any]]:
                 line_end=None,
                 class_name=None,
                 is_async=is_async,
+                source_code=_slice_source(content, line, None),
             )
         )
 
@@ -296,6 +333,7 @@ def _extract_js_ts(content: str) -> list[dict[str, Any]]:
                 line_end=None,
                 class_name=None,
                 is_async=is_async,
+                source_code=_slice_source(content, line, None),
             )
         )
 
@@ -328,6 +366,7 @@ def _make_symbol(
     line_end: int | None,
     class_name: str | None,
     is_async: bool,
+    source_code: str | None,
 ) -> dict[str, Any]:
     return {
         "name": name,
@@ -340,4 +379,5 @@ def _make_symbol(
         "line_end": line_end,
         "class_name": class_name,
         "is_async": is_async,
+        "source_code": source_code,
     }

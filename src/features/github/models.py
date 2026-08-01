@@ -43,6 +43,8 @@ class ConnectedRepository(BaseDbModelMixin, Base):
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
     description: Mapped[str | None] = mapped_column(nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    scan_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    scan_progress: Mapped[int] = mapped_column(Integer, default=0)
 
     user: Mapped["User"] = relationship("User")  # noqa: F821
 
@@ -117,6 +119,9 @@ class RepositoryFunction(Base):
     parameters: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON: [{name, type, default}]
     return_type: Mapped[str | None] = mapped_column(String(512), nullable=True)
     docstring: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Extracted source code (trimmed to MAX_FUNCTION_LINES)
+    source_code: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Source location
     line_start: Mapped[int | None] = mapped_column(Integer, nullable=True)

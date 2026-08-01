@@ -18,6 +18,21 @@ class UserCreateSchema(BaseModel):
     first_name: str = Field(max_length=255)
     last_name: str = Field(max_length=255)
     email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserLoginSchema(BaseModel):
+    email: EmailStr
+    password: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LoginResponseSchema(BaseModel):
+    user: 'UserWithGitHubSchema'
+    token: str
 
     model_config = ConfigDict(from_attributes=True)
 

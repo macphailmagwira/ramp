@@ -4,7 +4,7 @@ import logging
 
 from src.core.celery_app import app
 from src.config.constants import API_MAIN_LOGGER_NAME_PREFIX
-from src.db.session import AsyncSessionLocal
+from src.db.session import create_worker_session_factory
 from src.features.github.services.scanner_service import RepoScannerService
 
 logger = logging.getLogger(f"{API_MAIN_LOGGER_NAME_PREFIX}.scanner.tasks")
@@ -32,7 +32,9 @@ def scan_repository_task(
 
     async def _process():
         logger.debug("Opening DB session for repo=%s", connected_repo_id)
-        async with AsyncSessionLocal() as db:
+        # Create engine in the current event loop to avoid loop mismatch
+        SessionLocal = create_worker_session_factory()
+        async with SessionLocal() as db:
             svc = RepoScannerService(db)
 
             logger.debug(
@@ -52,7 +54,12 @@ def scan_repository_task(
             return count
 
     try:
-        count = asyncio.run(_process())
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            count = loop.run_until_complete(_process())
+        finally:
+            loop.close()
         logger.info(
             "Repo scan complete | repo=%s user=%s files_indexed=%d",
             connected_repo_id, user_id, count,

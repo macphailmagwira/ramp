@@ -13,3 +13,4 @@ class User(BaseDbModelMixin, Base):
     first_name: Mapped[str] = mapped_column(String(255))
     last_name: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)

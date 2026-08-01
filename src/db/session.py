@@ -9,7 +9,7 @@ engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     future=True,
-    pool_pre_ping=True,      
+    pool_pre_ping=False,      
     pool_recycle=90,         
 )
 
@@ -20,6 +20,50 @@ AsyncSessionLocal = async_sessionmaker(
     autocommit=False,
     autoflush=False,
 )
+
+
+def create_worker_session_factory():
+    """Create a new engine and session factory for use in Celery workers.
+    
+    This avoids event loop mismatch issues since Celery tasks run in
+    different event loops than the one the module-level engine was created in.
+    """
+    worker_engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=settings.DEBUG,
+        future=True,
+        pool_pre_ping=False,
+        pool_recycle=90,
+    )
+    return async_sessionmaker(
+        worker_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+    )
+
+
+def create_worker_session_factory():
+    """Create a new engine and session factory for use in Celery workers.
+    
+    This avoids event loop mismatch issues since Celery tasks run in
+    different event loops than the one the module-level engine was created in.
+    """
+    worker_engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=settings.DEBUG,
+        future=True,
+        pool_pre_ping=False,
+        pool_recycle=90,
+    )
+    return async_sessionmaker(
+        worker_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+    )
 
 import logging
 logging.getLogger("api-main").warning(f"DATABASE_URL in use: {settings.DATABASE_URL}")

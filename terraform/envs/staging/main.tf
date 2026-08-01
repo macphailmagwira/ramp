@@ -241,77 +241,45 @@ resource "aws_vpc_endpoint" "ec2messages_staging" {
 
 
 
-#######################################
-# SES - Email Service
+########################################
+# SES – Cognito system emails only
 ########################################
 
-#module "ses" {
-#  source = "../../modules/ses"
+# Verify the sending domain
+resource "aws_ses_domain_identity" "main" {
+  domain = "stitchsense.ai"
+}
 
-#  domain                  = "stitchsense.ai"
-#  configuration_set_name  = "stitchsense-staging-emails"
-#  environment             = "staging"
+# DNS verification record in Route53
+resource "aws_route53_record" "ses_verification" {
+  zone_id = "Z0695564227B1XIS89WTI"
+  name    = "_amazonses.stitchsense.ai"
+  type    = "TXT"
+  ttl     = 600
+  records = [aws_ses_domain_identity.main.verification_token]
+}
 
-# Route53 DNS records
-#  create_route53_records  = true
-#  route53_zone_id         = "Z0695564227B1XIS89WTI"
+resource "aws_ses_domain_identity_verification" "main" {
+  domain = aws_ses_domain_identity.main.id
 
-  # Email templates
-#  email_templates = {
-#    user-invite-template = {
-#      subject = "You're invited to join {{tenant_name}} on StitchSense"
-#      html    = file("${path.module}/../../modules/ses/templates/user_invite.html")
-#    }
-#  }
+  depends_on = [aws_route53_record.ses_verification]
+}
 
-  # Verified emails
-#  verified_emails = ["noreply@stitchsense.ai"]
+# DKIM (recommended — improves deliverability)
+resource "aws_ses_domain_dkim" "main" {
+  domain = aws_ses_domain_identity.main.domain
+}
 
-#  tags = {
-#    Environment = "staging"
-#    Project     = "StitchSense"
-#  }
-#}
+resource "aws_route53_record" "ses_dkim" {
+  count           = 3
+  zone_id         = "Z0695564227B1XIS89WTI"
+  name            = "${aws_ses_domain_dkim.main.dkim_tokens[count.index]}._domainkey.stitchsense.ai"
+  type            = "CNAME"
+  ttl             = 600
+  records         = ["${aws_ses_domain_dkim.main.dkim_tokens[count.index]}.dkim.amazonses.com"]
+  allow_overwrite = true
+}
 
-# IAM permissions for EC2
-#module "ses_iam" {
-#  source = "../../modules/ses/iam"
-
-#  name_prefix         = "stitchsense-staging"
-#  ses_identity_arns   = [module.ses.domain_identity_arn]
-#  iam_role_names      = [module.iam.role_name]
-
-#  restrict_from_addresses = true
-#  allowed_from_addresses  = ["noreply@stitchsense.ai"]
-
-#  tags = {
-#    Environment = "staging"
-#  }
-#}
-
-
-# Store in SSM for app to use
-#resource "aws_ssm_parameter" "ses_from_email" {
-#  name        = "/stitchsense/staging/SES_FROM_EMAIL"
-#  description = "SES from email address"
-#  type        = "String"
-#  value       = "noreply@stitchsense.ai"
-#
-#  tags = {
-#    Environment = "staging"
-#  }
-#}
-
-#resource "aws_ssm_parameter" "ses_configuration_set" {
-#  name        = "/stitchsense/staging/SES_CONFIGURATION_SET"
-#  description = "SES configuration set name"
-#  type        = "String"
-#  value       = module.ses.configuration_set_name
-#
-#  tags = {
-#    Environment = "staging"
-#  }
-#}
 
 
 ########################################

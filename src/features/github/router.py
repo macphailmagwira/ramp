@@ -1,7 +1,10 @@
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+import logging
+import asyncio
+from fastapi import APIRouter, Depends, Query, HTTPException
+
 from fastapi.responses import RedirectResponse
 from starlette import status
 
@@ -16,6 +19,8 @@ from src.features.github.schema import (
     GitHubFileSchema,
     GitHubOAuthLoginResponseSchema,
     GitHubRepoListSchema, FlowGraphSchema,
+    OverviewResponseSchema,
+    ScanStatusResponseSchema,
 )
 from src.features.github.services.architecture_service import ArchitectureService
 from src.features.github.services.flow_service import FlowService
@@ -24,6 +29,7 @@ from src.features.github.services.service import (
     GitHubRepositoryAccessService,
     GitHubRepositoryService,
 )
+from src.features.github.services.overview_service import OverviewService
 from src.middleware.user_context import get_current_user
 from src.config import settings
 
@@ -34,6 +40,8 @@ from src.db.session import get_db
 from src.features.github.schema import ArchitectureGraphSchema
 from src.features.github.services.architecture_service import ArchitectureService
 from src.middleware.user_context import get_current_user
+
+logger = logging.getLogger("github.router")
 
 github_router = APIRouter(prefix="/github", tags=["github"])
 
@@ -53,6 +61,7 @@ async def github_oauth_login(
     state: Optional[str] = Query(None, description="Optional CSRF state token"),
     service: GitHubOAuthService = Depends(),
 ):
+    logger.info("GitHub OAuth login initiated. state=%s", state)
     """
     Redirects the user to GitHub's OAuth authorization page.
     After the user grants access, GitHub redirects back to the configured
@@ -82,6 +91,7 @@ async def github_oauth_callback(
     if current_user.id is None:
         raise HTTPException(status_code=401, detail="User not found in database.")
     
+    logger.info("GitHub OAuth callback received. code=%s, state=%s, user_id=%s", code, state, current_user.id)
     await service.handle_callback(code=code, user_id=current_user.id)
     
     return RedirectResponse(url=f"{settings.FRONTEND_URL}?github=connected")
@@ -100,6 +110,7 @@ async def github_oauth_disconnect(
     service: GitHubOAuthService = Depends(),
 ):
     """Remove the stored GitHub OAuth token for the current user."""
+    logger.info("GitHub OAuth disconnect requested for user_id=%s", current_user.id)
     await service.disconnect(user_id=current_user.id)
 
 
@@ -121,6 +132,7 @@ async def list_github_repositories(
     current_user=Depends(get_current_user),
     service: GitHubRepositoryService = Depends(),
 ):
+    logger.info("Listing GitHub repositories for user_id=%s: page=%s, per_page=%s, visibility=%s", current_user.id, page, per_page, visibility)
     """
     Returns the list of GitHub repositories accessible to the current user.
     Requires a connected GitHub account (OAuth flow must be completed first).
@@ -151,6 +163,7 @@ async def connect_repository(
     current_user=Depends(get_current_user),
     service: GitHubRepositoryService = Depends(),
 ):
+    logger.info("Connecting repository for user_id=%s: owner=%s, name=%s", current_user.id, request.owner, request.name)
     """
     Connect a GitHub repository to Ramp for the current user.
     Stores repository metadata (owner, name, provider, connection details).
@@ -172,6 +185,7 @@ async def list_connected_repositories(
     current_user=Depends(get_current_user),
     service: GitHubRepositoryService = Depends(),
 ):
+    logger.info("Listing connected repositories for user_id=%s", current_user.id)
     """Returns all active repository connections for the current user."""
     return await service.list_connected_repositories(user_id=current_user.id)
 
@@ -188,6 +202,7 @@ async def disconnect_repository(
     service: GitHubRepositoryService = Depends(),
 ):
     """Soft-deletes a connected repository record."""
+    logger.info("Disconnecting repository %s for user_id=%s", repo_id, current_user.id)
     await service.disconnect_repository(repo_id=repo_id, user_id=current_user.id)
 
 
@@ -208,6 +223,7 @@ async def list_repo_branches(
     current_user=Depends(get_current_user),
     service: GitHubRepositoryAccessService = Depends(),
 ):
+    logger.info("Listing branches for repo %s/%s, user_id=%s", owner, repo, current_user.id)
     """Lists all branches in the specified repository."""
     return await service.list_branches(user_id=current_user.id, owner=owner, repo=repo)
 
@@ -227,6 +243,7 @@ async def list_repo_commits(
     current_user=Depends(get_current_user),
     service: GitHubRepositoryAccessService = Depends(),
 ):
+    logger.info("Listing commits for repo %s/%s, branch=%s, page=%s, per_page=%s, user_id=%s", owner, repo, branch, page, per_page, current_user.id)
     """Returns recent commits for the given repository and optional branch."""
     return await service.list_commits(
         user_id=current_user.id,
@@ -252,6 +269,7 @@ async def list_repo_files(
     current_user=Depends(get_current_user),
     service: GitHubRepositoryAccessService = Depends(),
 ):
+    logger.info("Listing files for repo %s/%s, path=%s, ref=%s, user_id=%s", owner, repo, path, ref, current_user.id)
     """
     Lists files and directories at the given path within a repository.
     Use path="" for the root directory.
@@ -279,6 +297,7 @@ async def get_repo_file_content(
     Fetches and returns the decoded content of a specific file.
     Base64-encoded content from GitHub is automatically decoded to UTF-8.
     """
+    logger.info("Fetching file content for repo %s/%s, path=%s, ref=%s, user_id=%s", owner, repo, path, ref, current_user.id)
     return await service.get_file_content(
         user_id=current_user.id, owner=owner, repo=repo, path=path, ref=ref
     )
@@ -318,6 +337,7 @@ async def get_repository_flow(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    logger.info("Generating flow for repo_id=%s, entry_function=%s, entry_file=%s, feature_name=%s, max_depth=%s, user_id=%s", repo_id, entry_function, entry_file, feature_name, max_depth, current_user.id)
     service = FlowService(db)
     return await service.get_flow(
         connected_repo_id=repo_id,
@@ -326,3 +346,180 @@ async def get_repository_flow(
         feature_name=feature_name,
         max_depth=max_depth,
     )
+
+
+# ---------------------------------------------------------------------------
+# 6. Overview — aggregated repo stats and recent commits
+# ---------------------------------------------------------------------------
+
+
+@github_router.get(
+    "/{repo_id}/overview",
+    response_model=OverviewResponseSchema,
+    operation_id="getRepositoryOverview",
+    summary="Get overview data for a connected repository",
+)
+async def get_repository_overview(
+    repo_id: uuid.UUID,
+    since: Optional[str] = Query(None, description="Start date (ISO 8601, e.g. 2025-01-01)"),
+    until: Optional[str] = Query(None, description="End date (ISO 8601, e.g. 2025-12-31)"),
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Returns aggregated overview data: stats from architecture/flow graphs and recent commits."""
+    logger.info("Fetching overview for repo_id=%s, since=%s, until=%s, user_id=%s", repo_id, since, until, current_user.id)
+    service = OverviewService(db)
+    return await service.get_overview(repo_id, current_user.id, since, until)
+
+
+# ---------------------------------------------------------------------------
+# 7. Scan status polling & rescan
+# ---------------------------------------------------------------------------
+
+
+@github_router.get(
+    "/{repo_id}/scan-status",
+    response_model=ScanStatusResponseSchema,
+    operation_id="getScanStatus",
+    summary="Get scan progress for a connected repository",
+)
+async def get_scan_status(
+    repo_id: uuid.UUID,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Returns the current scan status and progress percentage."""
+    from src.features.github.models import ConnectedRepository
+    from sqlalchemy import select
+    from fastapi import HTTPException
+
+    result = await db.execute(
+        select(ConnectedRepository).where(
+            ConnectedRepository.id == repo_id,
+            ConnectedRepository.user_id == current_user.id,
+        )
+    )
+    repo = result.scalar_one_or_none()
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repository not found.")
+
+    step_map = {
+        "pending": "Waiting to start",
+        "cloning": "Cloning repository",
+        "indexing_files": "Reading repository structure",
+        "mapping_deps": "Mapping dependencies",
+        "extracting_symbols": "Detecting services",
+        "building_call_graph": "Building call graph",
+        "generating_docs": "Creating documentation",
+        "complete": "Scan complete",
+        "failed": "Scan failed",
+    }
+
+    return ScanStatusResponseSchema(
+        status=repo.scan_status,
+        progress=repo.scan_progress,
+        current_step=step_map.get(repo.scan_status, repo.scan_status),
+    )
+
+
+@github_router.post(
+    "/{repo_id}/rescan",
+    response_model=ScanStatusResponseSchema,
+    operation_id="rescanRepository",
+    summary="Trigger a re-scan of a connected repository",
+)
+async def rescan_repository(
+    repo_id: uuid.UUID,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Triggers a new scan for an already-connected repository."""
+    from src.features.github.models import ConnectedRepository
+    from src.features.github.services.service import GitHubRepositoryService
+    from src.features.github.repository import GitHubOAuthTokenRepository
+    from sqlalchemy import select
+    from fastapi import HTTPException
+
+    result = await db.execute(
+        select(ConnectedRepository).where(
+            ConnectedRepository.id == repo_id,
+            ConnectedRepository.user_id == current_user.id,
+        )
+    )
+    repo = result.scalar_one_or_none()
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repository not found.")
+
+    token_repo = GitHubOAuthTokenRepository(db)
+    token = await token_repo.get_by_user_id(user_id=current_user.id)
+    if not token:
+        raise HTTPException(status_code=400, detail="GitHub token not found.")
+
+    repo.scan_status = "pending"
+    repo.scan_progress = 0
+    await db.commit()
+
+    from src.features.github.tasks import scan_repository_task
+    scan_repository_task.delay( # type: ignore[attr-defined]
+        connected_repo_id=str(repo.id),
+        user_id=str(current_user.id),
+        clone_url=repo.clone_url,
+        access_token=token.access_token,
+        default_branch=repo.default_branch,
+    )
+    
+
+    return ScanStatusResponseSchema(
+        status="pending",
+        progress=0,
+        current_step="Waiting to start",
+    )
+
+
+@github_router.get(
+    "/{repo_id}/sync-status",
+    operation_id="getSyncStatus",
+    summary="Check if repository has new commits since last scan",
+)
+async def get_sync_status(
+    repo_id: uuid.UUID,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Check if the remote repository has commits that haven't been scanned yet."""
+    from src.features.github.models import ConnectedRepository
+    from src.features.github.services.service import GitHubRepositoryService
+    from src.features.github.repository import GitHubOAuthTokenRepository
+    from sqlalchemy import select
+    from fastapi import HTTPException
+
+    result = await db.execute(
+        select(ConnectedRepository).where(
+            ConnectedRepository.id == repo_id,
+            ConnectedRepository.user_id == current_user.id,
+        )
+    )
+    repo = result.scalar_one_or_none()
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repository not found.")
+
+    token_repo = GitHubOAuthTokenRepository(db)
+    token = await token_repo.get_by_user_id(user_id=current_user.id)
+    if not token:
+        raise HTTPException(status_code=400, detail="GitHub token not found.")
+
+    access_service = GitHubRepositoryAccessService(token_repository=token_repo)
+    try:
+        comparison = await access_service.get_repo_comparison(
+            user_id=current_user.id,
+            owner=repo.owner,
+            repo=repo.name,
+            base=repo.default_branch,
+            head=repo.default_branch,
+        )
+        behind_by = comparison.get("behind_by", 0)
+        return {"is_behind": behind_by > 0, "behind_by": behind_by}
+    except Exception:
+        return {"is_behind": False, "behind_by": 0}
+
+

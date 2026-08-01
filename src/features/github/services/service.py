@@ -148,7 +148,7 @@ class GitHubOAuthService:
 
     async def get_token_for_user(self, user_id: uuid.UUID) -> GitHubOAuthToken:
         """Retrieve stored token or raise 401 if not connected."""
-        token = await self.token_repo.get_by_user_id(user_id)
+        token = await self.token_repo.get_by_user_id(user_id=user_id)
         if not token:
             raise HTTPException(
                 status_code=401,
@@ -176,7 +176,7 @@ class GitHubRepositoryService:
         self.repo_repo = repo_repository
 
     async def _get_access_token(self, user_id: uuid.UUID) -> str:
-        token = await self.token_repo.get_by_user_id(user_id)
+        token = await self.token_repo.get_by_user_id(user_id=user_id)
         if not token:
             raise HTTPException(
                 status_code=401,
@@ -272,7 +272,7 @@ class GitHubRepositoryService:
             await self.repo_repo.db.refresh(existing)
             repo = existing
         else:
-            repo = await self.repo_repo.create(request, user_id)
+            repo = await self.repo_repo.create(data=request, user_id=user_id)
 
         scan_repository_task.delay( # type: ignore[attr-defined]
             connected_repo_id=str(repo.id),
@@ -288,7 +288,7 @@ class GitHubRepositoryService:
 
     async def disconnect_repository(self, repo_id: uuid.UUID, user_id: uuid.UUID) -> None:
             """Soft-delete a connected repository."""
-            repo = await self.repo_repo.get_by_id(repo_id)
+            repo = await self.repo_repo.get_by_id(repo_id=repo_id)
             if not repo:
                 raise HTTPException(status_code=404, detail="Connected repository not found.")
             if repo.user_id != user_id:
@@ -321,7 +321,7 @@ class GitHubRepositoryAccessService:
         self.token_repo = token_repository
 
     async def _get_headers(self, user_id: uuid.UUID) -> dict:
-        token = await self.token_repo.get_by_user_id(user_id)
+        token = await self.token_repo.get_by_user_id(user_id=user_id)
         if not token:
             raise HTTPException(
                 status_code=401,
@@ -441,10 +441,7 @@ class GitHubRepositoryAccessService:
         path: str,
         ref: Optional[str] = None,
     ) -> GitHubFileContentSchema:
-        """
-        Fetch and decode the content of a single file.
-        GitHub returns content as base64; this decodes it to a UTF-8 string.
-        """
+        """Get content of a specific file in the repository."""
         headers = await self._get_headers(user_id)
         params = {}
         if ref:
@@ -456,6 +453,69 @@ class GitHubRepositoryAccessService:
                 headers=headers,
                 params=params,
             )
+
+        _raise_for_github_error(response, owner, repo)
+
+        data = response.json()
+        if isinstance(data, list):
+            raise HTTPException(status_code=400, detail="Path points to a directory, not a file.")
+
+        raw_content = data.get("content", "")
+        encoding = data.get("encoding", "base64")
+
+        if encoding == "base64":
+            decoded = base64.b64decode(raw_content).decode("utf-8", errors="replace")
+        else:
+            decoded = raw_content
+
+        return GitHubFileContentSchema(
+            path=data["path"],
+            name=data["name"],
+            content=decoded,
+            encoding=encoding,
+            size=data["size"],
+            sha=data["sha"],
+        )
+
+    async def get_repo_comparison(
+        self,
+        user_id: uuid.UUID,
+        owner: str,
+        repo: str,
+        base: str,
+        head: str,
+    ) -> dict:
+        """Compare two refs to check if local is behind remote."""
+        headers = await self._get_headers(user_id)
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{GITHUB_API_BASE}/repos/{owner}/{repo}/compare/{base}...{head}",
+                headers=headers,
+            )
+
+        _raise_for_github_error(response, owner, repo)
+        return response.json()
+
+    async def get_repo_comparison(
+        self,
+        user_id: uuid.UUID,
+        owner: str,
+        repo: str,
+        base: str,
+        head: str,
+    ) -> dict:
+        """Compare two refs to check if local is behind remote."""
+        headers = await self._get_headers(user_id)
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{GITHUB_API_BASE}/repos/{owner}/{repo}/compare/{base}...{head}",
+                headers=headers,
+            )
+
+        _raise_for_github_error(response, owner, repo)
+        return response.json()
 
         _raise_for_github_error(response, owner, repo)
 

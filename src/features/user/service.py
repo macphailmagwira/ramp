@@ -2,6 +2,7 @@ import uuid
 from typing import Optional
 
 from fastapi import Depends, HTTPException
+from passlib.context import CryptContext
 
 from src.features.user.models import User
 from src.features.user.repository import UserRepository
@@ -12,6 +13,8 @@ from src.features.user.schema import (
     UserWithGitHubSchema,
 )
 from src.features.github.repository import GitHubOAuthTokenRepository
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserService:
@@ -48,7 +51,21 @@ class UserService:
         existing = await self.repository.get_by_email(data.email)
         if existing:
             raise HTTPException(status_code=400, detail="User with this email already exists")
-        user = await self.repository.create(data)
+        hashed = pwd_context.hash(data.password)
+        user = await self.repository.create_with_password(
+            first_name=data.first_name,
+            last_name=data.last_name,
+            email=data.email,
+            hashed_password=hashed,
+        )
+        return await self._to_schema(user)
+
+    async def authenticate(self, email: str, password: str) -> UserWithGitHubSchema:
+        user = await self.repository.get_by_email(email)
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        if not user.hashed_password or not pwd_context.verify(password, user.hashed_password):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
         return await self._to_schema(user)
 
     async def get_user(self, user_id: uuid.UUID) -> UserWithGitHubSchema:

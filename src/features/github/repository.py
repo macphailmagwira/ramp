@@ -18,7 +18,7 @@ from src.features.github.models import FunctionCall, RepositoryFunction
 
 class GitHubOAuthTokenRepository(BaseRepository):
     async def upsert(self, data: GitHubOAuthTokenCreateSchema) -> GitHubOAuthToken:
-        existing = await self.get_by_user_id(data.user_id)
+        existing = await self.get_by_user_id(user_id=data.user_id)
 
         if existing:
             existing.access_token = data.access_token
@@ -36,21 +36,25 @@ class GitHubOAuthTokenRepository(BaseRepository):
         await self.db.refresh(token)
         return token
 
-    async def get_by_user_id(self, user_id: uuid.UUID) -> GitHubOAuthToken | None:
+    async def get_by_user_id(self, **kwargs) -> GitHubOAuthToken | None:
+        user_id = kwargs['user_id']
         result = await self.db.execute(
             select(GitHubOAuthToken).where(GitHubOAuthToken.user_id == user_id)
         )
         return result.scalar_one_or_none()
 
     async def delete_by_user_id(self, user_id: uuid.UUID) -> None:
-        token = await self.get_by_user_id(user_id)
+        token = await self.get_by_user_id(user_id=user_id)
         if token:
             await self.db.delete(token)
             await self.db.commit()
 
 
 class ConnectedRepositoryRepository(BaseRepository):
-    async def create(self, data: ConnectRepositoryRequestSchema, user_id: uuid.UUID) -> ConnectedRepository:
+    async def create(self, **kwargs) -> ConnectedRepository:
+        data = kwargs['data']
+        user_id = kwargs['user_id']
+        
         repo = ConnectedRepository(
             user_id=user_id,
             repo_id=data.repo_id,
@@ -67,7 +71,8 @@ class ConnectedRepositoryRepository(BaseRepository):
         await self.db.refresh(repo)
         return repo
 
-    async def get_by_id(self, repo_id: uuid.UUID) -> ConnectedRepository | None:
+    async def get_by_id(self, **kwargs) -> ConnectedRepository | None:
+        repo_id = kwargs['repo_id']
         result = await self.db.execute(
             select(ConnectedRepository).where(ConnectedRepository.id == repo_id)
         )
@@ -94,7 +99,7 @@ class ConnectedRepositoryRepository(BaseRepository):
         return result.scalar_one_or_none()
 
     async def soft_delete(self, repo_id: uuid.UUID) -> Optional[ConnectedRepository]:
-        repo = await self.get_by_id(repo_id)
+        repo = await self.get_by_id(repo_id=repo_id)
         if repo:
             repo.is_active = False
             await self.db.commit()

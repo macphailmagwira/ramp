@@ -78,8 +78,26 @@ class ConnectedRepositoryRetrieveSchema(BaseModel):
     is_private: bool
     description: Optional[str] = None
     is_active: bool
+    scan_status: str = "pending"
+    scan_progress: int = 0
     created_at: datetime
     updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ScanStatusResponseSchema(BaseModel):
+    status: str
+    progress: int
+    current_step: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ScanStatusResponseSchema(BaseModel):
+    status: str
+    progress: int
+    current_step: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -109,6 +127,56 @@ class GitHubCommitSchema(BaseModel):
     url: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class OverviewCommitSchema(BaseModel):
+    sha: str
+    message: str
+    author: str
+    date: str
+    type: str  # 'feat', 'fix', or 'other'
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OverviewStatsSchema(BaseModel):
+    files: int
+    folders: int
+    functions: int
+    dependencies: int
+
+
+class OverviewResponseSchema(BaseModel):
+    stats: OverviewStatsSchema
+    recent_commits: List[OverviewCommitSchema]
+    language: Optional[str] = None
+    default_branch: str
+    description: Optional[str] = None
+
+
+class OverviewCommitSchema(BaseModel):
+    sha: str
+    message: str
+    author: str
+    date: str
+    type: str  # 'feat', 'fix', or 'other'
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OverviewStatsSchema(BaseModel):
+    files: int
+    folders: int
+    functions: int
+    dependencies: int
+
+
+class OverviewResponseSchema(BaseModel):
+    stats: OverviewStatsSchema
+    recent_commits: List[OverviewCommitSchema]
+    language: Optional[str] = None
+    default_branch: str
+    description: Optional[str] = None
 
 
 class GitHubFileSchema(BaseModel):

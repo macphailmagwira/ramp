@@ -15,6 +15,20 @@ class UserRepository(BaseRepository):
         await self.db.refresh(user)
         return user
 
+    async def create_with_password(
+        self, first_name: str, last_name: str, email: str, hashed_password: str
+    ) -> User:
+        user = User(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            hashed_password=hashed_password,
+        )
+        self.db.add(user)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
+
     async def get_by_id(self, user_id: uuid.UUID) -> User | None:
         result = await self.db.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()

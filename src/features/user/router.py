@@ -1,13 +1,39 @@
 import uuid
+import secrets
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from src.features.user.schema import UserWithGitHubSchema, UserCreateSchema, UserProfileUpdateSchema
+from src.features.user.schema import UserWithGitHubSchema, UserCreateSchema, UserProfileUpdateSchema, UserLoginSchema, LoginResponseSchema
 from src.features.user.service import UserService
 
 user_router = APIRouter(prefix="/users", tags=["users"])
+
+
+@user_router.post(
+    "/signup",
+    status_code=status.HTTP_201_CREATED,
+    response_model=LoginResponseSchema,
+    operation_id="signupUser"
+)
+async def signup(user_data: UserCreateSchema, service: UserService = Depends()):
+    """Create a new user and return auth token."""
+    user_schema = await service.create_user(user_data)
+    token = secrets.token_urlsafe(32)
+    return LoginResponseSchema(user=user_schema, token=token)
+
+
+@user_router.post(
+    "/login",
+    response_model=LoginResponseSchema,
+    operation_id="loginUser"
+)
+async def login(user_data: UserLoginSchema, service: UserService = Depends()):
+    """Authenticate user and return auth token."""
+    user_schema = await service.authenticate(user_data.email, user_data.password)
+    token = secrets.token_urlsafe(32)
+    return LoginResponseSchema(user=user_schema, token=token)
 
 
 @user_router.post(
