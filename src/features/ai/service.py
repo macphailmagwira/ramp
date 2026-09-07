@@ -1,9 +1,18 @@
+import asyncio
 import json
 import logging
+import re
+
 from src.features.ai.bedrock import invoke_qwen
 from src.features.ai.schema import ArchitectureStoryResponse
 
 logger = logging.getLogger("api-main.ai.service")
+
+# Each LLM call covers at most this many files. Bounding the graph size keeps
+# the generated JSON small enough to fit in max_tokens and avoids truncation.
+BATCH_SIZE = 25
+BATCH_MAX_TOKENS = 4096
+RETRY_MAX_TOKENS = 4096
 
 SYSTEM_PROMPT = """You are a senior software engineer onboarding a new developer to a codebase.
 Given a dependency graph of files and their imports, generate an engaging guided walkthrough.
@@ -187,20 +196,104 @@ def parse_raw(raw: str) -> dict:
     return json.loads(raw.strip())
 
 
+def _repair_truncated_json(s: str) -> dict | None:
+    """Best-effort recovery of a JSON value cut off mid-stream.
+
+    Returns the largest valid dict prefix, or None if nothing recoverable.
+    Used when the model hits max_tokens and emits an unterminated string.
+    """
+    s = s.strip()
+    decoder = json.JSONDecoder()
+
+    def is_valid(prefix: str) -> dict | None:
+        prefix = prefix.rstrip()
+        # Drop a trailing dangling key fragment like `, "description":`
+        prefix = re.sub(r',\s*"[^"]*"\s*:\s*$', "", prefix)
+        prefix = prefix.rstrip(",: ")
+        try:
+            obj, idx = decoder.raw_decode(prefix)
+        except json.JSONDecodeError:
+            return None
+        if idx != len(prefix):
+            return None
+        return obj if isinstance(obj, dict) else None
+
+    lo, hi = 1, len(s)
+    best = None
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        obj = is_valid(s[:mid])
+        if obj is not None:
+            best = obj
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return best
+
+
+def _safe_parse(raw: str) -> dict:
+    try:
+        return parse_raw(raw)
+    except json.JSONDecodeError:
+        logger.warning(
+            "LLM output was not valid JSON (likely truncated at max_tokens); attempting repair"
+        )
+        repaired = _repair_truncated_json(raw)
+        if repaired is not None:
+            logger.info("Recovered %d story steps via JSON repair", len(repaired.get("steps", [])))
+            return repaired
+        logger.error("Could not recover LLM JSON output; skipping this batch")
+        return {"summary": "", "steps": []}
+
+
+def _edges_for_files(edges: list[dict], files_subset: list[str]) -> list[dict]:
+    """Assign each edge to the batch containing its source file, so every edge
+    is generated exactly once."""
+    fset = set(files_subset)
+    return [e for e in edges if e["source"] in fset]
+
+
+def _invoke_and_parse(files_subset: list[str], edges_subset: list[dict], max_tokens: int) -> dict:
+    prompt = build_story_prompt(files_subset, edges_subset)
+    raw = invoke_qwen(prompt=prompt, system=SYSTEM_PROMPT, max_tokens=max_tokens)
+    return _safe_parse(raw)
+
+
+def chunk_list(items: list, size: int):
+    for i in range(0, len(items), size):
+        yield items[i : i + size]
+
+
 async def generate_architecture_story(
     files: list[str],
     edges: list[dict],
     max_retries: int = 2,
 ) -> ArchitectureStoryResponse:
 
-    # Initial generation
-    prompt = build_story_prompt(files, edges)
-    raw = invoke_qwen(prompt=prompt, system=SYSTEM_PROMPT, max_tokens=6000)
-    story_data = parse_raw(raw)
+    # Initial generation, batched so each call's output stays within max_tokens.
+    batches = list(chunk_list(files, BATCH_SIZE))
+    batch_results = await asyncio.gather(
+        *[
+            asyncio.to_thread(
+                _invoke_and_parse,
+                batch,
+                _edges_for_files(edges, batch),
+                BATCH_MAX_TOKENS,
+            )
+            for batch in batches
+        ]
+    )
+
+    summary = next((r.get("summary") for r in batch_results if r.get("summary")), "")
+    steps: list[dict] = []
+    for r in batch_results:
+        steps.extend(r.get("steps", []))
+
+    story_data = {"summary": summary, "steps": steps}
 
     logger.info(
-        "Story generated | steps=%d files=%d edges=%d",
-        len(story_data.get("steps", [])), len(files), len(edges),
+        "Story generated | steps=%d files=%d edges=%d batches=%d",
+        len(steps), len(files), len(edges), len(batches),
     )
 
     # Validation + retry loop
@@ -233,11 +326,14 @@ async def generate_architecture_story(
             missing_edges=missing_edges,
             disconnected_nodes=disconnected_nodes,
         )
-        raw = invoke_qwen(prompt=retry_prompt, system=SYSTEM_PROMPT, max_tokens=3000)
-        retry_data = parse_raw(raw)
+        raw = invoke_qwen(prompt=retry_prompt, system=SYSTEM_PROMPT, max_tokens=RETRY_MAX_TOKENS)
+        retry_data = _safe_parse(raw)
 
         # Merge new/corrected steps into existing story
         story_data["steps"].extend(retry_data.get("steps", []))
+        if not summary and retry_data.get("summary"):
+            summary = retry_data["summary"]
+            story_data["summary"] = summary
         logger.info(
             "Story retry %d merged | total_steps=%d",
             attempt + 1,

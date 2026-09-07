@@ -18,7 +18,7 @@ from src.features.github.models import FunctionCall, RepositoryFunction
 
 class GitHubOAuthTokenRepository(BaseRepository):
     async def upsert(self, data: GitHubOAuthTokenCreateSchema) -> GitHubOAuthToken:
-        existing = await self.get_by_user_id(user_id=data.user_id)
+        existing = await self.get_by_user_id(data.user_id)
 
         if existing:
             existing.access_token = data.access_token
@@ -36,15 +36,14 @@ class GitHubOAuthTokenRepository(BaseRepository):
         await self.db.refresh(token)
         return token
 
-    async def get_by_user_id(self, **kwargs) -> GitHubOAuthToken | None:
-        user_id = kwargs['user_id']
+    async def get_by_user_id(self, user_id: uuid.UUID) -> GitHubOAuthToken | None:
         result = await self.db.execute(
             select(GitHubOAuthToken).where(GitHubOAuthToken.user_id == user_id)
         )
         return result.scalar_one_or_none()
 
     async def delete_by_user_id(self, user_id: uuid.UUID) -> None:
-        token = await self.get_by_user_id(user_id=user_id)
+        token = await self.get_by_user_id(user_id)
         if token:
             await self.db.delete(token)
             await self.db.commit()
