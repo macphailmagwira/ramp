@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
-Fetch .env for the dev environment from AWS SSM Parameter Store.
-Usage: python scripts/sync-envs-dev.py <app-name>
+Fetch .env for the staging environment from AWS SSM Parameter Store.
+Usage: python scripts/pull-staging-env.py <app-name>
 Supported apps: api-main, worker-main
+
+AWS_DEFAULT_REGION=us-east-1 poetry run ./scripts/pull-staging-env.py api-main/worker-main
 """
 
 import boto3
@@ -16,10 +18,10 @@ SUPPORTED_APPS = ["api-main", "worker-main"]
 ssm = boto3.client("ssm")
 
 # SSM path prefix - same for all apps
-SSM_PATH_PREFIX = "/stitchsense/dev/"
+SSM_PATH_PREFIX = "/ramp/staging/"
 
 # Output directory - relative to monorepo root
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "apps", "api-main")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def fetch_parameters(path_prefix):
     """Fetch all parameters from SSM under the given path prefix."""
