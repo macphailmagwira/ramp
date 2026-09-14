@@ -82,9 +82,9 @@ class BaseConfig(BaseSettings):
     # CORS
     # -----------------------------
     CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-
-    ]
+    "http://localhost:3000",
+    "https://app.codewithramp.xyz",
+]
 
     DEBUG: bool = False
 
