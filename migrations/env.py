@@ -17,7 +17,10 @@ from src.db.base import Base  # noqa: F401
 config = context.config
 
 # Set the database URL from your app settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option(
+    "sqlalchemy.url",
+    settings.DATABASE_URL.replace("%", "%%"),
+)
 
 # Setup logging from alembic.ini
 if config.config_file_name is not None:
