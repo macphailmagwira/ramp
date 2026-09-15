@@ -32,6 +32,8 @@ from src.features.github.services.service import (
 from src.features.github.services.overview_service import OverviewService
 from src.middleware.user_context import get_current_user
 from src.config import settings
+from jose import JWTError
+from src.auth.jwt import decode_access_token
 
 
 
@@ -84,16 +86,23 @@ async def github_oauth_login(
 )
 async def github_oauth_callback(
     code: str = Query(...),
-    state: Optional[str] = Query(None),
-    current_user=Depends(get_current_user),
+    state: str = Query(..., description="Ramp auth JWT passed through from /oauth/login"),
     service: GitHubOAuthService = Depends(),
 ):
-    if current_user.id is None:
-        raise HTTPException(status_code=401, detail="User not found in database.")
-    
-    logger.info("GitHub OAuth callback received. code=%s, state=%s, user_id=%s", code, state, current_user.id)
-    await service.handle_callback(code=code, user_id=current_user.id)
-    
+    # A browser top-level redirect from GitHub cannot carry a Bearer header,
+    # so the Ramp user identity is carried in the `state` param as a signed JWT.
+    try:
+        claims = decode_access_token(state)
+        user_id = uuid.UUID(claims["sub"])
+    except (JWTError, KeyError, ValueError):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired state token. Restart the GitHub connect flow.",
+        )
+
+    logger.info("GitHub OAuth callback received. code=%s, user_id=%s", code, user_id)
+    await service.handle_callback(code=code, user_id=user_id)
+
     return RedirectResponse(url=f"{settings.FRONTEND_URL}?github=connected")
 
 

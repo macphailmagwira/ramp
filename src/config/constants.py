@@ -4,7 +4,17 @@ API_MAIN_LOGGER_NAME_PREFIX = "api-main"
 WORKER_MAIN_LOGGER_NAME_PREFIX = "worker-main"
 
 # API PUBLIC PATHS NO AUTHORIZATION
-PUBLIC_PATHS = ["/api/v1/health", "/", "/docs", "/redoc", "/openapi.json"]
+PUBLIC_PATHS = [
+    "/api/v1/health",
+    "/",
+    "/docs",
+    "/redoc",
+    "/openapi.json",
+    "/api/v1/users/signup",
+    "/api/v1/users/login",
+    "/api/v1/github/oauth/login",
+    "/api/v1/github/oauth/callback",
+]
 
 SKIP_DB_FETCH_PATHS = [
     "/api/v1/health",

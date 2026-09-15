@@ -1,18 +1,19 @@
 import logging
+import uuid
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
+from jose import JWTError
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from starlette.middleware.base import BaseHTTPMiddleware
 
+from src.auth.jwt import decode_access_token
 from src.config.constants import API_MAIN_LOGGER_NAME_PREFIX, PUBLIC_PATHS
 from src.db.session import get_db
 from src.features.user.models import User
-from starlette.middleware.base import BaseHTTPMiddleware
-
 
 logger = logging.getLogger(f"{API_MAIN_LOGGER_NAME_PREFIX}.middleware")
 
@@ -25,6 +26,10 @@ class EnrichedUserContext:
     @property
     def id(self):
         return self.db_user.id if self.db_user else None
+
+    @property
+    def user_id(self):
+        return str(self.id) if self.id else None
 
     @property
     def email(self) -> str:
@@ -54,20 +59,28 @@ class UserContextMiddleware(BaseHTTPMiddleware):
             request.state.db = None
             return await call_next(request)
 
-        # --- AUTH ENABLED: uncomment to enable JWT verification ---
-        # from src.auth.cognito import verify_cognito_jwt
-        # auth_header = request.headers.get("authorization")
-        # if not auth_header or not auth_header.startswith("Bearer "):
-        #     return JSONResponse(status_code=401, content={"detail": "Missing Authorization header"})
-        # token = auth_header.split(" ")[1]
-        # cognito_user = verify_cognito_jwt(token)
-        # cognito_email = cognito_user.get("email")
-        # --- END AUTH ENABLED ---
+        auth_header = request.headers.get("authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Missing or invalid Authorization header"},
+            )
+        token = auth_header.split(" ", 1)[1]
 
-        # --- AUTH DISABLED: remove when enabling auth above ---
-        cognito_user = {"sub": "dev-user", "email": "dev@example.com"}
-        cognito_email = cognito_user["email"]
-        # --- END AUTH DISABLED ---
+        try:
+            claims = decode_access_token(token)
+        except JWTError:
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Invalid or expired token"},
+            )
+
+        subject = claims.get("sub")
+        if not subject:
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Invalid token claims"},
+            )
 
         if (
             hasattr(request.app.state, "test_db_session")
@@ -87,14 +100,18 @@ class UserContextMiddleware(BaseHTTPMiddleware):
 
         try:
             result = await db.execute(
-                select(User).where(User.email == cognito_email)
+                select(User).where(User.id == uuid.UUID(subject))
             )
             db_user = result.scalar_one_or_none()
 
             if not db_user:
-                logger.warning(f"User {cognito_email} not found in database")
+                logger.warning(f"User {subject} from token not found in database")
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "User no longer exists"},
+                )
 
-            enriched_user = EnrichedUserContext(cognito_user, db_user)
+            enriched_user = EnrichedUserContext(claims, db_user)
             request.state.user = enriched_user
             logger.debug(f"User context: {enriched_user.to_dict()}")
 

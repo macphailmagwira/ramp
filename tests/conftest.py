@@ -1,5 +1,6 @@
 import uuid
 from datetime import date, datetime, time, timedelta, timezone
+from types import SimpleNamespace
 from urllib.parse import urlparse
 
 import asyncpg
@@ -8,8 +9,6 @@ from httpx import ASGITransport, AsyncClient
 from pytest_asyncio import is_async_test
 from slowapi import Limiter
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from src.config import settings
-from src.db.base import Base
 from src.features.buyer.repository import BuyerRepository
 from src.features.buyer.schema import (
     BrandCreateSchema,
@@ -67,11 +66,12 @@ from src.features.style.repository import MaterialRepository, StyleRepository
 from src.features.style.schema import MaterialDetailCreate, StyleCreate
 from src.features.tenant.repository import TenantRepository
 from src.features.tenant.schema import TenantProvisionSchema
+
+from src.config import settings
+from src.db.base import Base
 from src.features.user.models import RoleType, User
 from src.main import app
 from src.middleware.rate_limit import get_identifier
-from types import SimpleNamespace
-
 
 DATABASE_URL = settings.DATABASE_URL
 
@@ -172,24 +172,21 @@ async def client(db_session: AsyncSession, monkeypatch):
 
 
 @pytest.fixture
-def auth_headers():
-    return {"Authorization": "Bearer mock_token_for_testing"}
+async def auth_headers(api_user):
+    from src.auth.jwt import create_access_token
+
+    token = create_access_token(str(api_user.id), email=api_user.email)
+    return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
-def mock_verify_jwt(monkeypatch, tenant, api_user):
-    monkeypatch.setenv("COGNITO_USER_POOL_ID", "us-east-1_testpool")
+def mock_verify_jwt():
+    """Kept for backward compatibility with fixtures that request it.
 
-    def mock_verify(token: str):
-        return {
-            "sub": "test-user-id",
-            "email": "test@example.com",
-            "cognito:username": "testuser",
-            "custom:tenant_id": str(tenant.id),
-        }
-
-    monkeypatch.setattr("src.middleware.user_context.verify_cognito_jwt", mock_verify)
-    monkeypatch.setattr("src.auth.cognito.verify_cognito_jwt", mock_verify)
+    Auth is now handled locally via signed JWTs (see src.auth.jwt), so no
+    external identity provider mocking is required.
+    """
+    return None
 
 
 # ==================== BUYER FIXTURES ====================
@@ -654,18 +651,12 @@ def sample_break(shift, tenant, factory):
 
 
 @pytest.fixture
-async def api_user(db_session, tenant, factory):
+async def api_user(db_session):
     """Create a user directly in the database for API tests"""
     user = User(
         first_name="API",
         last_name="User",
         email="api.user@example.com",
-        cognito_sub="test-user-id",
-        tenant_id=tenant.id,
-        factory_id=factory.id,
-        country_code="+1",
-        phone_number="5551234567",
-        is_active=True,
     )
 
     db_session.add(user)

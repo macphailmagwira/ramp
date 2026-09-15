@@ -77,6 +77,13 @@ class BaseConfig(BaseSettings):
     PROJECT_NAME: str = "Ramp API Main"
     FRONTEND_URL: str = "http://localhost:3000"
 
+    # -----------------------------
+    # Local JWT Auth (username/password flow)
+    # -----------------------------
+    SECRET_KEY: Optional[str] = "dev-insecure-secret-change-me"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
 
     # -----------------------------
     # CORS
@@ -154,6 +161,21 @@ class BaseConfig(BaseSettings):
             if not self.SQS_DEFAULT_QUEUE_ARN:
                 logging.warning(
                     f"SQS_S3_EVENTS_QUEUE_ARN not set for {self.ENVIRONMENT} environment"
+                )
+
+        # ---------------------------------------------
+        # Validate local JWT secret
+        # ---------------------------------------------
+        if not self.SECRET_KEY or self.SECRET_KEY == "dev-insecure-secret-change-me":
+            if self.ENVIRONMENT in ["STAGING", "PRODUCTION"]:
+                logging.error(
+                    "SECRET_KEY is not set. A secure SECRET_KEY is required to "
+                    "sign auth tokens in STAGING/PRODUCTION."
+                )
+            else:
+                logging.warning(
+                    "SECRET_KEY is using the insecure development default. "
+                    "Set a strong SECRET_KEY in non-development environments."
                 )
 
         # ---------------------------------------------

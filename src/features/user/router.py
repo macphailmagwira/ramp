@@ -1,11 +1,17 @@
 import uuid
-import secrets
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from starlette import status
 
-from src.features.user.schema import UserWithGitHubSchema, UserCreateSchema, UserProfileUpdateSchema, UserLoginSchema, LoginResponseSchema
+from src.auth.jwt import create_access_token
+from src.features.user.schema import (
+    LoginResponseSchema,
+    UserCreateSchema,
+    UserLoginSchema,
+    UserProfileUpdateSchema,
+    UserWithGitHubSchema,
+)
 from src.features.user.service import UserService
 
 user_router = APIRouter(prefix="/users", tags=["users"])
@@ -18,9 +24,9 @@ user_router = APIRouter(prefix="/users", tags=["users"])
     operation_id="signupUser"
 )
 async def signup(user_data: UserCreateSchema, service: UserService = Depends()):
-    """Create a new user and return auth token."""
+    """Create a new user and return an auth token."""
     user_schema = await service.create_user(user_data)
-    token = secrets.token_urlsafe(32)
+    token = create_access_token(str(user_schema.id), email=user_schema.email)
     return LoginResponseSchema(user=user_schema, token=token)
 
 
@@ -30,9 +36,9 @@ async def signup(user_data: UserCreateSchema, service: UserService = Depends()):
     operation_id="loginUser"
 )
 async def login(user_data: UserLoginSchema, service: UserService = Depends()):
-    """Authenticate user and return auth token."""
+    """Authenticate user and return an auth token."""
     user_schema = await service.authenticate(user_data.email, user_data.password)
-    token = secrets.token_urlsafe(32)
+    token = create_access_token(str(user_schema.id), email=user_schema.email)
     return LoginResponseSchema(user=user_schema, token=token)
 
 

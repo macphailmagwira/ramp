@@ -45,9 +45,6 @@ app.include_router(router)
 setup_rate_limiting(app)
 
 
-# Setup cors and origins
-setup_cors(app, settings.CORS_ORIGINS)
-
 # Exception handlers
 app.add_exception_handler(Exception, generic_exception_handler)
 
@@ -73,6 +70,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Middleware
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(UserContextMiddleware)
+
+# Setup CORS last so it is the OUTERMOST middleware and its headers wrap
+# every response (including those short-circuited by inner auth middleware).
+setup_cors(app, settings.CORS_ORIGINS)
 
 
 @app.get("/")

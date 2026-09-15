@@ -1,11 +1,10 @@
-import time
 import json
 import logging
+import time
+
 from fastapi import Request
-from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from src.auth.cognito import verify_cognito_jwt
-from src.config.constants import PUBLIC_PATHS
+
 from src.config.constants import API_MAIN_LOGGER_NAME_PREFIX
 
 
