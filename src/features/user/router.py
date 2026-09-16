@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from src.auth.jwt import create_access_token
+from src.middleware.user_context import get_current_user
 from src.features.user.schema import (
     LoginResponseSchema,
     UserCreateSchema,
@@ -61,6 +62,19 @@ async def create_user(user_data: UserCreateSchema, service: UserService = Depend
 async def list_users(service: UserService = Depends()):
     """List all users."""
     return await service.list_users()
+
+
+@user_router.get(
+    "/me",
+    response_model=UserWithGitHubSchema,
+    operation_id="getCurrentUser",
+)
+async def get_current_user_profile(
+    current_user=Depends(get_current_user),
+    service: UserService = Depends(),
+):
+    """Get the authenticated user's profile and GitHub connection status."""
+    return await service.get_user(current_user.id)
 
 
 @user_router.get(

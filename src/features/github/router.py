@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import logging
 import asyncio
+from urllib.parse import urlencode
 from fastapi import APIRouter, Depends, Query, HTTPException
 
 from fastapi.responses import RedirectResponse
@@ -33,7 +34,7 @@ from src.features.github.services.overview_service import OverviewService
 from src.middleware.user_context import get_current_user
 from src.config import settings
 from jose import JWTError
-from src.auth.jwt import decode_access_token
+from src.auth.jwt import decode_access_token, create_access_token
 
 
 
@@ -103,7 +104,11 @@ async def github_oauth_callback(
     logger.info("GitHub OAuth callback received. code=%s, user_id=%s", code, user_id)
     await service.handle_callback(code=code, user_id=user_id)
 
-    return RedirectResponse(url=f"{settings.FRONTEND_URL}?github=connected")
+    # Hand a fresh app JWT back to the SPA so it can re-establish its session
+    # after the GitHub redirect (the SPA may have lost its in-memory token).
+    app_token = create_access_token(str(user_id))
+    redirect_url = f"{settings.FRONTEND_URL}?{urlencode({'github': 'connected', 'token': app_token})}"
+    return RedirectResponse(url=redirect_url)
 
 
 
