@@ -1,0 +1,862 @@
+{
+  "connected_repo_id": "a9954d1a-6308-46a9-bc20-4042b2be2bf1",
+  "repo_id": "1103397270",
+  "full_name": "macphailmagwira/agent_app",
+  "default_branch": "main",
+  "language": "TypeScript",
+  "description": "Agent app",
+  "overview_stats": {
+    "files": 24,
+    "folders": 8,
+    "functions": 29,
+    "dependencies": 27
+  },
+  "file_nodes": [
+    {
+      "id": "vite.config.ts",
+      "label": "vite.config.ts",
+      "node_type": "file",
+      "file_path": "vite.config.ts",
+      "file_id": "39190c43-25de-42ad-8d3f-97515edad48f"
+    },
+    {
+      "id": "tsconfig.json",
+      "label": "tsconfig.json",
+      "node_type": "file",
+      "file_path": "tsconfig.json",
+      "file_id": "3a5eb69f-cd28-4f3e-9aa4-bb4790187339"
+    },
+    {
+      "id": "index.html",
+      "label": "index.html",
+      "node_type": "file",
+      "file_path": "index.html",
+      "file_id": "d341ac39-1935-4761-9120-e0b69d39d49f"
+    },
+    {
+      "id": "package.json",
+      "label": "package.json",
+      "node_type": "file",
+      "file_path": "package.json",
+      "file_id": "7df9effe-26b3-4310-8140-5880f7e933fc"
+    },
+    {
+      "id": "metadata.json",
+      "label": "metadata.json",
+      "node_type": "file",
+      "file_path": "metadata.json",
+      "file_id": "f4dc6d99-76f2-4b63-b2d9-a45eb00bd9c1"
+    },
+    {
+      "id": ".gitignore",
+      "label": ".gitignore",
+      "node_type": "file",
+      "file_path": ".gitignore",
+      "file_id": "10df1f3e-08da-4bbd-a9b2-cb8ed5a93cce"
+    },
+    {
+      "id": "package-lock.json",
+      "label": "package-lock.json",
+      "node_type": "file",
+      "file_path": "package-lock.json",
+      "file_id": "711ddab1-714e-466f-8137-4ade4ecdf159"
+    },
+    {
+      "id": "tailwind.config.js",
+      "label": "tailwind.config.js",
+      "node_type": "file",
+      "file_path": "tailwind.config.js",
+      "file_id": "17005346-2d76-4ce9-83e0-f59b14ff9612"
+    },
+    {
+      "id": "README.md",
+      "label": "README.md",
+      "node_type": "file",
+      "file_path": "README.md",
+      "file_id": "d3dd0601-b76c-4bd9-b032-bd07dd29de62"
+    },
+    {
+      "id": "src/types.ts",
+      "label": "types.ts",
+      "node_type": "file",
+      "file_path": "src/types.ts",
+      "file_id": "9d88d8ff-5dd3-415a-801b-144cc47064a2"
+    },
+    {
+      "id": "src/index.css",
+      "label": "index.css",
+      "node_type": "file",
+      "file_path": "src/index.css",
+      "file_id": "1ea92959-8031-44d2-ab22-6f0b9e416e7b"
+    },
+    {
+      "id": "src/App.tsx",
+      "label": "App.tsx",
+      "node_type": "file",
+      "file_path": "src/App.tsx",
+      "file_id": "a6bd2bdc-0feb-44a5-8417-e2d9cfb536b2"
+    },
+    {
+      "id": "src/constants.ts",
+      "label": "constants.ts",
+      "node_type": "file",
+      "file_path": "src/constants.ts",
+      "file_id": "d787341b-c2a1-4626-82f0-9ecb9985e082"
+    },
+    {
+      "id": "src/index.tsx",
+      "label": "index.tsx",
+      "node_type": "file",
+      "file_path": "src/index.tsx",
+      "file_id": "5ca77dc3-3d28-4806-bf57-564cb4f09785"
+    },
+    {
+      "id": "src/pages/Dashboard.tsx",
+      "label": "Dashboard.tsx",
+      "node_type": "file",
+      "file_path": "src/pages/Dashboard.tsx",
+      "file_id": "84bb0235-4cb2-4cbc-a51f-e3b9c54cb024"
+    },
+    {
+      "id": "src/lib/supabase.ts",
+      "label": "supabase.ts",
+      "node_type": "file",
+      "file_path": "src/lib/supabase.ts",
+      "file_id": "badb09d2-63d6-4065-977d-2c7ba2b1aa72"
+    },
+    {
+      "id": "src/components/Layout.tsx",
+      "label": "Layout.tsx",
+      "node_type": "file",
+      "file_path": "src/components/Layout.tsx",
+      "file_id": "4c1d6556-393a-4420-be55-6cdd06a42505"
+    },
+    {
+      "id": "src/components/Orders.tsx",
+      "label": "Orders.tsx",
+      "node_type": "file",
+      "file_path": "src/components/Orders.tsx",
+      "file_id": "3da08276-3f34-408b-8cf5-21ae67854cf7"
+    },
+    {
+      "id": "src/components/Batches.tsx",
+      "label": "Batches.tsx",
+      "node_type": "file",
+      "file_path": "src/components/Batches.tsx",
+      "file_id": "57adc8fe-d8b8-406a-95ef-bf0a59aeaa6e"
+    },
+    {
+      "id": "src/components/Login.tsx",
+      "label": "Login.tsx",
+      "node_type": "file",
+      "file_path": "src/components/Login.tsx",
+      "file_id": "8b19057b-c6b1-4aa2-887f-64aa10c64917"
+    },
+    {
+      "id": "src/components/POS.tsx",
+      "label": "POS.tsx",
+      "node_type": "file",
+      "file_path": "src/components/POS.tsx",
+      "file_id": "27aa667c-f712-4b3e-bc32-e128e8c4468d"
+    },
+    {
+      "id": "src/hooks/useAgent.ts",
+      "label": "useAgent.ts",
+      "node_type": "file",
+      "file_path": "src/hooks/useAgent.ts",
+      "file_id": "487445fe-7d12-40bb-9bde-d07056995a26"
+    },
+    {
+      "id": "src/context/AppContext.tsx",
+      "label": "AppContext.tsx",
+      "node_type": "file",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd"
+    },
+    {
+      "id": "src/services/supabaseService.ts",
+      "label": "supabaseService.ts",
+      "node_type": "file",
+      "file_path": "src/services/supabaseService.ts",
+      "file_id": "749f129a-b592-45cf-b508-446017b35403"
+    }
+  ],
+  "file_edges": [
+    {
+      "source": "src/App.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/App.tsx",
+      "target": "src/components/Layout.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/App.tsx",
+      "target": "src/pages/Dashboard.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/App.tsx",
+      "target": "src/components/POS.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/App.tsx",
+      "target": "src/components/Orders.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/App.tsx",
+      "target": "src/components/Batches.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/App.tsx",
+      "target": "src/components/Login.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Batches.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Batches.tsx",
+      "target": "src/types.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Layout.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Layout.tsx",
+      "target": "src/hooks/useAgent.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Login.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Orders.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/Orders.tsx",
+      "target": "src/types.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/POS.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/components/POS.tsx",
+      "target": "src/types.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/constants.ts",
+      "target": "src/types.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/context/AppContext.tsx",
+      "target": "src/lib/supabase.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/context/AppContext.tsx",
+      "target": "src/services/supabaseService.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/context/AppContext.tsx",
+      "target": "src/types.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/context/AppContext.tsx",
+      "target": "src/constants.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/hooks/useAgent.ts",
+      "target": "src/lib/supabase.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/hooks/useAgent.ts",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/index.tsx",
+      "target": "src/App.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/pages/Dashboard.tsx",
+      "target": "src/context/AppContext.tsx",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/services/supabaseService.ts",
+      "target": "src/lib/supabase.ts",
+      "edge_type": "esm_import"
+    },
+    {
+      "source": "src/services/supabaseService.ts",
+      "target": "src/types.ts",
+      "edge_type": "esm_import"
+    }
+  ],
+  "function_nodes": [
+    {
+      "id": "6da9828d-3477-43e5-8e07-d7cbe80e7000",
+      "label": "renderContent",
+      "node_type": "function",
+      "file_path": "src/App.tsx",
+      "file_id": "a6bd2bdc-0feb-44a5-8417-e2d9cfb536b2",
+      "line_start": 39,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const renderContent = () => {\n    switch (activeTab) {\n      case 'dashboard':\n        return <Dashboard onNavigate={setActiveTab} />;\n      case 'pos':\n        return <POS />;\n      case 'orders':\n        return <Orders />;\n      case 'batches':\n        return <Batches />;\n      default:\n        return <Dashboard onNavigate={setActiveTab} />;\n    }\n  };\n\n  return (\n    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>\n      {renderContent()}\n    </Layout>\n  );\n};\n\nconst App: React.FC = () => {\n  return (\n    <AppProvider>\n      <AppContent />\n    </AppProvider>\n  );\n};\n\nexport default App;",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "ad5ee6c3-c079-4fc9-9d81-32c21cd31dd8",
+      "label": "getStatusColor",
+      "node_type": "function",
+      "file_path": "src/components/Batches.tsx",
+      "file_id": "57adc8fe-d8b8-406a-95ef-bf0a59aeaa6e",
+      "line_start": 17,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "    const getStatusColor = () => {\n        if (isFull) return {\n            border: 'border-emerald-200 dark:border-emerald-900',\n            bg: 'bg-emerald-50 dark:bg-emerald-900/20',\n            text: 'text-emerald-700 dark:text-emerald-400',\n            bar: 'bg-emerald-500',\n            iconBg: 'bg-emerald-100 dark:bg-emerald-900/50',\n            iconText: 'text-emerald-700 dark:text-emerald-400'\n        };\n        if (isOpen) return {\n            border: 'border-blue-200 dark:border-blue-900',\n            bg: 'bg-blue-50 dark:bg-blue-900/20',\n            text: 'text-blue-700 dark:text-blue-400',\n            bar: 'bg-blue-500',\n            iconBg: 'bg-white dark:bg-zinc-800',\n            iconText: 'text-blue-600 dark:text-blue-400'\n        };\n        return {\n            border: 'border-slate-200 dark:border-zinc-800',\n            bg: 'bg-slate-50 dark:bg-zinc-800',\n            text: 'text-slate-500 dark:text-zinc-500',\n            bar: 'bg-slate-400',\n            iconBg: 'bg-slate-100 dark:bg-zinc-700',\n            iconText: 'text-slate-500 dark:text-zinc-400'\n        };\n    };\n\n    const styles = getStatusColor();\n    \n    return (\n        <div className={`bg-white dark:bg-zinc-900 border ${styles.border} rounded-lg overflow-hidden transition-all relative group shadow-sm`}>\n            {isFull && <div className=\"absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 z-10 hidden md:block\"></div>}\n            \n            {/* Main Row Content */}\n            <div \n                className=\"flex flex-col md:flex-row items-stretch cursor-pointer\"\n                onClick={() => setExpanded(!expanded)}\n            >\n                {/* Status Section */}\n                <div className={`p-4 md:w-64 ${styles.bg} border-b md:border-b-0 md:border-r ${styles.border} flex flex-row md:flex-col justify-between items-center md:items-start gap-3`}>\n                    <div className=\"flex items-center gap-3\">\n                        <div className={`p-2 rounded border border-transparent ${styles.iconBg} ${styles.iconText}`}>\n                            {isFull ? <CheckCircle2 className=\"w-5 h-5\" /> : <Truck className=\"w-5 h-5\" />}\n                        </div>\n                        <div>\n                            <h3 className=\"font-bold font-mono text-slate-900 dark:text-white text-lg\">{batch.id}</h3>\n                            <div className=\"flex md:hidden mt-1\">\n                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${styles.bg} ${styles.text} border border-transparent`}>\n                                    {isFull ? 'FULL' : batch.status}\n                                </span>\n                            </div>\n                        </div>\n                    </div>\n                    <div className=\"hidden md:block\">\n                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${isFull ? 'bg-emerald-200/50 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300' : 'bg-slate-200 dark:bg-zinc-800 text-slate-500 dark:text-zinc-500'}`}>\n                            {isFull ? 'READY FOR DISPATCH' : batch.status}\n                        </span>\n                    </div>\n                </div>\n\n                {/* Info Section */}\n                <div className=\"flex-1 p-4 md:p-6 flex flex-col justify-center\">\n                    <h4 className=\"font-bold text-slate-900 dark:text-white text-sm mb-1\">{batch.name}</h4>\n                    <div className=\"flex items-center gap-4 text-xs text-slate-500 dark:text-zinc-400\">\n                        <span className=\"flex items-center gap-1\">\n                            <Box className=\"w-3.5 h-3.5\" /> {batchOrders.length} Orders Assigned\n                        </span>\n                        <span className=\"w-1 h-1 bg-slate-300 dark:bg-zinc-700 rounded-full\"></span>\n                        <span>Delivers: {new Date(batch.deliveryDate).toLocaleDateString()}</span>\n                    </div>\n                </div>\n\n                {/* Capacity Section */}\n                <div className={`p-4 md:p-6 md:w-72 ${styles.bg} border-t md:border-t-0 md:border-l ${styles.border} flex flex-col justify-center`}>\n                    <div className=\"flex justify-between items-end mb-2\">\n                        <h4 className=\"text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider\">Capacity</h4>\n                        <span className={`text-sm font-bold ${styles.text}`}>{batch.currentFill} / {batch.capacity}</span>\n                    </div>\n                    \n                    {/* Progress Bar */}\n                    <div className=\"h-4 w-full bg-white dark:bg-zinc-900 rounded-full overflow-hidden relative border border-slate-100 dark:border-zinc-800\">\n                        <div \n                        className={`h-full transition-all duration-700 rounded-full ${styles.bar}`} \n                        style={{ width: `${fillPercent}%` }}\n                        ></div>\n                    </div>\n                    <p className=\"text-[10px] text-right mt-1 text-slate-400 dark:text-zinc-500 font-medium\">\n                        {fillPercent}% Filled\n                    </p>\n                </div>\n\n                <div className={`p-2 md:p-0 md:w-16 flex items-center justify-center border-t md:border-t-0 md:border-l ${styles.border} hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors group-hover:text-emerald-600 dark:group-hover:text-emerald-400`}>\n                    {expanded ? (\n                         <ChevronDown className=\"w-5 h-5 text-emerald-600 dark:text-emerald-400\" />\n                    ) : (\n                         <ChevronRight className=\"w-5 h-5 text-slate-300 dark:text-zinc-600\" />\n                    )}\n                </div>\n            </div>\n\n            {/* Expanded Content (Orders List) */}\n            {expanded && (\n                <div className=\"border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 p-4 animate-in slide-in-from-top-2 duration-200\">\n                    <h5 className=\"text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-500 mb-3 px-2\">Assigned Orders ({batchOrders.length})</h5>\n                    {batchOrders.length > 0 ? (\n                        <div className=\"bg-white dark:bg-zinc-950 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-hidden\">\n                            <div className=\"overflow-x-auto\">\n                                <table className=\"w-full text-sm text-left\">\n                                    <thead className=\"bg-slate-50 dark:bg-zinc-900 text-xs text-slate-500 dark:text-zinc-500 font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-zinc-800\">\n                                        <tr>\n                                            <th className=\"px-4 py-3\">Order ID</th>\n                                            <th className=\"px-4 py-3\">Customer</th>\n                                            <th className=\"px-4 py-3\">Items</th>\n                                            <th className=\"px-4 py-3 text-right\">Value</th>\n                                            <th className=\"px-4 py-3\">Time</th>\n                                        </tr>\n                                    </thead>\n                                    <tbody className=\"divide-y divide-slate-100 dark:divide-zinc-800\">\n                                        {batchOrders.map(order => (\n                                            <tr key={order.id} className=\"hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors\">\n                                                <td className=\"px-4 py-3 font-mono text-slate-700 dark:text-zinc-300\">{order.id}</td>\n                                                <td className=\"px-4 py-3 text-slate-900 dark:text-white font-medium\">{order.customer.name}</td>\n                                                <td className=\"px-4 py-3 text-slate-500 dark:text-zinc-400\">{order.items.reduce((acc, i) => acc + i.quantity, 0)} items</td>\n                                                <td className=\"px-4 py-3 text-right font-bold text-slate-900 dark:text-white\">${order.totalAmount.toFixed(2)}</td>\n                                                <td className=\"px-4 py-3 text-slate-400 dark:text-zinc-500 text-xs\">\n                                                    <div className=\"flex items-center gap-1\">\n                                                        <Clock className=\"w-3 h-3\" />\n                                                        {new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}\n                                                    </div>\n                                                </td>\n                                            </tr>\n                                        ))}\n                                    </tbody>\n                                </table>\n                            </div>\n                        </div>\n                    ) : (\n                        <div className=\"text-center py-6 text-slate-400 dark:text-zinc-600 text-sm italic\">\n                            No orders assigned to this batch yet.\n                        </div>\n                    )}\n                </div>\n            )}\n        </div>\n    )\n};\n\nconst Batches: React.FC = () => {\n  const { batches, orders, createBatch, loading } = useApp();\n  const [isModalOpen, setIsModalOpen] = useState(false);\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "55b0062d-2569-48e5-b9fe-6aaeba425147",
+      "label": "handleCreate",
+      "node_type": "function",
+      "file_path": "src/components/Batches.tsx",
+      "file_id": "57adc8fe-d8b8-406a-95ef-bf0a59aeaa6e",
+      "line_start": 171,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const handleCreate = async (e: React.FormEvent) => {\n      e.preventDefault();\n      setIsCreating(true);\n      setError('');\n      \n      try {\n          await createBatch(newBatchData.name, newBatchData.capacity);\n          setIsModalOpen(false);\n          setNewBatchData({ name: '', capacity: 20 });\n      } catch (err: any) {\n          setError(err.message || 'Failed to create batch');\n      } finally {\n          setIsCreating(false);\n      }\n  };\n\n  if (loading) {\n    return (\n      <div className=\"flex items-center justify-center h-96\">\n        <div className=\"text-center\">\n          <Loader2 className=\"w-8 h-8 animate-spin text-emerald-600 mx-auto mb-4\" />\n          <p className=\"text-slate-500 dark:text-zinc-400\">Loading batches...</p>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"space-y-8 pb-24 lg:pb-0\">\n       <div className=\"flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4\">\n           <div>\n               <h2 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">Batches</h2>\n               <p className=\"text-slate-500 dark:text-zinc-400 mt-1\">Manage delivery routes and inventory grouping.</p>\n           </div>\n           <button \n              onClick={() => setIsModalOpen(true)}\n              className=\"bg-slate-900 dark:bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-800 dark:hover:bg-emerald-500 transition-colors flex items-center gap-2 shadow-sm\"\n           >\n               <Plus className=\"w-4 h-4\" /> Create Batch\n           </button>\n       </div>\n\n       {batches.length === 0 ? (\n         <div className=\"text-center py-16 bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800\">\n           <Package className=\"w-12 h-12 text-slate-300 dark:text-zinc-700 mx-auto mb-4\" />\n           <h3 className=\"text-lg font-bold text-slate-900 dark:text-white mb-2\">No batches yet</h3>\n           <p className=\"text-slate-500 dark:text-zinc-400 mb-6\">Create your first batch to start organizing orders.</p>\n           <button \n             onClick={() => setIsModalOpen(true)}\n             className=\"bg-emerald-600 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-500 transition-colors inline-flex items-center gap-2\"\n           >\n             <Plus className=\"w-4 h-4\" /> Create First Batch\n           </button>\n         </div>\n       ) : (\n         <div className=\"flex flex-col gap-4\">\n           {batches.map(batch => <BatchCard key={batch.id} batch={batch} orders={orders} />)}\n         </div>\n       )}\n\n       {isModalOpen && (\n           <div className=\"fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 dark:bg-black/70 backdrop-blur-sm\">\n               <div className=\"bg-white dark:bg-zinc-900 w-full max-w-sm rounded-lg shadow-xl border border-slate-200 dark:border-zinc-800 overflow-hidden\">\n                   <div className=\"p-4 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-800/50\">\n                       <h3 className=\"font-bold text-slate-900 dark:text-white\">Create New Batch</h3>\n                       <button onClick={() => setIsModalOpen(false)} disabled={isCreating}>\n                         <X className=\"w-5 h-5 text-slate-400\" />\n                       </button>\n                   </div>\n                   <form onSubmit={handleCreate} className=\"p-6 space-y-4\">\n                       {error && (\n                         <div className=\"p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-600 dark:text-red-400\">\n                           {error}\n                         </div>\n                       )}\n                       \n                       <div>\n                           <label className=\"block text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-2\">Batch Name / Route</label>\n                           <input \n                               type=\"text\"\n                               required\n                               placeholder=\"e.g. Downtown Express A\"\n                               className=\"w-full px-3 py-2 bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-emerald-500 outline-none\"\n                               value={newBatchData.name}\n                               onChange={e => setNewBatchData({...newBatchData, name: e.target.value})}\n                               disabled={isCreating}\n                           />\n                       </div>\n                       <div>\n                           <label className=\"block text-xs font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-2\">Capacity (Orders)</label>\n                           <input \n                               type=\"number\"\n                               min=\"1\"\n                               max=\"100\"\n                               required\n                               className=\"w-full px-3 py-2 bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-emerald-500 outline-none\"\n                               value={newBatchData.capacity}\n                               onChange={e => setNewBatchData({...newBatchData, capacity: parseInt(e.target.value)})}\n                               disabled={isCreating}\n                           />\n                       </div>\n                       <button \n                         type=\"submit\" \n                         disabled={isCreating}\n                         className=\"w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2\"\n                       >\n                         {isCreating ? (\n                           <>\n                             <Loader2 className=\"w-4 h-4 animate-spin\" />\n                             Creating...\n                           </>\n                         ) : (\n                           'Create Batch'\n                         )}\n                       </button>\n                   </form>\n               </div>\n           </div>\n       )}\n    </div>\n  );\n};\n\nexport default Batches;",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "6462248e-4f15-416e-8397-fe00c1b34675",
+      "label": "getUserInitials",
+      "node_type": "function",
+      "file_path": "src/components/Layout.tsx",
+      "file_id": "4c1d6556-393a-4420-be55-6cdd06a42505",
+      "line_start": 22,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const getUserInitials = () => {\n    if (agent?.full_name) {\n      const names = agent.full_name.split(' ');\n      if (names.length >= 2) {\n        return (names[0][0] + names[names.length - 1][0]).toUpperCase();\n      }\n      return agent.full_name.slice(0, 2).toUpperCase();\n    }\n    if (user?.email) {\n      return user.email.slice(0, 2).toUpperCase();\n    }\n    return 'AG';\n  };\n\n  // Get display name - from agent data or email\n  const getDisplayName = () => {\n    if (agent?.full_name) {\n      return agent.full_name;\n    }\n    if (user?.email) {\n      const name = user.email.split('@')[0];\n      return name\n        .replace(/[._]/g, ' ')\n        .split(' ')\n        .map(word => word.charAt(0).toUpperCase() + word.slice(1))\n        .join(' ');\n    }\n    return 'Agent';\n  };\n\n  // Get agent ID from database\n  const getAgentId = () => {\n    if (agent?.agent_id) {\n      return agent.agent_id;\n    }\n    return agentLoading ? '...' : 'N/A';\n  };\n\n  const handleLogout = async () => {\n    setIsLoggingOut(true);\n    try {\n      await logout();\n    } catch (error) {\n      console.error('Logout failed:', error);\n      setIsLoggingOut(false);\n    }\n  };\n\n  const navItems = [\n    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },\n    { id: 'pos', label: 'New Order', icon: ShoppingCart, badge: cartItemCount > 0 ? cartItemCount : undefined },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'Transactions', icon: Receipt },\n  ];\n\n  const mobileNavItems = [\n    { id: 'dashboard', label: 'Home', icon: Home },\n    { id: 'pos', label: 'Order', icon: PlusCircle, badge: cartItemCount > 0 },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'History', icon: Clock },\n  ];\n\n  const handleNotificationClick = (id: string) => {\n    markNotificationRead(id);\n  };\n\n  return (\n    <div className=\"flex h-screen bg-slate-50 dark:bg-zinc-950 overflow-hidden font-sans text-slate-900 dark:text-zinc-100 transition-colors duration-300\">\n      {/* Sidebar Desktop */}\n      <aside className=\"hidden lg:flex flex-col w-64 bg-white dark:bg-zinc-900 border-r border-slate-200 dark:border-zinc-800 transition-colors duration-300 z-30\">\n        <div className=\"p-6 border-b border-slate-100 dark:border-zinc-800\">\n          <div className=\"flex items-center gap-3\">\n            <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white shadow-lg shadow-emerald-500/20\">\n              <svg viewBox=\"0 0 24 24\" className=\"w-5 h-5 fill-current\" xmlns=\"http://www.w3.org/2000/svg\">\n                <path d=\"M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z\" />\n              </svg>\n            </div>\n            <div>\n              <h1 className=\"text-lg font-bold font-display tracking-tight leading-none text-slate-900 dark:text-white\">Nexus</h1>\n              <span className=\"text-[10px] font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-widest\">Logistic Agent</span>\n            </div>\n          </div>\n        </div>\n        \n        <nav className=\"flex-1 px-3 py-6 space-y-1\">\n          {navItems.map((item) => {\n            const Icon = item.icon;\n            const isActive = activeTab === item.id;\n            return (\n              <button\n                key={item.id}\n                onClick={() => setActiveTab(item.id)}\n                className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-md transition-all duration-200 ${\n                  isActive\n                    ? 'bg-emerald-50 text-emerald-700 border-l-2 border-emerald-500 dark:bg-zinc-800 dark:text-emerald-400'\n                    : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-200'\n                }`}\n              >\n                <div className=\"flex items-center\">\n                    <Icon className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'}`} />\n                    <span className=\"text-sm font-medium\">{item.label}</span>\n                </div>\n                {item.badge && (\n                    <span className=\"bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full\">{item.badge}</span>\n                )}\n              </button>\n            );\n          })}\n        </nav>\n\n        <div className=\"p-4 border-t border-slate-100 dark:border-zinc-800 space-y-2\">\n            <div className=\"flex items-center justify-between px-2 mb-2\">\n                <span className=\"text-[10px] font-bold text-slate-400 uppercase tracking-wider\">Appearance</span>\n                <button \n                  onClick={toggleTheme} \n                  className=\"p-1.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors\"\n                >\n                  {theme === 'light' ? <Moon className=\"w-4 h-4\" /> : <Sun className=\"w-4 h-4\" />}\n                </button>\n            </div>\n\n          <div className=\"flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors group\">\n            <div className=\"w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-xs font-bold text-white shadow-sm\">\n              {agentLoading ? '...' : getUserInitials()}\n            </div>\n            <div className=\"flex-1 min-w-0\">\n              <p className=\"text-sm font-medium text-slate-700 dark:text-zinc-200 truncate\">\n                {agentLoading ? 'Loading...' : getDisplayName()}\n              </p>\n              <p className=\"text-xs text-slate-500 dark:text-zinc-500 truncate font-mono\">\n                ID: {getAgentId()}\n              </p>\n            </div>\n            <button \n              onClick={handleLogout} \n              disabled={isLoggingOut}\n              className=\"p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"\n              title=\"Logout\"\n            >\n              {isLoggingOut ? (\n                <div className=\"w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin\"></div>\n              ) : (\n                <LogOut className=\"w-4 h-4\" />\n              )}\n            </button>\n          </div>\n        </div>\n      </aside>\n\n      {/* Main Content Area */}\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "52233cde-6268-4a91-8590-e9d5f0227ccc",
+      "label": "getDisplayName",
+      "node_type": "function",
+      "file_path": "src/components/Layout.tsx",
+      "file_id": "4c1d6556-393a-4420-be55-6cdd06a42505",
+      "line_start": 37,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const getDisplayName = () => {\n    if (agent?.full_name) {\n      return agent.full_name;\n    }\n    if (user?.email) {\n      const name = user.email.split('@')[0];\n      return name\n        .replace(/[._]/g, ' ')\n        .split(' ')\n        .map(word => word.charAt(0).toUpperCase() + word.slice(1))\n        .join(' ');\n    }\n    return 'Agent';\n  };\n\n  // Get agent ID from database\n  const getAgentId = () => {\n    if (agent?.agent_id) {\n      return agent.agent_id;\n    }\n    return agentLoading ? '...' : 'N/A';\n  };\n\n  const handleLogout = async () => {\n    setIsLoggingOut(true);\n    try {\n      await logout();\n    } catch (error) {\n      console.error('Logout failed:', error);\n      setIsLoggingOut(false);\n    }\n  };\n\n  const navItems = [\n    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },\n    { id: 'pos', label: 'New Order', icon: ShoppingCart, badge: cartItemCount > 0 ? cartItemCount : undefined },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'Transactions', icon: Receipt },\n  ];\n\n  const mobileNavItems = [\n    { id: 'dashboard', label: 'Home', icon: Home },\n    { id: 'pos', label: 'Order', icon: PlusCircle, badge: cartItemCount > 0 },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'History', icon: Clock },\n  ];\n\n  const handleNotificationClick = (id: string) => {\n    markNotificationRead(id);\n  };\n\n  return (\n    <div className=\"flex h-screen bg-slate-50 dark:bg-zinc-950 overflow-hidden font-sans text-slate-900 dark:text-zinc-100 transition-colors duration-300\">\n      {/* Sidebar Desktop */}\n      <aside className=\"hidden lg:flex flex-col w-64 bg-white dark:bg-zinc-900 border-r border-slate-200 dark:border-zinc-800 transition-colors duration-300 z-30\">\n        <div className=\"p-6 border-b border-slate-100 dark:border-zinc-800\">\n          <div className=\"flex items-center gap-3\">\n            <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white shadow-lg shadow-emerald-500/20\">\n              <svg viewBox=\"0 0 24 24\" className=\"w-5 h-5 fill-current\" xmlns=\"http://www.w3.org/2000/svg\">\n                <path d=\"M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z\" />\n              </svg>\n            </div>\n            <div>\n              <h1 className=\"text-lg font-bold font-display tracking-tight leading-none text-slate-900 dark:text-white\">Nexus</h1>\n              <span className=\"text-[10px] font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-widest\">Logistic Agent</span>\n            </div>\n          </div>\n        </div>\n        \n        <nav className=\"flex-1 px-3 py-6 space-y-1\">\n          {navItems.map((item) => {\n            const Icon = item.icon;\n            const isActive = activeTab === item.id;\n            return (\n              <button\n                key={item.id}\n                onClick={() => setActiveTab(item.id)}\n                className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-md transition-all duration-200 ${\n                  isActive\n                    ? 'bg-emerald-50 text-emerald-700 border-l-2 border-emerald-500 dark:bg-zinc-800 dark:text-emerald-400'\n                    : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-200'\n                }`}\n              >\n                <div className=\"flex items-center\">\n                    <Icon className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'}`} />\n                    <span className=\"text-sm font-medium\">{item.label}</span>\n                </div>\n                {item.badge && (\n                    <span className=\"bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full\">{item.badge}</span>\n                )}\n              </button>\n            );\n          })}\n        </nav>\n\n        <div className=\"p-4 border-t border-slate-100 dark:border-zinc-800 space-y-2\">\n            <div className=\"flex items-center justify-between px-2 mb-2\">\n                <span className=\"text-[10px] font-bold text-slate-400 uppercase tracking-wider\">Appearance</span>\n                <button \n                  onClick={toggleTheme} \n                  className=\"p-1.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors\"\n                >\n                  {theme === 'light' ? <Moon className=\"w-4 h-4\" /> : <Sun className=\"w-4 h-4\" />}\n                </button>\n            </div>\n\n          <div className=\"flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors group\">\n            <div className=\"w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-xs font-bold text-white shadow-sm\">\n              {agentLoading ? '...' : getUserInitials()}\n            </div>\n            <div className=\"flex-1 min-w-0\">\n              <p className=\"text-sm font-medium text-slate-700 dark:text-zinc-200 truncate\">\n                {agentLoading ? 'Loading...' : getDisplayName()}\n              </p>\n              <p className=\"text-xs text-slate-500 dark:text-zinc-500 truncate font-mono\">\n                ID: {getAgentId()}\n              </p>\n            </div>\n            <button \n              onClick={handleLogout} \n              disabled={isLoggingOut}\n              className=\"p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"\n              title=\"Logout\"\n            >\n              {isLoggingOut ? (\n                <div className=\"w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin\"></div>\n              ) : (\n                <LogOut className=\"w-4 h-4\" />\n              )}\n            </button>\n          </div>\n        </div>\n      </aside>\n\n      {/* Main Content Area */}\n      <div className=\"flex-1 flex flex-col h-full min-w-0 bg-slate-50 dark:bg-zinc-950 transition-colors duration-300\">\n        \n        {/* Top Header - NOW STICKY */}\n        <header className=\"sticky top-0 z-40 h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-4 lg:px-8 shrink-0 transition-colors duration-300\">\n            <div className=\"flex items-center lg:hidden gap-3\">\n                 <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white\">\n                     <span className=\"font-bold\">N</span>\n                 </div>\n                 <span className=\"font-display font-bold text-slate-900 dark:text-white\">Nexus</span>\n            </div>\n            \n            <div className=\"hidden lg:flex items-center gap-2 text-sm text-slate-500 dark:text-zinc-500\">\n                <span className=\"hover:text-slate-900 dark:hover:text-zinc-300 cursor-pointer\">Home</span>\n                <span className=\"text-slate-300 dark:text-zinc-700\">/</span>\n                <span className=\"font-medium text-slate-900 dark:text-zinc-200 capitalize\">{activeTab}</span>\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "4046d16e-6094-42c4-9f26-352849d4a574",
+      "label": "getAgentId",
+      "node_type": "function",
+      "file_path": "src/components/Layout.tsx",
+      "file_id": "4c1d6556-393a-4420-be55-6cdd06a42505",
+      "line_start": 53,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const getAgentId = () => {\n    if (agent?.agent_id) {\n      return agent.agent_id;\n    }\n    return agentLoading ? '...' : 'N/A';\n  };\n\n  const handleLogout = async () => {\n    setIsLoggingOut(true);\n    try {\n      await logout();\n    } catch (error) {\n      console.error('Logout failed:', error);\n      setIsLoggingOut(false);\n    }\n  };\n\n  const navItems = [\n    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },\n    { id: 'pos', label: 'New Order', icon: ShoppingCart, badge: cartItemCount > 0 ? cartItemCount : undefined },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'Transactions', icon: Receipt },\n  ];\n\n  const mobileNavItems = [\n    { id: 'dashboard', label: 'Home', icon: Home },\n    { id: 'pos', label: 'Order', icon: PlusCircle, badge: cartItemCount > 0 },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'History', icon: Clock },\n  ];\n\n  const handleNotificationClick = (id: string) => {\n    markNotificationRead(id);\n  };\n\n  return (\n    <div className=\"flex h-screen bg-slate-50 dark:bg-zinc-950 overflow-hidden font-sans text-slate-900 dark:text-zinc-100 transition-colors duration-300\">\n      {/* Sidebar Desktop */}\n      <aside className=\"hidden lg:flex flex-col w-64 bg-white dark:bg-zinc-900 border-r border-slate-200 dark:border-zinc-800 transition-colors duration-300 z-30\">\n        <div className=\"p-6 border-b border-slate-100 dark:border-zinc-800\">\n          <div className=\"flex items-center gap-3\">\n            <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white shadow-lg shadow-emerald-500/20\">\n              <svg viewBox=\"0 0 24 24\" className=\"w-5 h-5 fill-current\" xmlns=\"http://www.w3.org/2000/svg\">\n                <path d=\"M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z\" />\n              </svg>\n            </div>\n            <div>\n              <h1 className=\"text-lg font-bold font-display tracking-tight leading-none text-slate-900 dark:text-white\">Nexus</h1>\n              <span className=\"text-[10px] font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-widest\">Logistic Agent</span>\n            </div>\n          </div>\n        </div>\n        \n        <nav className=\"flex-1 px-3 py-6 space-y-1\">\n          {navItems.map((item) => {\n            const Icon = item.icon;\n            const isActive = activeTab === item.id;\n            return (\n              <button\n                key={item.id}\n                onClick={() => setActiveTab(item.id)}\n                className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-md transition-all duration-200 ${\n                  isActive\n                    ? 'bg-emerald-50 text-emerald-700 border-l-2 border-emerald-500 dark:bg-zinc-800 dark:text-emerald-400'\n                    : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-200'\n                }`}\n              >\n                <div className=\"flex items-center\">\n                    <Icon className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'}`} />\n                    <span className=\"text-sm font-medium\">{item.label}</span>\n                </div>\n                {item.badge && (\n                    <span className=\"bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full\">{item.badge}</span>\n                )}\n              </button>\n            );\n          })}\n        </nav>\n\n        <div className=\"p-4 border-t border-slate-100 dark:border-zinc-800 space-y-2\">\n            <div className=\"flex items-center justify-between px-2 mb-2\">\n                <span className=\"text-[10px] font-bold text-slate-400 uppercase tracking-wider\">Appearance</span>\n                <button \n                  onClick={toggleTheme} \n                  className=\"p-1.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors\"\n                >\n                  {theme === 'light' ? <Moon className=\"w-4 h-4\" /> : <Sun className=\"w-4 h-4\" />}\n                </button>\n            </div>\n\n          <div className=\"flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors group\">\n            <div className=\"w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-xs font-bold text-white shadow-sm\">\n              {agentLoading ? '...' : getUserInitials()}\n            </div>\n            <div className=\"flex-1 min-w-0\">\n              <p className=\"text-sm font-medium text-slate-700 dark:text-zinc-200 truncate\">\n                {agentLoading ? 'Loading...' : getDisplayName()}\n              </p>\n              <p className=\"text-xs text-slate-500 dark:text-zinc-500 truncate font-mono\">\n                ID: {getAgentId()}\n              </p>\n            </div>\n            <button \n              onClick={handleLogout} \n              disabled={isLoggingOut}\n              className=\"p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"\n              title=\"Logout\"\n            >\n              {isLoggingOut ? (\n                <div className=\"w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin\"></div>\n              ) : (\n                <LogOut className=\"w-4 h-4\" />\n              )}\n            </button>\n          </div>\n        </div>\n      </aside>\n\n      {/* Main Content Area */}\n      <div className=\"flex-1 flex flex-col h-full min-w-0 bg-slate-50 dark:bg-zinc-950 transition-colors duration-300\">\n        \n        {/* Top Header - NOW STICKY */}\n        <header className=\"sticky top-0 z-40 h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-4 lg:px-8 shrink-0 transition-colors duration-300\">\n            <div className=\"flex items-center lg:hidden gap-3\">\n                 <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white\">\n                     <span className=\"font-bold\">N</span>\n                 </div>\n                 <span className=\"font-display font-bold text-slate-900 dark:text-white\">Nexus</span>\n            </div>\n            \n            <div className=\"hidden lg:flex items-center gap-2 text-sm text-slate-500 dark:text-zinc-500\">\n                <span className=\"hover:text-slate-900 dark:hover:text-zinc-300 cursor-pointer\">Home</span>\n                <span className=\"text-slate-300 dark:text-zinc-700\">/</span>\n                <span className=\"font-medium text-slate-900 dark:text-zinc-200 capitalize\">{activeTab}</span>\n            </div>\n\n            <div className=\"flex items-center gap-4\">\n                <div className=\"hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-zinc-800/50 border border-emerald-100 dark:border-zinc-700 rounded text-xs font-medium text-emerald-700 dark:text-emerald-400\">\n                    <span className=\"w-2 h-2 rounded-full bg-emerald-500 animate-pulse\"></span>\n                    {agent ? `${agent.agent_id} Online` : 'System Online'}\n                </div>\n                \n                {/* Notifications */}\n                <div className=\"relative\">\n                  <button \n                    onClick={() => setShowNotifications(!showNotifications)}\n                    className=\"relative p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors\"\n                  >\n                      <Bell className=\"w-5 h-5\" />\n                      {unreadCount > 0 && (\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "bcdd9c4b-8aa1-40ef-b9c6-afd4f10dc51c",
+      "label": "handleLogout",
+      "node_type": "function",
+      "file_path": "src/components/Layout.tsx",
+      "file_id": "4c1d6556-393a-4420-be55-6cdd06a42505",
+      "line_start": 60,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const handleLogout = async () => {\n    setIsLoggingOut(true);\n    try {\n      await logout();\n    } catch (error) {\n      console.error('Logout failed:', error);\n      setIsLoggingOut(false);\n    }\n  };\n\n  const navItems = [\n    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },\n    { id: 'pos', label: 'New Order', icon: ShoppingCart, badge: cartItemCount > 0 ? cartItemCount : undefined },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'Transactions', icon: Receipt },\n  ];\n\n  const mobileNavItems = [\n    { id: 'dashboard', label: 'Home', icon: Home },\n    { id: 'pos', label: 'Order', icon: PlusCircle, badge: cartItemCount > 0 },\n    { id: 'batches', label: 'Batches', icon: Container },\n    { id: 'orders', label: 'History', icon: Clock },\n  ];\n\n  const handleNotificationClick = (id: string) => {\n    markNotificationRead(id);\n  };\n\n  return (\n    <div className=\"flex h-screen bg-slate-50 dark:bg-zinc-950 overflow-hidden font-sans text-slate-900 dark:text-zinc-100 transition-colors duration-300\">\n      {/* Sidebar Desktop */}\n      <aside className=\"hidden lg:flex flex-col w-64 bg-white dark:bg-zinc-900 border-r border-slate-200 dark:border-zinc-800 transition-colors duration-300 z-30\">\n        <div className=\"p-6 border-b border-slate-100 dark:border-zinc-800\">\n          <div className=\"flex items-center gap-3\">\n            <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white shadow-lg shadow-emerald-500/20\">\n              <svg viewBox=\"0 0 24 24\" className=\"w-5 h-5 fill-current\" xmlns=\"http://www.w3.org/2000/svg\">\n                <path d=\"M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z\" />\n              </svg>\n            </div>\n            <div>\n              <h1 className=\"text-lg font-bold font-display tracking-tight leading-none text-slate-900 dark:text-white\">Nexus</h1>\n              <span className=\"text-[10px] font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-widest\">Logistic Agent</span>\n            </div>\n          </div>\n        </div>\n        \n        <nav className=\"flex-1 px-3 py-6 space-y-1\">\n          {navItems.map((item) => {\n            const Icon = item.icon;\n            const isActive = activeTab === item.id;\n            return (\n              <button\n                key={item.id}\n                onClick={() => setActiveTab(item.id)}\n                className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-md transition-all duration-200 ${\n                  isActive\n                    ? 'bg-emerald-50 text-emerald-700 border-l-2 border-emerald-500 dark:bg-zinc-800 dark:text-emerald-400'\n                    : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-200'\n                }`}\n              >\n                <div className=\"flex items-center\">\n                    <Icon className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'}`} />\n                    <span className=\"text-sm font-medium\">{item.label}</span>\n                </div>\n                {item.badge && (\n                    <span className=\"bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full\">{item.badge}</span>\n                )}\n              </button>\n            );\n          })}\n        </nav>\n\n        <div className=\"p-4 border-t border-slate-100 dark:border-zinc-800 space-y-2\">\n            <div className=\"flex items-center justify-between px-2 mb-2\">\n                <span className=\"text-[10px] font-bold text-slate-400 uppercase tracking-wider\">Appearance</span>\n                <button \n                  onClick={toggleTheme} \n                  className=\"p-1.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors\"\n                >\n                  {theme === 'light' ? <Moon className=\"w-4 h-4\" /> : <Sun className=\"w-4 h-4\" />}\n                </button>\n            </div>\n\n          <div className=\"flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors group\">\n            <div className=\"w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-xs font-bold text-white shadow-sm\">\n              {agentLoading ? '...' : getUserInitials()}\n            </div>\n            <div className=\"flex-1 min-w-0\">\n              <p className=\"text-sm font-medium text-slate-700 dark:text-zinc-200 truncate\">\n                {agentLoading ? 'Loading...' : getDisplayName()}\n              </p>\n              <p className=\"text-xs text-slate-500 dark:text-zinc-500 truncate font-mono\">\n                ID: {getAgentId()}\n              </p>\n            </div>\n            <button \n              onClick={handleLogout} \n              disabled={isLoggingOut}\n              className=\"p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"\n              title=\"Logout\"\n            >\n              {isLoggingOut ? (\n                <div className=\"w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin\"></div>\n              ) : (\n                <LogOut className=\"w-4 h-4\" />\n              )}\n            </button>\n          </div>\n        </div>\n      </aside>\n\n      {/* Main Content Area */}\n      <div className=\"flex-1 flex flex-col h-full min-w-0 bg-slate-50 dark:bg-zinc-950 transition-colors duration-300\">\n        \n        {/* Top Header - NOW STICKY */}\n        <header className=\"sticky top-0 z-40 h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-4 lg:px-8 shrink-0 transition-colors duration-300\">\n            <div className=\"flex items-center lg:hidden gap-3\">\n                 <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white\">\n                     <span className=\"font-bold\">N</span>\n                 </div>\n                 <span className=\"font-display font-bold text-slate-900 dark:text-white\">Nexus</span>\n            </div>\n            \n            <div className=\"hidden lg:flex items-center gap-2 text-sm text-slate-500 dark:text-zinc-500\">\n                <span className=\"hover:text-slate-900 dark:hover:text-zinc-300 cursor-pointer\">Home</span>\n                <span className=\"text-slate-300 dark:text-zinc-700\">/</span>\n                <span className=\"font-medium text-slate-900 dark:text-zinc-200 capitalize\">{activeTab}</span>\n            </div>\n\n            <div className=\"flex items-center gap-4\">\n                <div className=\"hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-zinc-800/50 border border-emerald-100 dark:border-zinc-700 rounded text-xs font-medium text-emerald-700 dark:text-emerald-400\">\n                    <span className=\"w-2 h-2 rounded-full bg-emerald-500 animate-pulse\"></span>\n                    {agent ? `${agent.agent_id} Online` : 'System Online'}\n                </div>\n                \n                {/* Notifications */}\n                <div className=\"relative\">\n                  <button \n                    onClick={() => setShowNotifications(!showNotifications)}\n                    className=\"relative p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors\"\n                  >\n                      <Bell className=\"w-5 h-5\" />\n                      {unreadCount > 0 && (\n                        <span className=\"absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-900\"></span>\n                      )}\n                  </button>\n\n                  {showNotifications && (\n                    <>\n                      <div className=\"fixed inset-0 z-40\" onClick={() => setShowNotifications(false)}></div>\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "edf1bdc1-7344-4df1-9008-f12b18c1fa24",
+      "label": "handleNotificationClick",
+      "node_type": "function",
+      "file_path": "src/components/Layout.tsx",
+      "file_id": "4c1d6556-393a-4420-be55-6cdd06a42505",
+      "line_start": 84,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const handleNotificationClick = (id: string) => {\n    markNotificationRead(id);\n  };\n\n  return (\n    <div className=\"flex h-screen bg-slate-50 dark:bg-zinc-950 overflow-hidden font-sans text-slate-900 dark:text-zinc-100 transition-colors duration-300\">\n      {/* Sidebar Desktop */}\n      <aside className=\"hidden lg:flex flex-col w-64 bg-white dark:bg-zinc-900 border-r border-slate-200 dark:border-zinc-800 transition-colors duration-300 z-30\">\n        <div className=\"p-6 border-b border-slate-100 dark:border-zinc-800\">\n          <div className=\"flex items-center gap-3\">\n            <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white shadow-lg shadow-emerald-500/20\">\n              <svg viewBox=\"0 0 24 24\" className=\"w-5 h-5 fill-current\" xmlns=\"http://www.w3.org/2000/svg\">\n                <path d=\"M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z\" />\n              </svg>\n            </div>\n            <div>\n              <h1 className=\"text-lg font-bold font-display tracking-tight leading-none text-slate-900 dark:text-white\">Nexus</h1>\n              <span className=\"text-[10px] font-medium text-slate-500 dark:text-zinc-500 uppercase tracking-widest\">Logistic Agent</span>\n            </div>\n          </div>\n        </div>\n        \n        <nav className=\"flex-1 px-3 py-6 space-y-1\">\n          {navItems.map((item) => {\n            const Icon = item.icon;\n            const isActive = activeTab === item.id;\n            return (\n              <button\n                key={item.id}\n                onClick={() => setActiveTab(item.id)}\n                className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-md transition-all duration-200 ${\n                  isActive\n                    ? 'bg-emerald-50 text-emerald-700 border-l-2 border-emerald-500 dark:bg-zinc-800 dark:text-emerald-400'\n                    : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-200'\n                }`}\n              >\n                <div className=\"flex items-center\">\n                    <Icon className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-emerald-500' : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'}`} />\n                    <span className=\"text-sm font-medium\">{item.label}</span>\n                </div>\n                {item.badge && (\n                    <span className=\"bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full\">{item.badge}</span>\n                )}\n              </button>\n            );\n          })}\n        </nav>\n\n        <div className=\"p-4 border-t border-slate-100 dark:border-zinc-800 space-y-2\">\n            <div className=\"flex items-center justify-between px-2 mb-2\">\n                <span className=\"text-[10px] font-bold text-slate-400 uppercase tracking-wider\">Appearance</span>\n                <button \n                  onClick={toggleTheme} \n                  className=\"p-1.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors\"\n                >\n                  {theme === 'light' ? <Moon className=\"w-4 h-4\" /> : <Sun className=\"w-4 h-4\" />}\n                </button>\n            </div>\n\n          <div className=\"flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors group\">\n            <div className=\"w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-xs font-bold text-white shadow-sm\">\n              {agentLoading ? '...' : getUserInitials()}\n            </div>\n            <div className=\"flex-1 min-w-0\">\n              <p className=\"text-sm font-medium text-slate-700 dark:text-zinc-200 truncate\">\n                {agentLoading ? 'Loading...' : getDisplayName()}\n              </p>\n              <p className=\"text-xs text-slate-500 dark:text-zinc-500 truncate font-mono\">\n                ID: {getAgentId()}\n              </p>\n            </div>\n            <button \n              onClick={handleLogout} \n              disabled={isLoggingOut}\n              className=\"p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed\"\n              title=\"Logout\"\n            >\n              {isLoggingOut ? (\n                <div className=\"w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin\"></div>\n              ) : (\n                <LogOut className=\"w-4 h-4\" />\n              )}\n            </button>\n          </div>\n        </div>\n      </aside>\n\n      {/* Main Content Area */}\n      <div className=\"flex-1 flex flex-col h-full min-w-0 bg-slate-50 dark:bg-zinc-950 transition-colors duration-300\">\n        \n        {/* Top Header - NOW STICKY */}\n        <header className=\"sticky top-0 z-40 h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-4 lg:px-8 shrink-0 transition-colors duration-300\">\n            <div className=\"flex items-center lg:hidden gap-3\">\n                 <div className=\"w-8 h-8 bg-emerald-600 rounded flex items-center justify-center text-white\">\n                     <span className=\"font-bold\">N</span>\n                 </div>\n                 <span className=\"font-display font-bold text-slate-900 dark:text-white\">Nexus</span>\n            </div>\n            \n            <div className=\"hidden lg:flex items-center gap-2 text-sm text-slate-500 dark:text-zinc-500\">\n                <span className=\"hover:text-slate-900 dark:hover:text-zinc-300 cursor-pointer\">Home</span>\n                <span className=\"text-slate-300 dark:text-zinc-700\">/</span>\n                <span className=\"font-medium text-slate-900 dark:text-zinc-200 capitalize\">{activeTab}</span>\n            </div>\n\n            <div className=\"flex items-center gap-4\">\n                <div className=\"hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-zinc-800/50 border border-emerald-100 dark:border-zinc-700 rounded text-xs font-medium text-emerald-700 dark:text-emerald-400\">\n                    <span className=\"w-2 h-2 rounded-full bg-emerald-500 animate-pulse\"></span>\n                    {agent ? `${agent.agent_id} Online` : 'System Online'}\n                </div>\n                \n                {/* Notifications */}\n                <div className=\"relative\">\n                  <button \n                    onClick={() => setShowNotifications(!showNotifications)}\n                    className=\"relative p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors\"\n                  >\n                      <Bell className=\"w-5 h-5\" />\n                      {unreadCount > 0 && (\n                        <span className=\"absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-900\"></span>\n                      )}\n                  </button>\n\n                  {showNotifications && (\n                    <>\n                      <div className=\"fixed inset-0 z-40\" onClick={() => setShowNotifications(false)}></div>\n                      <div className=\"fixed sm:absolute right-4 sm:right-0 left-4 sm:left-auto top-20 sm:top-auto sm:mt-2 w-auto sm:w-80 max-w-md bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-slate-200 dark:border-zinc-800 z-50 overflow-hidden\">\n                        <div className=\"p-3 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50 dark:bg-zinc-800/50\">\n                          <h3 className=\"text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400\">Notifications</h3>\n                          {unreadCount > 0 && <span className=\"text-xs text-emerald-600 dark:text-emerald-400 font-medium\">{unreadCount} new</span>}\n                        </div>\n                        <div className=\"max-h-[60vh] sm:max-h-[300px] overflow-y-auto\">\n                          {notifications.length === 0 ? (\n                            <div className=\"p-4 text-center text-xs text-slate-400\">No notifications</div>\n                          ) : (\n                            notifications.map(n => (\n                              <div \n                                key={n.id} \n                                onClick={() => handleNotificationClick(n.id)}\n                                className={`p-3 border-b border-slate-100 dark:border-zinc-800 last:border-0 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer ${!n.read ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}`}\n                              >\n                                <div className=\"flex justify-between items-start mb-1\">\n                                  <span className={`text-sm font-bold ${!n.read ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-zinc-400'}`}>{n.title}</span>\n                                  <span className=\"text-[10px] text-slate-400\">{n.time}</span>\n                                </div>\n                                <p className=\"text-xs text-slate-500 dark:text-zinc-500 line-clamp-2\">{n.message}</p>\n                              </div>\n                            ))\n                          )}\n                        </div>\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "e8ef0d07-4465-4989-a8b4-f875dc0e0e5d",
+      "label": "handleSubmit",
+      "node_type": "function",
+      "file_path": "src/components/Login.tsx",
+      "file_id": "8b19057b-c6b1-4aa2-887f-64aa10c64917",
+      "line_start": 11,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault();\n    setIsLoading(true);\n    setError('');\n    \n    try {\n      await login(credentials.email, credentials.password);\n    } catch (err: any) {\n      setError(err.message || 'Authentication failed');\n    } finally {\n      setIsLoading(false);\n    }\n  };\n\n  return (\n    <div className=\"min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden font-sans\">\n      {/* Dynamic Background */}\n      <div className=\"absolute inset-0 z-0\">\n          <div className=\"absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black\"></div>\n          <div className=\"absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse\"></div>\n          <div className=\"absolute top-[60%] -left-[10%] w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse delay-1000\"></div>\n      </div>\n\n      <div className=\"w-full max-w-[400px] z-10\">\n          {/* Logo Section */}\n          <div className=\"text-center mb-8\">\n               <div className=\"inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-600 shadow-2xl shadow-emerald-500/30 mb-4 border border-emerald-400/20\">\n                    <span className=\"text-3xl font-bold text-white font-display\">N</span>\n               </div>\n               <h1 className=\"text-3xl font-display font-bold text-white tracking-tight\">Nexus Agent</h1>\n               <p className=\"text-slate-400 mt-2 text-sm\">Logistics & Point of Sale System</p>\n          </div>\n\n          {/* Card */}\n          <div className=\"bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden\">\n             <div className=\"p-8\">\n                 {error && (\n                   <div className=\"mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-400 text-sm\">\n                     <AlertCircle className=\"w-4 h-4\" />\n                     <span>{error}</span>\n                   </div>\n                 )}\n                 \n                 <form onSubmit={handleSubmit} className=\"space-y-5\">\n                     <div className=\"space-y-1.5\">\n                         <label className=\"text-xs font-bold text-emerald-400 uppercase tracking-widest ml-1\">Email</label>\n                         <input \n                            type=\"email\" \n                            required\n                            className=\"w-full px-4 py-3.5 rounded-xl bg-slate-900/50 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all\"\n                            placeholder=\"agent@nexus.com\"\n                            value={credentials.email}\n                            onChange={e => setCredentials({...credentials, email: e.target.value})}\n                         />\n                     </div>\n                     \n                     <div className=\"space-y-1.5\">\n                         <div className=\"flex justify-between items-center ml-1\">\n                             <label className=\"text-xs font-bold text-emerald-400 uppercase tracking-widest\">Password</label>\n                         </div>\n                         <input \n                            type=\"password\" \n                            required\n                            className=\"w-full px-4 py-3.5 rounded-xl bg-slate-900/50 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all\"\n                            placeholder=\"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\"\n                            value={credentials.password}\n                            onChange={e => setCredentials({...credentials, password: e.target.value})}\n                         />\n                     </div>\n\n                     <button \n                        type=\"submit\"\n                        disabled={isLoading}\n                        className=\"w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed mt-2 active:scale-[0.98]\"\n                     >\n                        {isLoading ? (\n                            <div className=\"flex items-center gap-2\">\n                                <div className=\"w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin\"></div>\n                                <span>Authenticating...</span>\n                            </div>\n                        ) : (\n                            <>\n                                Access Dashboard <ArrowRight className=\"w-4 h-4 group-hover:translate-x-1 transition-transform\" />\n                            </>\n                        )}\n                     </button>\n                 </form>\n             </div>\n             \n             <div className=\"bg-slate-900/30 px-8 py-4 border-t border-white/5 flex justify-center items-center gap-2\">\n                 <div className=\"w-2 h-2 rounded-full bg-emerald-500 animate-pulse\"></div>\n                 <span className=\"text-xs text-slate-400 font-medium\">Secure Connection Established</span>\n             </div>\n          </div>\n          \n          <p className=\"text-center text-slate-500 text-xs mt-8\">\u00a9 2024 Nexus Logistics. All rights reserved.</p>\n      </div>\n    </div>\n  );\n};\n\nexport default Login;",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "3cb188ff-9246-4de0-a57a-a2a8fa189f16",
+      "label": "handleRefresh",
+      "node_type": "function",
+      "file_path": "src/components/Orders.tsx",
+      "file_id": "3da08276-3f34-408b-8cf5-21ae67854cf7",
+      "line_start": 12,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const handleRefresh = async () => {\n    setIsRefreshing(true);\n    try {\n      await refreshData();\n    } finally {\n      setIsRefreshing(false);\n    }\n  };\n\n  const filteredOrders = orders.filter(o => {\n      const matchSearch = o.id.toLowerCase().includes(search.toLowerCase()) || o.customer.name.toLowerCase().includes(search.toLowerCase());\n      const matchFilter = filter === 'All' || o.status === filter;\n      return matchSearch && matchFilter;\n  });\n\n  const StatusPill = ({ status }: { status: OrderStatus }) => {\n      const styles = {\n          [OrderStatus.PENDING]: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700',\n          [OrderStatus.PACKED]: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',\n          [OrderStatus.IN_TRANSIT]: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800',\n          [OrderStatus.DELIVERED]: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',\n          [OrderStatus.CANCELLED]: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',\n      };\n      return (\n          <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${styles[status]}`}>\n              {status}\n          </span>\n      );\n  };\n\n  if (loading) {\n    return (\n      <div className=\"flex items-center justify-center h-96\">\n        <div className=\"text-center\">\n          <Loader2 className=\"w-8 h-8 animate-spin text-emerald-600 mx-auto mb-4\" />\n          <p className=\"text-slate-500 dark:text-zinc-400\">Loading orders...</p>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"space-y-6 pb-24 lg:pb-0\">\n      <div className=\"flex flex-col md:flex-row justify-between items-end gap-4\">\n        <div>\n           <h2 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">Transactions</h2>\n           <p className=\"text-slate-500 dark:text-zinc-400 mt-1\">Manage sales history and order fulfillment status.</p>\n        </div>\n        <div className=\"flex gap-2\">\n            <button \n              onClick={handleRefresh}\n              disabled={isRefreshing}\n              className=\"px-3 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 rounded hover:bg-slate-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-sm font-medium transition-colors disabled:opacity-50\"\n            >\n                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} /> \n                {isRefreshing ? 'Refreshing...' : 'Refresh'}\n            </button>\n            <button className=\"px-3 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 rounded hover:bg-slate-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-sm font-medium transition-colors\">\n                <Download className=\"w-4 h-4\" /> Export\n            </button>\n        </div>\n      </div>\n\n      <div className=\"bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg shadow-sm flex flex-col min-h-[600px] transition-colors\">\n          {/* Toolbar */}\n          <div className=\"p-4 border-b border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50 dark:bg-zinc-800/30\">\n             <div className=\"relative w-full sm:w-80\">\n                 <Search className=\"w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500\" />\n                 <input \n                    className=\"w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500\"\n                    placeholder=\"Search order ID or customer...\"\n                    value={search}\n                    onChange={(e) => setSearch(e.target.value)}\n                 />\n             </div>\n             <div className=\"flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar\">\n                 <Filter className=\"w-4 h-4 text-slate-400 dark:text-zinc-500 mr-2\" />\n                 {['All', ...Object.values(OrderStatus)].map(s => (\n                     <button\n                        key={s}\n                        onClick={() => setFilter(s)}\n                        className={`px-3 py-1.5 text-xs font-medium rounded whitespace-nowrap transition-colors ${filter === s ? 'bg-slate-900 dark:bg-emerald-600 text-white' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}\n                     >\n                         {s}\n                     </button>\n                 ))}\n             </div>\n          </div>\n\n          {/* Empty State */}\n          {orders.length === 0 ? (\n            <div className=\"flex-1 flex items-center justify-center p-12\">\n              <div className=\"text-center max-w-sm\">\n                <div className=\"w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4\">\n                  <ShoppingBag className=\"w-8 h-8 text-slate-400 dark:text-zinc-600\" />\n                </div>\n                <h3 className=\"text-lg font-bold text-slate-900 dark:text-white mb-2\">No orders yet</h3>\n                <p className=\"text-slate-500 dark:text-zinc-400 mb-6\">\n                  Orders created through the POS will appear here.\n                </p>\n                <button \n                  onClick={handleRefresh}\n                  className=\"text-emerald-600 dark:text-emerald-400 text-sm font-medium hover:underline\"\n                >\n                  Refresh to check for new orders\n                </button>\n              </div>\n            </div>\n          ) : (\n            <>\n              {/* Table */}\n              <div className=\"overflow-x-auto flex-1\">\n                  <table className=\"w-full text-left text-sm\">\n                      <thead className=\"bg-slate-50 dark:bg-zinc-800/50 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-500 font-medium text-xs uppercase tracking-wider\">\n                          <tr>\n                              <th className=\"px-6 py-3\">Order ID</th>\n                              <th className=\"px-6 py-3\">Date</th>\n                              <th className=\"px-6 py-3\">Customer</th>\n                              <th className=\"px-6 py-3\">Manifest</th>\n                              <th className=\"px-6 py-3\">Items</th>\n                              <th className=\"px-6 py-3\">Total</th>\n                              <th className=\"px-6 py-3\">Status</th>\n                              <th className=\"px-6 py-3 text-right\">Actions</th>\n                          </tr>\n                      </thead>\n                      <tbody className=\"divide-y divide-slate-100 dark:divide-zinc-800\">\n                          {filteredOrders.map(order => (\n                              <tr key={order.id} className=\"hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group\">\n                                  <td className=\"px-6 py-4\">\n                                      <span className=\"font-mono font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors\">{order.id}</span>\n                                  </td>\n                                  <td className=\"px-6 py-4 text-slate-500 dark:text-zinc-400\">\n                                      {new Date(order.createdAt).toLocaleDateString()}\n                                      <span className=\"text-xs text-slate-400 dark:text-zinc-600 block\">{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>\n                                  </td>\n                                  <td className=\"px-6 py-4\">\n                                      <div className=\"font-medium text-slate-900 dark:text-zinc-200\">{order.customer.name}</div>\n                                      <div className=\"text-xs text-slate-500 dark:text-zinc-500\">{order.customer.phone}</div>\n                                  </td>\n                                  <td className=\"px-6 py-4\">\n                                      {order.batchId ? (\n                                          <span className=\"font-mono text-xs bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded text-slate-600 dark:text-zinc-400\">{order.batchId}</span>\n                                      ) : (\n                                          <span className=\"text-slate-400 dark:text-zinc-600 italic text-xs\">Unassigned</span>\n                                      )}\n                                  </td>\n                                  <td className=\"px-6 py-4 text-slate-600 dark:text-zinc-400\">\n                                      {order.items.reduce((acc, i) => acc + i.quantity, 0)} items\n                                  </td>\n                                  <td className=\"px-6 py-4 font-bold text-slate-900 dark:text-white\">\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "9002f6b5-0ec9-4c5f-a1dd-7f4704c9754b",
+      "label": "StatusPill",
+      "node_type": "function",
+      "file_path": "src/components/Orders.tsx",
+      "file_id": "3da08276-3f34-408b-8cf5-21ae67854cf7",
+      "line_start": 27,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const StatusPill = ({ status }: { status: OrderStatus }) => {\n      const styles = {\n          [OrderStatus.PENDING]: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700',\n          [OrderStatus.PACKED]: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',\n          [OrderStatus.IN_TRANSIT]: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800',\n          [OrderStatus.DELIVERED]: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',\n          [OrderStatus.CANCELLED]: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',\n      };\n      return (\n          <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${styles[status]}`}>\n              {status}\n          </span>\n      );\n  };\n\n  if (loading) {\n    return (\n      <div className=\"flex items-center justify-center h-96\">\n        <div className=\"text-center\">\n          <Loader2 className=\"w-8 h-8 animate-spin text-emerald-600 mx-auto mb-4\" />\n          <p className=\"text-slate-500 dark:text-zinc-400\">Loading orders...</p>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"space-y-6 pb-24 lg:pb-0\">\n      <div className=\"flex flex-col md:flex-row justify-between items-end gap-4\">\n        <div>\n           <h2 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">Transactions</h2>\n           <p className=\"text-slate-500 dark:text-zinc-400 mt-1\">Manage sales history and order fulfillment status.</p>\n        </div>\n        <div className=\"flex gap-2\">\n            <button \n              onClick={handleRefresh}\n              disabled={isRefreshing}\n              className=\"px-3 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 rounded hover:bg-slate-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-sm font-medium transition-colors disabled:opacity-50\"\n            >\n                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} /> \n                {isRefreshing ? 'Refreshing...' : 'Refresh'}\n            </button>\n            <button className=\"px-3 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 rounded hover:bg-slate-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-sm font-medium transition-colors\">\n                <Download className=\"w-4 h-4\" /> Export\n            </button>\n        </div>\n      </div>\n\n      <div className=\"bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg shadow-sm flex flex-col min-h-[600px] transition-colors\">\n          {/* Toolbar */}\n          <div className=\"p-4 border-b border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50 dark:bg-zinc-800/30\">\n             <div className=\"relative w-full sm:w-80\">\n                 <Search className=\"w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500\" />\n                 <input \n                    className=\"w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500\"\n                    placeholder=\"Search order ID or customer...\"\n                    value={search}\n                    onChange={(e) => setSearch(e.target.value)}\n                 />\n             </div>\n             <div className=\"flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar\">\n                 <Filter className=\"w-4 h-4 text-slate-400 dark:text-zinc-500 mr-2\" />\n                 {['All', ...Object.values(OrderStatus)].map(s => (\n                     <button\n                        key={s}\n                        onClick={() => setFilter(s)}\n                        className={`px-3 py-1.5 text-xs font-medium rounded whitespace-nowrap transition-colors ${filter === s ? 'bg-slate-900 dark:bg-emerald-600 text-white' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}\n                     >\n                         {s}\n                     </button>\n                 ))}\n             </div>\n          </div>\n\n          {/* Empty State */}\n          {orders.length === 0 ? (\n            <div className=\"flex-1 flex items-center justify-center p-12\">\n              <div className=\"text-center max-w-sm\">\n                <div className=\"w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4\">\n                  <ShoppingBag className=\"w-8 h-8 text-slate-400 dark:text-zinc-600\" />\n                </div>\n                <h3 className=\"text-lg font-bold text-slate-900 dark:text-white mb-2\">No orders yet</h3>\n                <p className=\"text-slate-500 dark:text-zinc-400 mb-6\">\n                  Orders created through the POS will appear here.\n                </p>\n                <button \n                  onClick={handleRefresh}\n                  className=\"text-emerald-600 dark:text-emerald-400 text-sm font-medium hover:underline\"\n                >\n                  Refresh to check for new orders\n                </button>\n              </div>\n            </div>\n          ) : (\n            <>\n              {/* Table */}\n              <div className=\"overflow-x-auto flex-1\">\n                  <table className=\"w-full text-left text-sm\">\n                      <thead className=\"bg-slate-50 dark:bg-zinc-800/50 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-500 font-medium text-xs uppercase tracking-wider\">\n                          <tr>\n                              <th className=\"px-6 py-3\">Order ID</th>\n                              <th className=\"px-6 py-3\">Date</th>\n                              <th className=\"px-6 py-3\">Customer</th>\n                              <th className=\"px-6 py-3\">Manifest</th>\n                              <th className=\"px-6 py-3\">Items</th>\n                              <th className=\"px-6 py-3\">Total</th>\n                              <th className=\"px-6 py-3\">Status</th>\n                              <th className=\"px-6 py-3 text-right\">Actions</th>\n                          </tr>\n                      </thead>\n                      <tbody className=\"divide-y divide-slate-100 dark:divide-zinc-800\">\n                          {filteredOrders.map(order => (\n                              <tr key={order.id} className=\"hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group\">\n                                  <td className=\"px-6 py-4\">\n                                      <span className=\"font-mono font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors\">{order.id}</span>\n                                  </td>\n                                  <td className=\"px-6 py-4 text-slate-500 dark:text-zinc-400\">\n                                      {new Date(order.createdAt).toLocaleDateString()}\n                                      <span className=\"text-xs text-slate-400 dark:text-zinc-600 block\">{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>\n                                  </td>\n                                  <td className=\"px-6 py-4\">\n                                      <div className=\"font-medium text-slate-900 dark:text-zinc-200\">{order.customer.name}</div>\n                                      <div className=\"text-xs text-slate-500 dark:text-zinc-500\">{order.customer.phone}</div>\n                                  </td>\n                                  <td className=\"px-6 py-4\">\n                                      {order.batchId ? (\n                                          <span className=\"font-mono text-xs bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded text-slate-600 dark:text-zinc-400\">{order.batchId}</span>\n                                      ) : (\n                                          <span className=\"text-slate-400 dark:text-zinc-600 italic text-xs\">Unassigned</span>\n                                      )}\n                                  </td>\n                                  <td className=\"px-6 py-4 text-slate-600 dark:text-zinc-400\">\n                                      {order.items.reduce((acc, i) => acc + i.quantity, 0)} items\n                                  </td>\n                                  <td className=\"px-6 py-4 font-bold text-slate-900 dark:text-white\">\n                                      ${order.totalAmount.toFixed(2)}\n                                  </td>\n                                  <td className=\"px-6 py-4\">\n                                      <StatusPill status={order.status} />\n                                  </td>\n                                  <td className=\"px-6 py-4 text-right\">\n                                      <button className=\"p-1 text-slate-400 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-white rounded hover:bg-slate-100 dark:hover:bg-zinc-700 transition-colors\">\n                                          <MoreHorizontal className=\"w-4 h-4\" />\n                                      </button>\n                                  </td>\n                              </tr>\n                          ))}\n                          {filteredOrders.length === 0 && orders.length > 0 && (\n                              <tr>\n                                  <td colSpan={8} className=\"px-6 py-12 text-center text-slate-500 dark:text-zinc-500\">\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "24aebfa4-03f8-47ad-9681-2348e40f06af",
+      "label": "getCategoryIcon",
+      "node_type": "function",
+      "file_path": "src/components/POS.tsx",
+      "file_id": "27aa667c-f712-4b3e-bc32-e128e8c4468d",
+      "line_start": 34,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const getCategoryIcon = (category: string) => {\n      switch (category.toLowerCase()) {\n          case 'electronics': return <Package className=\"w-8 h-8\" />;\n          case 'accessories': return <Box className=\"w-8 h-8\" />;\n          case 'furniture': return <Box className=\"w-8 h-8\" />;\n          case 'office': return <Box className=\"w-8 h-8\" />;\n          default: return <Box className=\"w-8 h-8\" />;\n      }\n  };\n\n  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n\n  const handleCheckout = async () => {\n    setIsProcessing(true);\n    setError('');\n    \n    try {\n      // Create order in database\n      await createOrder(\n        cart, \n        {\n          name: customerDetails.name,\n          phone: customerDetails.phone,\n          address: customerDetails.address || 'N/A'\n        }, \n        paymentMethod, \n        selectedBatchId || undefined\n      );\n      \n      // Generate order ID for display (this would come from the database in reality)\n      const orderId = `ORD-${Math.floor(Math.random() * 100000)}`;\n      setLastOrderId(orderId);\n      \n      setShowSuccess(true);\n      setTimeout(() => {\n          setShowSuccess(false);\n          setIsCheckoutOpen(false);\n          clearCart();\n          setCustomerDetails({ name: '', phone: '', address: '' });\n          setSelectedBatchId('');\n          setPaymentMethod('Cash');\n      }, 2500);\n    } catch (err: any) {\n      console.error('Checkout error:', err);\n      setError(err.message || 'Failed to create order. Please try again.');\n    } finally {\n      setIsProcessing(false);\n    }\n  };\n\n  if (loading) {\n    return (\n      <div className=\"flex items-center justify-center h-96\">\n        <div className=\"text-center\">\n          <Loader2 className=\"w-8 h-8 animate-spin text-emerald-600 mx-auto mb-4\" />\n          <p className=\"text-slate-500 dark:text-zinc-400\">Loading products...</p>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"flex flex-col lg:flex-row gap-6 pb-24 lg:pb-0\">\n      \n      {/* Product Catalog */}\n      <div className=\"flex-1 flex flex-col bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors min-h-[600px]\">\n        {/* Toolbar */}\n        <div className=\"p-4 border-b border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50 dark:bg-zinc-800/30\">\n            <div className=\"relative w-full sm:w-72\">\n                <Search className=\"w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500\" />\n                <input \n                    type=\"text\" \n                    placeholder=\"Search inventory...\" \n                    className=\"w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all\"\n                    value={search}\n                    onChange={(e) => setSearch(e.target.value)}\n                />\n            </div>\n            <div className=\"flex gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 no-scrollbar\">\n                {categories.map(cat => (\n                    <button\n                        key={cat}\n                        onClick={() => setSelectedCategory(cat)}\n                        className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${selectedCategory === cat ? 'bg-slate-900 dark:bg-emerald-600 text-white' : 'bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:border-slate-300 dark:hover:border-zinc-600'}`}\n                    >\n                        {cat}\n                    </button>\n                ))}\n            </div>\n        </div>\n\n        {/* Grid */}\n        <div className=\"flex-1 overflow-y-auto p-4 bg-slate-50/30 dark:bg-zinc-950/30\">\n            {filteredProducts.length === 0 ? (\n              <div className=\"flex items-center justify-center h-full\">\n                <div className=\"text-center\">\n                  <Package className=\"w-12 h-12 text-slate-300 dark:text-zinc-700 mx-auto mb-4\" />\n                  <h3 className=\"text-lg font-bold text-slate-900 dark:text-white mb-2\">\n                    {products.length === 0 ? 'No products available' : 'No products found'}\n                  </h3>\n                  <p className=\"text-slate-500 dark:text-zinc-400 text-sm\">\n                    {products.length === 0 ? 'Add products to get started' : 'Try a different search or category'}\n                  </p>\n                </div>\n              </div>\n            ) : (\n              <div className=\"grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4\">\n                  {filteredProducts.map(product => (\n                      <button \n                          key={product.id}\n                          onClick={() => addToCart(product)}\n                          disabled={product.stock === 0}\n                          className=\"group flex flex-col bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:shadow-md hover:border-emerald-500 dark:hover:border-emerald-500 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed\"\n                      >\n                          <div className=\"aspect-[4/3] bg-slate-50 dark:bg-zinc-800/50 flex items-center justify-center text-slate-300 dark:text-zinc-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors relative overflow-hidden\">\n                              {product.image ? (\n                                <img src={product.image} alt={product.name} className=\"w-full h-full object-cover\" />\n                              ) : (\n                                getCategoryIcon(product.category)\n                              )}\n                              <div className=\"absolute top-2 right-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur text-slate-900 dark:text-white text-xs font-bold px-2 py-0.5 rounded shadow-sm border border-slate-100 dark:border-zinc-700\">\n                                  ${product.price.toFixed(2)}\n                              </div>\n                              {product.stock === 0 && (\n                                <div className=\"absolute inset-0 bg-black/50 flex items-center justify-center\">\n                                  <span className=\"text-white text-xs font-bold uppercase tracking-wider bg-red-600 px-3 py-1 rounded\">Out of Stock</span>\n                                </div>\n                              )}\n                          </div>\n                          <div className=\"p-3 flex flex-col flex-1\">\n                              <h4 className=\"font-bold text-slate-900 dark:text-white text-sm leading-tight mb-1\">{product.name}</h4>\n                              <p className=\"text-xs text-slate-500 dark:text-zinc-400 mb-2\">{product.category}</p>\n                              <div className=\"mt-auto flex justify-between items-center pt-2 border-t border-slate-50 dark:border-zinc-800\">\n                                  <span className={`text-[10px] font-bold uppercase tracking-wider ${product.stock === 0 ? 'text-red-600 dark:text-red-400' : product.stock < 10 ? 'text-orange-600 dark:text-orange-400' : 'text-emerald-600 dark:text-emerald-400'}`}>\n                                      {product.stock === 0 ? 'Out of stock' : `${product.stock} in stock`}\n                                  </span>\n                                  <div className=\"w-6 h-6 rounded bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-400 dark:text-zinc-500 group-hover:bg-emerald-600 group-hover:text-white transition-colors\">\n                                      <Plus className=\"w-3 h-3\" />\n                                  </div>\n                              </div>\n                          </div>\n                      </button>\n                  ))}\n              </div>\n            )}\n        </div>\n      </div>\n\n      {/* Cart Sidebar */}\n      <div className=\"lg:w-[400px] flex flex-col bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[400px] lg:min-h-0 transition-colors mb-8 lg:mb-0\">\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "c8046105-c499-4750-b9ec-531d74046863",
+      "label": "handleCheckout",
+      "node_type": "function",
+      "file_path": "src/components/POS.tsx",
+      "file_id": "27aa667c-f712-4b3e-bc32-e128e8c4468d",
+      "line_start": 46,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const handleCheckout = async () => {\n    setIsProcessing(true);\n    setError('');\n    \n    try {\n      // Create order in database\n      await createOrder(\n        cart, \n        {\n          name: customerDetails.name,\n          phone: customerDetails.phone,\n          address: customerDetails.address || 'N/A'\n        }, \n        paymentMethod, \n        selectedBatchId || undefined\n      );\n      \n      // Generate order ID for display (this would come from the database in reality)\n      const orderId = `ORD-${Math.floor(Math.random() * 100000)}`;\n      setLastOrderId(orderId);\n      \n      setShowSuccess(true);\n      setTimeout(() => {\n          setShowSuccess(false);\n          setIsCheckoutOpen(false);\n          clearCart();\n          setCustomerDetails({ name: '', phone: '', address: '' });\n          setSelectedBatchId('');\n          setPaymentMethod('Cash');\n      }, 2500);\n    } catch (err: any) {\n      console.error('Checkout error:', err);\n      setError(err.message || 'Failed to create order. Please try again.');\n    } finally {\n      setIsProcessing(false);\n    }\n  };\n\n  if (loading) {\n    return (\n      <div className=\"flex items-center justify-center h-96\">\n        <div className=\"text-center\">\n          <Loader2 className=\"w-8 h-8 animate-spin text-emerald-600 mx-auto mb-4\" />\n          <p className=\"text-slate-500 dark:text-zinc-400\">Loading products...</p>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"flex flex-col lg:flex-row gap-6 pb-24 lg:pb-0\">\n      \n      {/* Product Catalog */}\n      <div className=\"flex-1 flex flex-col bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors min-h-[600px]\">\n        {/* Toolbar */}\n        <div className=\"p-4 border-b border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50 dark:bg-zinc-800/30\">\n            <div className=\"relative w-full sm:w-72\">\n                <Search className=\"w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500\" />\n                <input \n                    type=\"text\" \n                    placeholder=\"Search inventory...\" \n                    className=\"w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all\"\n                    value={search}\n                    onChange={(e) => setSearch(e.target.value)}\n                />\n            </div>\n            <div className=\"flex gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 no-scrollbar\">\n                {categories.map(cat => (\n                    <button\n                        key={cat}\n                        onClick={() => setSelectedCategory(cat)}\n                        className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${selectedCategory === cat ? 'bg-slate-900 dark:bg-emerald-600 text-white' : 'bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:border-slate-300 dark:hover:border-zinc-600'}`}\n                    >\n                        {cat}\n                    </button>\n                ))}\n            </div>\n        </div>\n\n        {/* Grid */}\n        <div className=\"flex-1 overflow-y-auto p-4 bg-slate-50/30 dark:bg-zinc-950/30\">\n            {filteredProducts.length === 0 ? (\n              <div className=\"flex items-center justify-center h-full\">\n                <div className=\"text-center\">\n                  <Package className=\"w-12 h-12 text-slate-300 dark:text-zinc-700 mx-auto mb-4\" />\n                  <h3 className=\"text-lg font-bold text-slate-900 dark:text-white mb-2\">\n                    {products.length === 0 ? 'No products available' : 'No products found'}\n                  </h3>\n                  <p className=\"text-slate-500 dark:text-zinc-400 text-sm\">\n                    {products.length === 0 ? 'Add products to get started' : 'Try a different search or category'}\n                  </p>\n                </div>\n              </div>\n            ) : (\n              <div className=\"grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4\">\n                  {filteredProducts.map(product => (\n                      <button \n                          key={product.id}\n                          onClick={() => addToCart(product)}\n                          disabled={product.stock === 0}\n                          className=\"group flex flex-col bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:shadow-md hover:border-emerald-500 dark:hover:border-emerald-500 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed\"\n                      >\n                          <div className=\"aspect-[4/3] bg-slate-50 dark:bg-zinc-800/50 flex items-center justify-center text-slate-300 dark:text-zinc-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors relative overflow-hidden\">\n                              {product.image ? (\n                                <img src={product.image} alt={product.name} className=\"w-full h-full object-cover\" />\n                              ) : (\n                                getCategoryIcon(product.category)\n                              )}\n                              <div className=\"absolute top-2 right-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur text-slate-900 dark:text-white text-xs font-bold px-2 py-0.5 rounded shadow-sm border border-slate-100 dark:border-zinc-700\">\n                                  ${product.price.toFixed(2)}\n                              </div>\n                              {product.stock === 0 && (\n                                <div className=\"absolute inset-0 bg-black/50 flex items-center justify-center\">\n                                  <span className=\"text-white text-xs font-bold uppercase tracking-wider bg-red-600 px-3 py-1 rounded\">Out of Stock</span>\n                                </div>\n                              )}\n                          </div>\n                          <div className=\"p-3 flex flex-col flex-1\">\n                              <h4 className=\"font-bold text-slate-900 dark:text-white text-sm leading-tight mb-1\">{product.name}</h4>\n                              <p className=\"text-xs text-slate-500 dark:text-zinc-400 mb-2\">{product.category}</p>\n                              <div className=\"mt-auto flex justify-between items-center pt-2 border-t border-slate-50 dark:border-zinc-800\">\n                                  <span className={`text-[10px] font-bold uppercase tracking-wider ${product.stock === 0 ? 'text-red-600 dark:text-red-400' : product.stock < 10 ? 'text-orange-600 dark:text-orange-400' : 'text-emerald-600 dark:text-emerald-400'}`}>\n                                      {product.stock === 0 ? 'Out of stock' : `${product.stock} in stock`}\n                                  </span>\n                                  <div className=\"w-6 h-6 rounded bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-400 dark:text-zinc-500 group-hover:bg-emerald-600 group-hover:text-white transition-colors\">\n                                      <Plus className=\"w-3 h-3\" />\n                                  </div>\n                              </div>\n                          </div>\n                      </button>\n                  ))}\n              </div>\n            )}\n        </div>\n      </div>\n\n      {/* Cart Sidebar */}\n      <div className=\"lg:w-[400px] flex flex-col bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[400px] lg:min-h-0 transition-colors mb-8 lg:mb-0\">\n         <div className=\"p-4 bg-slate-900 dark:bg-zinc-950 text-white flex justify-between items-center\">\n             <h2 className=\"font-display font-bold\">Current Order</h2>\n             <span className=\"bg-slate-800 dark:bg-zinc-800 text-slate-300 dark:text-zinc-400 text-xs font-mono px-2 py-1 rounded\">\n                 {cart.reduce((a, b) => a + b.quantity, 0)} ITEMS\n             </span>\n         </div>\n         \n         <div className=\"flex-1 overflow-y-auto p-4 space-y-3\">\n             {cart.length === 0 ? (\n                 <div className=\"h-full flex flex-col items-center justify-center text-slate-300 dark:text-zinc-600 space-y-4 py-12\">\n                     <ShoppingBag className=\"w-12 h-12\" strokeWidth={1} />\n                     <p className=\"text-sm font-medium\">No items selected</p>\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "640a0176-83aa-4c01-a061-96e520ac230a",
+      "label": "refreshData",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 89,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const refreshData = async () => {\n    setLoading(true);\n    try {\n      const [productsData, ordersData, batchesData] = await Promise.all([\n        productService.getAll(),\n        orderService.getAll(),\n        batchService.getAll(),\n      ]);\n\n      setProducts(productsData);\n      setOrders(ordersData);\n      setBatches(batchesData);\n    } catch (error) {\n      console.error('Error loading data:', error);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  // Load theme from localStorage\n  useEffect(() => {\n    const savedTheme = localStorage.getItem('theme') as Theme;\n    if (savedTheme) {\n      setTheme(savedTheme);\n      document.documentElement.classList.toggle('dark', savedTheme === 'dark');\n    }\n  }, []);\n\n  const toggleTheme = () => {\n    setTheme(prev => {\n      const newTheme = prev === 'light' ? 'dark' : 'light';\n      localStorage.setItem('theme', newTheme);\n      document.documentElement.classList.toggle('dark', newTheme === 'dark');\n      return newTheme;\n    });\n  };\n\n  // Supabase login\n  const login = async (email: string, password: string) => {\n    const { data, error } = await supabase.auth.signInWithPassword({\n      email,\n      password,\n    });\n\n    if (error) throw error;\n    \n    setUser(data.user);\n    setIsLoggedIn(true);\n  };\n\n  // Supabase logout\n  const logout = async () => {\n    await supabase.auth.signOut();\n    setUser(null);\n    setIsLoggedIn(false);\n    setCart([]);\n    setProducts([]);\n    setOrders([]);\n    setBatches([]);\n  };\n\n  // Calculate metrics whenever orders change\n  useEffect(() => {\n    const today = new Date().toDateString();\n    \n    const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);\n    const revenue = todaysOrders.reduce((sum, order) => sum + order.totalAmount, 0);\n    const inTransit = orders.filter(o => o.status === OrderStatus.IN_TRANSIT).length;\n    const completed = orders.filter(o => o.status === OrderStatus.DELIVERED).length;\n\n    setMetrics({\n      ordersToday: todaysOrders.length,\n      revenueToday: revenue,\n      ordersInTransit: inTransit,\n      ordersCompleted: completed,\n    });\n  }, [orders]);\n\n  const createBatch = async (name: string, capacity: number) => {\n    try {\n      const newBatch = await batchService.create(name, capacity);\n      setBatches(prev => [newBatch, ...prev]);\n    } catch (error) {\n      console.error('Error creating batch:', error);\n      throw error;\n    }\n  };\n\n  const addToCart = (product: Product) => {\n    setCart(prev => {\n      const existing = prev.find(p => p.id === product.id);\n      if (existing) {\n        if (existing.quantity >= product.stock) return prev;\n        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);\n      }\n      return [...prev, { ...product, quantity: 1 }];\n    });\n  };\n\n  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "58ea440a-e148-4715-b152-b5ebf86bf782",
+      "label": "toggleTheme",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 117,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const toggleTheme = () => {\n    setTheme(prev => {\n      const newTheme = prev === 'light' ? 'dark' : 'light';\n      localStorage.setItem('theme', newTheme);\n      document.documentElement.classList.toggle('dark', newTheme === 'dark');\n      return newTheme;\n    });\n  };\n\n  // Supabase login\n  const login = async (email: string, password: string) => {\n    const { data, error } = await supabase.auth.signInWithPassword({\n      email,\n      password,\n    });\n\n    if (error) throw error;\n    \n    setUser(data.user);\n    setIsLoggedIn(true);\n  };\n\n  // Supabase logout\n  const logout = async () => {\n    await supabase.auth.signOut();\n    setUser(null);\n    setIsLoggedIn(false);\n    setCart([]);\n    setProducts([]);\n    setOrders([]);\n    setBatches([]);\n  };\n\n  // Calculate metrics whenever orders change\n  useEffect(() => {\n    const today = new Date().toDateString();\n    \n    const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);\n    const revenue = todaysOrders.reduce((sum, order) => sum + order.totalAmount, 0);\n    const inTransit = orders.filter(o => o.status === OrderStatus.IN_TRANSIT).length;\n    const completed = orders.filter(o => o.status === OrderStatus.DELIVERED).length;\n\n    setMetrics({\n      ordersToday: todaysOrders.length,\n      revenueToday: revenue,\n      ordersInTransit: inTransit,\n      ordersCompleted: completed,\n    });\n  }, [orders]);\n\n  const createBatch = async (name: string, capacity: number) => {\n    try {\n      const newBatch = await batchService.create(name, capacity);\n      setBatches(prev => [newBatch, ...prev]);\n    } catch (error) {\n      console.error('Error creating batch:', error);\n      throw error;\n    }\n  };\n\n  const addToCart = (product: Product) => {\n    setCart(prev => {\n      const existing = prev.find(p => p.id === product.id);\n      if (existing) {\n        if (existing.quantity >= product.stock) return prev;\n        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);\n      }\n      return [...prev, { ...product, quantity: 1 }];\n    });\n  };\n\n  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "2aeb53f5-1ef5-42ba-a3c8-391f1a14209f",
+      "label": "login",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 127,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const login = async (email: string, password: string) => {\n    const { data, error } = await supabase.auth.signInWithPassword({\n      email,\n      password,\n    });\n\n    if (error) throw error;\n    \n    setUser(data.user);\n    setIsLoggedIn(true);\n  };\n\n  // Supabase logout\n  const logout = async () => {\n    await supabase.auth.signOut();\n    setUser(null);\n    setIsLoggedIn(false);\n    setCart([]);\n    setProducts([]);\n    setOrders([]);\n    setBatches([]);\n  };\n\n  // Calculate metrics whenever orders change\n  useEffect(() => {\n    const today = new Date().toDateString();\n    \n    const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);\n    const revenue = todaysOrders.reduce((sum, order) => sum + order.totalAmount, 0);\n    const inTransit = orders.filter(o => o.status === OrderStatus.IN_TRANSIT).length;\n    const completed = orders.filter(o => o.status === OrderStatus.DELIVERED).length;\n\n    setMetrics({\n      ordersToday: todaysOrders.length,\n      revenueToday: revenue,\n      ordersInTransit: inTransit,\n      ordersCompleted: completed,\n    });\n  }, [orders]);\n\n  const createBatch = async (name: string, capacity: number) => {\n    try {\n      const newBatch = await batchService.create(name, capacity);\n      setBatches(prev => [newBatch, ...prev]);\n    } catch (error) {\n      console.error('Error creating batch:', error);\n      throw error;\n    }\n  };\n\n  const addToCart = (product: Product) => {\n    setCart(prev => {\n      const existing = prev.find(p => p.id === product.id);\n      if (existing) {\n        if (existing.quantity >= product.stock) return prev;\n        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);\n      }\n      return [...prev, { ...product, quantity: 1 }];\n    });\n  };\n\n  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "dd178ecc-ab6d-4631-8699-167118e5a8a3",
+      "label": "logout",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 140,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const logout = async () => {\n    await supabase.auth.signOut();\n    setUser(null);\n    setIsLoggedIn(false);\n    setCart([]);\n    setProducts([]);\n    setOrders([]);\n    setBatches([]);\n  };\n\n  // Calculate metrics whenever orders change\n  useEffect(() => {\n    const today = new Date().toDateString();\n    \n    const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);\n    const revenue = todaysOrders.reduce((sum, order) => sum + order.totalAmount, 0);\n    const inTransit = orders.filter(o => o.status === OrderStatus.IN_TRANSIT).length;\n    const completed = orders.filter(o => o.status === OrderStatus.DELIVERED).length;\n\n    setMetrics({\n      ordersToday: todaysOrders.length,\n      revenueToday: revenue,\n      ordersInTransit: inTransit,\n      ordersCompleted: completed,\n    });\n  }, [orders]);\n\n  const createBatch = async (name: string, capacity: number) => {\n    try {\n      const newBatch = await batchService.create(name, capacity);\n      setBatches(prev => [newBatch, ...prev]);\n    } catch (error) {\n      console.error('Error creating batch:', error);\n      throw error;\n    }\n  };\n\n  const addToCart = (product: Product) => {\n    setCart(prev => {\n      const existing = prev.find(p => p.id === product.id);\n      if (existing) {\n        if (existing.quantity >= product.stock) return prev;\n        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);\n      }\n      return [...prev, { ...product, quantity: 1 }];\n    });\n  };\n\n  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "98287992-7e01-4e19-88df-dfdbbf5d1a86",
+      "label": "createBatch",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 167,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const createBatch = async (name: string, capacity: number) => {\n    try {\n      const newBatch = await batchService.create(name, capacity);\n      setBatches(prev => [newBatch, ...prev]);\n    } catch (error) {\n      console.error('Error creating batch:', error);\n      throw error;\n    }\n  };\n\n  const addToCart = (product: Product) => {\n    setCart(prev => {\n      const existing = prev.find(p => p.id === product.id);\n      if (existing) {\n        if (existing.quantity >= product.stock) return prev;\n        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);\n      }\n      return [...prev, { ...product, quantity: 1 }];\n    });\n  };\n\n  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "e73ade9c-2f9f-48bd-8673-74de72e56d89",
+      "label": "addToCart",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 177,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const addToCart = (product: Product) => {\n    setCart(prev => {\n      const existing = prev.find(p => p.id === product.id);\n      if (existing) {\n        if (existing.quantity >= product.stock) return prev;\n        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);\n      }\n      return [...prev, { ...product, quantity: 1 }];\n    });\n  };\n\n  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "841cf690-9c03-4437-9298-237f2364f2eb",
+      "label": "updateCartQuantity",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 188,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const updateCartQuantity = (id: string, delta: number) => {\n    setCart(prev => prev.map(p => {\n       if (p.id === id) {\n           const newQty = Math.max(0, p.quantity + delta);\n           return newQty === 0 ? p : { ...p, quantity: newQty };\n       }\n       return p;\n    }).filter(p => p.quantity > 0));\n  };\n\n  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "4a7f8860-3833-49fb-9b1d-4fd86eddd566",
+      "label": "clearCart",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 198,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const clearCart = () => setCart([]);\n\n  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "5d2ac986-2e15-4f47-80ce-db6dbdf35549",
+      "label": "createOrder",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 200,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const createOrder = async (items: CartItem[], customer: Customer, paymentMethod: string, batchId?: string) => {\n    try {\n      const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n      \n      const orderData = {\n        customer,\n        items,\n        totalAmount,\n        status: batchId ? OrderStatus.PACKED : OrderStatus.PENDING,\n        paymentStatus: PaymentStatus.PAID,\n        paymentMethod: paymentMethod as any,\n        batchId,\n      };\n\n      const newOrder = await orderService.create(orderData);\n      \n      // Refresh data to get updated state\n      await refreshData();\n      \n    } catch (error) {\n      console.error('Error creating order:', error);\n      throw error;\n    }\n  };\n\n  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "5bbbf87a-87a1-4de1-9aad-cb8a978d71e7",
+      "label": "updateOrderStatus",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 225,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {\n    try {\n      await orderService.updateStatus(orderId, status);\n      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));\n    } catch (error) {\n      console.error('Error updating order status:', error);\n      throw error;\n    }\n  };\n\n  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "5833fc44-b7bb-4ebd-b344-e249f31eeaef",
+      "label": "markNotificationRead",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 235,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const markNotificationRead = (id: string) => {\n    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));\n  };\n\n  return (\n    <AppContext.Provider value={{ \n      products, orders, batches, metrics, notifications, cart, loading,\n      addToCart, updateCartQuantity, clearCart, createOrder, createBatch, \n      updateOrderStatus, markNotificationRead, refreshData,\n      isLoggedIn, user, authLoading, login, logout,\n      theme, toggleTheme\n    }}>\n      {children}\n    </AppContext.Provider>\n  );\n};\n\nexport const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "ef491351-9c83-4eef-a54a-ac7891e9576a",
+      "label": "useApp",
+      "node_type": "function",
+      "file_path": "src/context/AppContext.tsx",
+      "file_id": "bcb87f2a-05bc-440d-8368-7532fd0988cd",
+      "line_start": 252,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "export const useApp = () => {\n  const context = useContext(AppContext);\n  if (context === undefined) {\n    throw new Error('useApp must be used within an AppProvider');\n  }\n  return context;\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "14d2728d-c93e-4954-8663-8eaebfc2ddad",
+      "label": "useAgent",
+      "node_type": "function",
+      "file_path": "src/hooks/useAgent.ts",
+      "file_id": "487445fe-7d12-40bb-9bde-d07056995a26",
+      "line_start": 17,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "export const useAgent = () => {\n  const { user, isLoggedIn } = useApp();\n  const [agent, setAgent] = useState<Agent | null>(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<string | null>(null);\n\n  useEffect(() => {\n    const fetchAgent = async () => {\n      if (!isLoggedIn || !user) {\n        setAgent(null);\n        setLoading(false);\n        return;\n      }\n\n      try {\n        setLoading(true);\n        const { data, error } = await supabase\n          .from('agents')\n          .select('*')\n          .eq('user_id', user.id)\n          .single();\n\n        if (error) {\n          throw error;\n        }\n\n        setAgent(data);\n        setError(null);\n      } catch (err: any) {\n        console.error('Error fetching agent:', err);\n        setError(err.message);\n        setAgent(null);\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    fetchAgent();\n  }, [user, isLoggedIn]);\n\n  const updateAgent = async (updates: Partial<Agent>) => {\n    if (!agent) return;\n\n    try {\n      const { data, error } = await supabase\n        .from('agents')\n        .update(updates)\n        .eq('user_id', user?.id)\n        .select()\n        .single();\n\n      if (error) throw error;\n\n      setAgent(data);\n      return { success: true, data };\n    } catch (err: any) {\n      console.error('Error updating agent:', err);\n      return { success: false, error: err.message };\n    }\n  };\n\n  return {\n    agent,\n    loading,\n    error,\n    updateAgent,\n  };\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "62e68b05-8941-4354-8740-04e6f9786d87",
+      "label": "fetchAgent",
+      "node_type": "function",
+      "file_path": "src/hooks/useAgent.ts",
+      "file_id": "487445fe-7d12-40bb-9bde-d07056995a26",
+      "line_start": 24,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "    const fetchAgent = async () => {\n      if (!isLoggedIn || !user) {\n        setAgent(null);\n        setLoading(false);\n        return;\n      }\n\n      try {\n        setLoading(true);\n        const { data, error } = await supabase\n          .from('agents')\n          .select('*')\n          .eq('user_id', user.id)\n          .single();\n\n        if (error) {\n          throw error;\n        }\n\n        setAgent(data);\n        setError(null);\n      } catch (err: any) {\n        console.error('Error fetching agent:', err);\n        setError(err.message);\n        setAgent(null);\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    fetchAgent();\n  }, [user, isLoggedIn]);\n\n  const updateAgent = async (updates: Partial<Agent>) => {\n    if (!agent) return;\n\n    try {\n      const { data, error } = await supabase\n        .from('agents')\n        .update(updates)\n        .eq('user_id', user?.id)\n        .select()\n        .single();\n\n      if (error) throw error;\n\n      setAgent(data);\n      return { success: true, data };\n    } catch (err: any) {\n      console.error('Error updating agent:', err);\n      return { success: false, error: err.message };\n    }\n  };\n\n  return {\n    agent,\n    loading,\n    error,\n    updateAgent,\n  };\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "a2606f85-177c-4106-9ee5-64cc834c6027",
+      "label": "updateAgent",
+      "node_type": "function",
+      "file_path": "src/hooks/useAgent.ts",
+      "file_id": "487445fe-7d12-40bb-9bde-d07056995a26",
+      "line_start": 57,
+      "line_end": null,
+      "is_async": true,
+      "source_code": "  const updateAgent = async (updates: Partial<Agent>) => {\n    if (!agent) return;\n\n    try {\n      const { data, error } = await supabase\n        .from('agents')\n        .update(updates)\n        .eq('user_id', user?.id)\n        .select()\n        .single();\n\n      if (error) throw error;\n\n      setAgent(data);\n      return { success: true, data };\n    } catch (err: any) {\n      console.error('Error updating agent:', err);\n      return { success: false, error: err.message };\n    }\n  };\n\n  return {\n    agent,\n    loading,\n    error,\n    updateAgent,\n  };\n};",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    },
+    {
+      "id": "29b7446d-9cca-4dec-8223-c69b114b429e",
+      "label": "getCategoryIcon",
+      "node_type": "function",
+      "file_path": "src/pages/Dashboard.tsx",
+      "file_id": "84bb0235-4cb2-4cbc-a51f-e3b9c54cb024",
+      "line_start": 27,
+      "line_end": null,
+      "is_async": false,
+      "source_code": "  const getCategoryIcon = (category: string) => {\n      switch (category.toLowerCase()) {\n          case 'staples': return <Package className=\"w-6 h-6\" />;\n          case 'pantry': return <Utensils className=\"w-6 h-6\" />;\n          case 'household': return <Box className=\"w-6 h-6\" />;\n          case 'clothing': return <Shirt className=\"w-6 h-6\" />;\n          default: return <Box className=\"w-6 h-6\" />;\n      }\n  };\n  \n  return (\n    <div className=\"space-y-8 pb-24 lg:pb-8\">\n      {/* Header */}\n      <div className=\"flex flex-col sm:flex-row sm:items-end justify-between gap-4\">\n        <div>\n           <h2 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">Control Center</h2>\n           <p className=\"text-slate-500 dark:text-zinc-400 mt-1\">Real-time overview of your allocated inventory and orders.</p>\n        </div>\n        <div className=\"flex gap-3\">\n            <button \n                onClick={() => onNavigate('batches')}\n                className=\"px-4 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-medium text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors shadow-sm\"\n            >\n                View Batches\n            </button>\n            <button \n                onClick={() => onNavigate('pos')}\n                className=\"px-4 py-2 bg-slate-900 dark:bg-emerald-600 text-white font-medium text-sm rounded-lg hover:bg-slate-800 dark:hover:bg-emerald-500 transition-colors shadow-sm flex items-center gap-2\"\n            >\n                New Order <ChevronRight className=\"w-4 h-4\" />\n            </button>\n        </div>\n      </div>\n\n      {/* Metrics Grid */}\n      <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4\">\n        <div className=\"bg-white dark:bg-zinc-900 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group transition-colors\">\n            <div className=\"flex justify-between items-start mb-4\">\n                <div className=\"p-2 bg-slate-100 dark:bg-zinc-800 rounded text-slate-600 dark:text-zinc-400 group-hover:bg-slate-900 dark:group-hover:bg-emerald-600 group-hover:text-white transition-colors\">\n                    <Package className=\"w-5 h-5\" />\n                </div>\n                <span className=\"flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full uppercase tracking-wider\">\n                    Today\n                </span>\n            </div>\n            <div className=\"space-y-1\">\n                <h3 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">{metrics.ordersToday}</h3>\n                <p className=\"text-sm font-medium text-slate-500 dark:text-zinc-500\">Orders Created</p>\n            </div>\n        </div>\n\n        <div className=\"bg-white dark:bg-zinc-900 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group transition-colors\">\n            <div className=\"flex justify-between items-start mb-4\">\n                <div className=\"p-2 bg-slate-100 dark:bg-zinc-800 rounded text-slate-600 dark:text-zinc-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors\">\n                    <DollarSign className=\"w-5 h-5\" />\n                </div>\n                <span className=\"flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full uppercase tracking-wider\">\n                    +12%\n                </span>\n            </div>\n            <div className=\"space-y-1\">\n                <h3 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">${metrics.revenueToday.toLocaleString()}</h3>\n                <p className=\"text-sm font-medium text-slate-500 dark:text-zinc-500\">Revenue Collected</p>\n            </div>\n        </div>\n\n        <div className=\"bg-white dark:bg-zinc-900 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group transition-colors\">\n            <div className=\"flex justify-between items-start mb-4\">\n                <div className=\"p-2 bg-slate-100 dark:bg-zinc-800 rounded text-slate-600 dark:text-zinc-400 group-hover:bg-blue-600 group-hover:text-white transition-colors\">\n                    <Truck className=\"w-5 h-5\" />\n                </div>\n            </div>\n            <div className=\"space-y-1\">\n                <h3 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">{metrics.ordersInTransit}</h3>\n                <p className=\"text-sm font-medium text-slate-500 dark:text-zinc-500\">In Transit</p>\n            </div>\n            <div className=\"absolute bottom-0 left-0 w-full h-1 bg-blue-100 dark:bg-blue-900/30\">\n                <div className=\"h-full bg-blue-500\" style={{ width: '45%' }}></div>\n            </div>\n        </div>\n\n        <div className=\"bg-white dark:bg-zinc-900 p-5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group transition-colors\">\n            <div className=\"flex justify-between items-start mb-4\">\n                <div className=\"p-2 bg-slate-100 dark:bg-zinc-800 rounded text-slate-600 dark:text-zinc-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors\">\n                    <CheckCheck className=\"w-5 h-5\" />\n                </div>\n            </div>\n            <div className=\"space-y-1\">\n                <h3 className=\"text-3xl font-display font-bold text-slate-900 dark:text-white\">{metrics.ordersCompleted}</h3>\n                <p className=\"text-sm font-medium text-slate-500 dark:text-zinc-500\">Completed Orders</p>\n            </div>\n        </div>\n      </div>\n\n      <div className=\"grid grid-cols-1 lg:grid-cols-3 gap-8\">\n        {/* Active Batch Panel */}\n        <div className=\"lg:col-span-2 space-y-4\">\n            <div className=\"flex items-center justify-between\">\n                <h3 className=\"text-lg font-display font-bold text-slate-900 dark:text-white\">Active Manifest</h3>\n                <span className=\"text-xs font-mono text-slate-400 dark:text-zinc-500\">SYNCED: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>\n            </div>\n            \n            {activeBatch ? (\n                <div className=\"bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors\">\n                    <div className=\"p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-800/20 flex flex-col sm:flex-row justify-between gap-4\">\n                         <div>\n                             <div className=\"flex items-center gap-2 mb-1\">\n                                 <h4 className=\"text-xl font-bold font-mono text-slate-900 dark:text-white\">{activeBatch.id}</h4>\n                                 <span className=\"px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider rounded\">Open</span>\n                             </div>\n                             <p className=\"text-sm text-slate-500 dark:text-zinc-400\">{activeBatch.name}</p>\n                         </div>\n                    </div>\n                    <div className=\"p-6\">\n                        <div className=\"flex justify-between text-sm mb-2 font-medium\">\n                            <span className=\"text-slate-500 dark:text-zinc-400\">Capacity Utilization</span>\n                            <span className=\"text-slate-900 dark:text-white\">{Math.round((activeBatch.currentFill / activeBatch.capacity) * 100)}%</span>\n                        </div>\n                        <div className=\"h-4 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden mb-4 border border-slate-200 dark:border-zinc-700\">\n                            <div className=\"h-full bg-gradient-to-r from-emerald-500 to-teal-400 relative\" style={{ width: `${(activeBatch.currentFill / activeBatch.capacity) * 100}%` }}></div>\n                        </div>\n                        <div className=\"flex gap-4 text-xs\">\n                            <div className=\"flex items-center gap-1.5 text-slate-600 dark:text-zinc-300 bg-slate-50 dark:bg-zinc-800 px-3 py-1.5 rounded border border-slate-100 dark:border-zinc-700\">\n                                <Package className=\"w-3.5 h-3.5\" />\n                                <span className=\"font-bold\">{activeBatch.currentFill}</span> / {activeBatch.capacity} Orders Filled\n                            </div>\n                            <div className=\"flex items-center gap-1.5 text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded border border-orange-100 dark:border-orange-800\">\n                                <AlertCircle className=\"w-3.5 h-3.5\" />\n                                <span className=\"font-bold\">{activeBatch.capacity - activeBatch.currentFill}</span> More Needed\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            ) : (\n                <div className=\"bg-white dark:bg-zinc-900 p-8 rounded-lg border border-slate-200 dark:border-zinc-800 border-dashed text-center\">\n                    <p className=\"text-slate-500 dark:text-zinc-500\">No active batches assigned currently.</p>\n                </div>\n            )}\n\n            <div className=\"pt-4\">\n                 <h3 className=\"text-lg font-display font-bold text-slate-900 dark:text-white mb-4\">Recently Picked Inventory</h3>\n                 <div className=\"grid grid-cols-2 md:grid-cols-4 gap-4\">\n                     {recentlyPickedItems.length > 0 ? recentlyPickedItems.map((item, i) => (\n                         <div key={`${item.id}-${i}`} className=\"bg-white dark:bg-zinc-900 p-4 rounded-lg border border-slate-200 dark:border-zinc-800 flex flex-col items-center text-center shadow-sm hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors group relative\">\n                             <div className=\"w-12 h-12 rounded-full bg-slate-50 dark:bg-zinc-800 flex items-center justify-center text-slate-400 dark:text-zinc-500 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/20 transition-colors mb-3\">\n                                 {getCategoryIcon(item.category)}\n                             </div>\n                             <h4 className=\"font-bold text-slate-900 dark:text-white text-sm line-clamp-2 w-full mb-1 min-h-[2.5rem]\">{item.name}</h4>\n                             <p className=\"text-xs text-slate-500 dark:text-zinc-500 mb-2\">Qty: {item.quantity}</p>\n                             <span className=\"text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded mb-2\">\n# ... (truncated at 150 lines)",
+      "symbol_type": "function",
+      "return_type": null,
+      "parameters": null,
+      "docstring": null
+    }
+  ],
+  "function_edges": [
+    {
+      "source": "ad5ee6c3-c079-4fc9-9d81-32c21cd31dd8",
+      "target": "ef491351-9c83-4eef-a54a-ac7891e9576a",
+      "edge_type": "calls",
+      "call_line": 165
+    },
+    {
+      "source": "55b0062d-2569-48e5-b9fe-6aaeba425147",
+      "target": "98287992-7e01-4e19-88df-dfdbbf5d1a86",
+      "edge_type": "calls",
+      "call_line": 177
+    },
+    {
+      "source": "bcdd9c4b-8aa1-40ef-b9c6-afd4f10dc51c",
+      "target": "dd178ecc-ab6d-4631-8699-167118e5a8a3",
+      "edge_type": "calls",
+      "call_line": 63
+    },
+    {
+      "source": "edf1bdc1-7344-4df1-9008-f12b18c1fa24",
+      "target": "5833fc44-b7bb-4ebd-b344-e249f31eeaef",
+      "edge_type": "calls",
+      "call_line": 85
+    },
+    {
+      "source": "edf1bdc1-7344-4df1-9008-f12b18c1fa24",
+      "target": "6462248e-4f15-416e-8397-fe00c1b34675",
+      "edge_type": "calls",
+      "call_line": 145
+    },
+    {
+      "source": "edf1bdc1-7344-4df1-9008-f12b18c1fa24",
+      "target": "52233cde-6268-4a91-8590-e9d5f0227ccc",
+      "edge_type": "calls",
+      "call_line": 149
+    },
+    {
+      "source": "edf1bdc1-7344-4df1-9008-f12b18c1fa24",
+      "target": "4046d16e-6094-42c4-9f26-352849d4a574",
+      "edge_type": "calls",
+      "call_line": 152
+    },
+    {
+      "source": "e8ef0d07-4465-4989-a8b4-f875dc0e0e5d",
+      "target": "2aeb53f5-1ef5-42ba-a3c8-391f1a14209f",
+      "edge_type": "calls",
+      "call_line": 17
+    },
+    {
+      "source": "3cb188ff-9246-4de0-a57a-a2a8fa189f16",
+      "target": "640a0176-83aa-4c01-a061-96e520ac230a",
+      "edge_type": "calls",
+      "call_line": 15
+    },
+    {
+      "source": "c8046105-c499-4750-b9ec-531d74046863",
+      "target": "5d2ac986-2e15-4f47-80ce-db6dbdf35549",
+      "edge_type": "calls",
+      "call_line": 52
+    },
+    {
+      "source": "c8046105-c499-4750-b9ec-531d74046863",
+      "target": "4a7f8860-3833-49fb-9b1d-4fd86eddd566",
+      "edge_type": "calls",
+      "call_line": 71
+    },
+    {
+      "source": "c8046105-c499-4750-b9ec-531d74046863",
+      "target": "e73ade9c-2f9f-48bd-8673-74de72e56d89",
+      "edge_type": "calls",
+      "call_line": 144
+    },
+    {
+      "source": "c8046105-c499-4750-b9ec-531d74046863",
+      "target": "24aebfa4-03f8-47ad-9681-2348e40f06af",
+      "edge_type": "calls",
+      "call_line": 152
+    },
+    {
+      "source": "c8046105-c499-4750-b9ec-531d74046863",
+      "target": "841cf690-9c03-4437-9298-237f2364f2eb",
+      "edge_type": "calls",
+      "call_line": 215
+    },
+    {
+      "source": "5d2ac986-2e15-4f47-80ce-db6dbdf35549",
+      "target": "640a0176-83aa-4c01-a061-96e520ac230a",
+      "edge_type": "calls",
+      "call_line": 217
+    },
+    {
+      "source": "14d2728d-c93e-4954-8663-8eaebfc2ddad",
+      "target": "ef491351-9c83-4eef-a54a-ac7891e9576a",
+      "edge_type": "calls",
+      "call_line": 18
+    },
+    {
+      "source": "24aebfa4-03f8-47ad-9681-2348e40f06af",
+      "target": "e73ade9c-2f9f-48bd-8673-74de72e56d89",
+      "edge_type": "calls",
+      "call_line": 181
+    }
+  ]
+}
