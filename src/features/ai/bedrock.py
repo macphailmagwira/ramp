@@ -1,6 +1,8 @@
 import json
+
 import boto3
 from botocore.config import Config
+
 from src.config import settings
 
 
@@ -35,3 +37,12 @@ def invoke_qwen(prompt: str, system: str, max_tokens: int = 4000) -> str:
     )
     result = json.loads(response["body"].read())
     return result["choices"][0]["message"]["content"]
+
+
+def parse_json(raw: str) -> dict:
+    """Parse an AI reply into a dict (strips ```json fences if present)."""
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        raw = raw[4:] if raw.startswith("json") else raw
+    return json.loads(raw.strip())

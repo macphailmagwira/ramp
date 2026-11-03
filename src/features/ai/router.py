@@ -1,10 +1,10 @@
 import logging
-from fastapi import APIRouter, HTTPException
-from src.features.ai.schema import ArchitectureStoryRequest, ArchitectureStoryResponse
-from src.features.ai.service import generate_architecture_story
-from src.features.ai.schema import FlowStoryRequest, FlowStoryResponse
-from src.features.ai.flow_story_service import generate_flow_story
-from src.features.ai.flow_discovery_service import discover_flows, enrich_flow
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.db.session import get_db_session
 from src.features.ai.schema import (
     ArchitectureStoryRequest,
     ArchitectureStoryResponse,
@@ -13,9 +13,13 @@ from src.features.ai.schema import (
     DiscoverFlowsRequest,
     DiscoverFlowsResponse,
     EnrichFlowRequest,
+    StorybookGenerateRequest,
+    StorybookResponse,
 )
+from src.features.ai.service import generate_architecture_story
 from src.features.ai.flow_story_service import generate_flow_story
 from src.features.ai.flow_discovery_service import discover_flows, enrich_flow
+from src.features.ai.storybook_service import StorybookService
 
 
 logger = logging.getLogger("api-main.ai.router")
@@ -76,4 +80,62 @@ async def enrich_flow_endpoint(request: EnrichFlowRequest):
         return await enrich_flow(request)
     except Exception as e:
         logger.exception("Failed to enrich flow | error=%s", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Storybook ────────────────────────────────────────────────────────────────
+@ai_router.post(
+    "/storybook",
+    response_model=StorybookResponse,
+    operation_id="generateStorybook",
+    summary="Generate a storybook for a connected repo, persist it, and return it",
+)
+async def generate_storybook_endpoint(
+    request: StorybookGenerateRequest,
+    db: AsyncSession = Depends(get_db_session),
+):
+    try:
+        return await StorybookService(db).generate(request.connected_repo_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Failed to generate storybook | error=%s", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@ai_router.get(
+    "/storybook/{connected_repo_id}",
+    response_model=StorybookResponse,
+    operation_id="getStorybook",
+    summary="Fetch the stored storybook for a connected repo",
+)
+async def get_storybook_endpoint(
+    connected_repo_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+):
+    try:
+        return await StorybookService(db).get(connected_repo_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Failed to fetch storybook | error=%s", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@ai_router.post(
+    "/storybook/{connected_repo_id}/refresh",
+    response_model=StorybookResponse,
+    operation_id="refreshStorybook",
+    summary="Re-scan the stored repo, then regenerate and persist the storybook",
+)
+async def refresh_storybook_endpoint(
+    connected_repo_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+):
+    try:
+        return await StorybookService(db).refresh(connected_repo_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Failed to refresh storybook | error=%s", str(e))
         raise HTTPException(status_code=500, detail=str(e))
