@@ -45,6 +45,15 @@ def _is_uuid(value: str) -> bool:
         return False
 
 
+def _parse_tech_stack(value):
+    if isinstance(value, str) and value:
+        try:
+            return json.loads(value)
+        except (ValueError, TypeError):
+            return []
+    return value or []
+
+
 def _top_folder(path: str) -> str:
     parts = Path(path).parts
     return str(Path(*parts[:-1])) if len(parts) > 1 else "__root__"
@@ -99,6 +108,7 @@ async def fetch(connected_repo_id: str) -> dict:
                     "node_type": "file",
                     "file_path": f.path,
                     "file_id": str(f.id),
+                    "content": f.content,
                 }
                 for f in files
                 if not f.is_binary
@@ -194,6 +204,8 @@ async def fetch(connected_repo_id: str) -> dict:
                 "default_branch": repo.default_branch,
                 "language": language,
                 "description": repo.description,
+                "framework": repo.framework,
+                "tech_stack": _parse_tech_stack(repo.tech_stack),
                 "overview_stats": {
                     "files": len(file_nodes),
                     "folders": len(folders),

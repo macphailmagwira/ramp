@@ -46,6 +46,9 @@ class ConnectedRepository(BaseDbModelMixin, Base):
     scan_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
     scan_progress: Mapped[int] = mapped_column(Integer, default=0)
 
+    framework: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    tech_stack: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     user: Mapped["User"] = relationship("User")  # noqa: F821
 
 
@@ -64,6 +67,8 @@ class RepositoryFile(Base):
     language: Mapped[str | None] = mapped_column(String(128), nullable=True)
     size_bytes: Mapped[int] = mapped_column(Integer, default=0)
     is_binary: Mapped[bool] = mapped_column(Boolean, default=False)
+    content: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

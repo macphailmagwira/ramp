@@ -28,24 +28,24 @@ KEY TERMS FOR BEGINNERS:
   so that anyone reading the logs can see exactly what was found/produced.
 """
 
+import json
+import logging
 import os
 import shutil
+import subprocess
 import tempfile
 import uuid
-import subprocess
-import logging
 from pathlib import Path
 from typing import List
 
-from sqlalchemy import select, update
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config.constants import API_MAIN_LOGGER_NAME_PREFIX
+from src.features.github.models import ConnectedRepository
 from src.features.github.repository import RepositoryFileRepository
 from src.features.github.services.dependency_service import DependencyGraphService
 from src.features.github.services.symbol_service import SymbolExtractionService
-from src.features.github.models import ConnectedRepository
-
 
 # The logger is how this module writes messages to our centralized logging
 # system. Using a hierarchical name (prefix + ".scanner.service") lets us
@@ -246,29 +246,32 @@ class RepoScannerService:
                 len(files), connected_repo_id, files[:20],
             )
 
-            # --- Step 3: Persist file metadata to the database --------------
+            # --- Step 3: Read file contents + persist file metadata ----------
             await _update_scan_status(db, connected_repo_id, "indexing_files", 25)
+            # Read the text of every non-binary file so we can both persist it
+            # and detect the framework. (Build folders are already excluded by
+            # _walk via IGNORED_DIRS.)
+            contents = self._read_file_contents(Path(tmpdir), files)
+            for f in files:
+                f["content"] = contents.get(f["path"])
             await self.file_repo.replace_for_repo(connected_repo_id, user_id, files)
             logger.info(
-                "Metadata persisted | repo=%s files=%d", connected_repo_id, len(files)
+                "Metadata + content persisted | repo=%s files=%d with_content=%d",
+                connected_repo_id, len(files), sum(1 for f in files if f.get("content")),
             )
             logger.debug(
                 "Metadata persistence details | repo=%s user=%s total_files=%d",
                 connected_repo_id, user_id, len(files),
             )
 
-            # --- Read parseable source files once; reuse for all analysis steps ---
-            # We only read files whose extension we know how to meaningfully
-            # analyze (Python/JS/TS). This dict maps "relative/path.py" ->
-            # "the full text contents of that file".
-            file_contents = self._read_parseable_files(Path(tmpdir), files)
+            # Analysis steps only need the parseable subset (Python/JS/TS).
+            file_contents = {
+                p: c for p, c in contents.items()
+                if Path(p).suffix.lower() in self.PARSEABLE
+            }
             logger.info(
-                "Read parseable file contents | repo=%s parseable_files=%d",
+                "Parseable file contents for analysis | repo=%s files=%d",
                 connected_repo_id, len(file_contents),
-            )
-            logger.debug(
-                "Parseable file paths read | repo=%s paths=%s",
-                connected_repo_id, list(file_contents.keys()),
             )
 
             # --- Step 4: Dependency graph ------------------------------------
@@ -312,7 +315,18 @@ class RepoScannerService:
                 connected_repo_id, call_count,
             )
 
-            # --- Step 7: Mark scan complete --------------------------------------
+            # --- Step 7: Detect framework + mark scan complete ----------------
+            framework, tech_stack = self._detect_framework(files, contents)
+            await db.execute(
+                update(ConnectedRepository)
+                .where(ConnectedRepository.id == connected_repo_id)
+                .values(framework=framework, tech_stack=json.dumps(tech_stack))
+            )
+            await db.commit()
+            logger.info(
+                "Framework detected | repo=%s framework=%s tech_stack=%s",
+                connected_repo_id, framework, tech_stack,
+            )
             await _update_scan_status(db, connected_repo_id, "complete", 100)
             logger.info(
                 "Scan complete | repo=%s total_files=%d edges=%d symbols=%d calls=%d",
@@ -338,65 +352,152 @@ class RepoScannerService:
             shutil.rmtree(tmpdir, ignore_errors=True)
             logger.debug("Temporary scan directory removed | tmpdir=%s", tmpdir)
 
-    def _read_parseable_files(self, root: Path, files: List[dict]) -> dict[str, str]:
+    # Extensions we have real code parsers for (dependency/symbol/call graph).
+    PARSEABLE = {".py", ".ts", ".tsx", ".js", ".jsx"}
+
+    # Don't persist the text of files larger than this (avoids bloating the DB
+    # on data files, lockfiles, minified bundles, etc.).
+    MAX_CONTENT_BYTES = 1_000_000
+
+    def _read_file_contents(self, root: Path, files: List[dict]) -> dict[str, str]:
         """
-        Read the full text content of "parseable" source files into memory.
+        Read the full text content of every NON-binary file into memory and
+        return {relative_path: text}. Used both to persist file content to the
+        database and to detect the project's framework.
 
-        WHY: Later analysis steps (dependency graph, symbol extraction, call
-        graph) all need to look at the actual source code text. Rather than
-        have each of those steps re-read files from disk independently, we
-        read everything once here and pass around a simple dictionary.
-
-        Only files with certain extensions are considered "parseable" right
-        now: .py, .ts, .tsx, .js, .jsx. Anything else (binary files, or
-        source languages we don't yet analyze, like Go or Rust) is skipped.
-
-        Args:
-            root: The root folder the repo was cloned into (used to resolve
-                each file's full path on disk).
-            files: The list of file metadata dictionaries produced by
-                `_walk`, each containing at least "path", "extension", and
-                "is_binary".
-
-        Returns:
-            A dictionary mapping each file's relative path (as a string,
-            e.g. "src/app.py") to that file's full text content (as a
-            string).
+        Skips:
+          - binary files (images/fonts/compiled assets)
+          - files larger than MAX_CONTENT_BYTES
+          - files containing a NUL byte (treated as binary)
+        Files that can't be decoded are skipped rather than failing the scan.
         """
-        PARSEABLE = {".py", ".ts", ".tsx", ".js", ".jsx"}
-        contents = {}
-        skipped_unreadable = []
+        contents: dict[str, str] = {}
+        skipped_unreadable: list[str] = []
 
         for f in files:
-            if f.get("is_binary") or f.get("extension") not in PARSEABLE:
-                # Skip binary files (images, fonts, etc.) and any file
-                # extension we don't currently know how to analyze.
+            if f.get("is_binary"):
+                continue
+            if (f.get("size_bytes") or 0) > self.MAX_CONTENT_BYTES:
+                skipped_unreadable.append(f["path"])
                 continue
 
             full_path = root / f["path"]
             try:
-                # `errors="replace"` means if a file has some invalid/odd
-                # byte sequences, we substitute a placeholder character
-                # instead of crashing the whole scan.
-                contents[f["path"]] = full_path.read_text(
-                    encoding="utf-8", errors="replace"
-                )
-            except OSError:
-                # File might have been deleted, be a broken symlink, have
-                # permission issues, etc. We just skip it rather than fail
-                # the entire scan over one unreadable file.
+                # `errors="replace"` substitutes a placeholder for any odd
+                # byte sequences instead of crashing the scan.
+                text = full_path.read_text(encoding="utf-8", errors="replace")
+            except (OSError, UnicodeDecodeError):
                 skipped_unreadable.append(f["path"])
+                continue
+            if "\x00" in text:
+                # Looks like binary despite the extension - don't store.
+                skipped_unreadable.append(f["path"])
+                continue
+
+            contents[f["path"]] = text
 
         logger.info(
-            "Read parseable files from disk | readable=%d skipped_unreadable=%d",
+            "Read file contents | readable=%d skipped=%d",
             len(contents), len(skipped_unreadable),
         )
         logger.debug(
-            "Parseable file read details | readable_paths=%s skipped_paths=%s",
+            "File content read details | readable_paths=%s skipped_paths=%s",
             list(contents.keys()), skipped_unreadable,
         )
-
         return contents
+
+    def _detect_framework(
+        self, files: List[dict], contents: dict[str, str]
+    ) -> tuple[str | None, list[str]]:
+        """
+        Best-effort framework detection from file contents + names.
+        Returns (primary_framework, tech_stack_list).
+        """
+        names = {f["name"].lower(): f["path"] for f in files}
+        tech: set[str] = set()
+
+        # --- Node / JS / TS ecosystem (package.json) ---
+        pj = names.get("package.json")
+        if pj and pj in contents:
+            try:
+                data = json.loads(contents[pj])
+                deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
+                d = set(deps.keys())
+            except (ValueError, AttributeError):
+                d = set()
+            if "next" in d:
+                tech.add("Next.js")
+            if "react" in d:
+                tech.add("React")
+            if "vue" in d:
+                tech.add("Vue")
+            if "svelte" in d:
+                tech.add("Svelte")
+            if "vite" in d:
+                tech.add("Vite")
+            if "express" in d:
+                tech.add("Express")
+            if "nestjs" in d or "@nestjs/core" in d:
+                tech.add("NestJS")
+            if "angular" in d or "@angular/core" in d:
+                tech.add("Angular")
+            if "typescript" in d:
+                tech.add("TypeScript")
+            if not tech:
+                tech.add("Node.js")
+
+        # --- Python ecosystem (pyproject.toml / requirements.txt) ---
+        py = next(
+            (p for n, p in names.items() if n in ("pyproject.toml", "requirements.txt", "setup.py")),
+            None,
+        )
+        if py and py in contents:
+            text = contents[py].lower()
+            if "fastapi" in text:
+                tech.add("FastAPI")
+            elif "django" in text:
+                tech.add("Django")
+            elif "flask" in text:
+                tech.add("Flask")
+            elif "starlette" in text:
+                tech.add("FastAPI")
+            else:
+                tech.add("Python")
+
+        # --- Config-file / language signals ---
+        for f in files:
+            n = (f.get("name") or "").lower()
+            if n.startswith("next.config"):
+                tech.add("Next.js")
+            if n.startswith("vite.config"):
+                tech.add("Vite")
+            if n.startswith("angular.json"):
+                tech.add("Angular")
+            if n == "go.mod":
+                tech.add("Go")
+            if n == "cargo.toml":
+                tech.add("Rust")
+            if n == "pom.xml":
+                tech.add("Java/Spring")
+            if n == "gemfile":
+                tech.add("Ruby on Rails")
+            if n == "composer.json":
+                tech.add("PHP/Laravel")
+
+        # --- Primary framework (by priority) ---
+        priority = [
+            "Next.js", "React", "Vue", "Angular", "Svelte",
+            "Express", "NestJS", "Vite", "FastAPI", "Django", "Flask",
+            "Python", "Node.js", "Go", "Rust", "Java/Spring",
+            "Ruby on Rails", "PHP/Laravel",
+        ]
+        primary = next((p for p in priority if p in tech), None)
+        if not primary:
+            langs = {f.get("language") for f in files if f.get("language")}
+            primary = sorted(langs)[0] if langs else None
+
+        return primary, sorted(tech)
+
 
     async def _clone(
         self, clone_url: str, access_token: str, dest: str, branch: str

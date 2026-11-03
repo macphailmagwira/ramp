@@ -1,7 +1,8 @@
+import json
 import uuid
 from datetime import datetime
-from typing import Any, List, Optional,Literal
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Any, List, Optional, Literal
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 
@@ -80,10 +81,22 @@ class ConnectedRepositoryRetrieveSchema(BaseModel):
     is_active: bool
     scan_status: str = "pending"
     scan_progress: int = 0
+    framework: Optional[str] = None
+    tech_stack: Optional[list[str]] = None
     created_at: datetime
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("tech_stack", mode="before")
+    @classmethod
+    def _parse_tech_stack(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except (ValueError, TypeError):
+                return []
+        return v
 
 
 class ScanStatusResponseSchema(BaseModel):

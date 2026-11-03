@@ -13,6 +13,9 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      # Inside the container, the postgres service is reachable as "db", not localhost
+      - DATABASE_URL=postgresql+asyncpg://user:password@db:5432/dbname
     depends_on:
       db:
         condition: service_healthy
@@ -38,6 +41,8 @@ services:
         condition: service_started
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://user:password@db:5432/dbname
     networks:
       - ramp_network
 
@@ -51,6 +56,8 @@ services:
       - ./src:/usr/src/app/src
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://user:password@db:5432/dbname
     depends_on:
       db:
         condition: service_healthy

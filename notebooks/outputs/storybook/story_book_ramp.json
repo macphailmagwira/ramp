@@ -1,0 +1,330 @@
+{
+  "project": "ramp",
+  "sections": {
+    "set_up": {
+      "schema_version": 1,
+      "summary": "The project can be started using Docker Compose configurations for development, local, staging, and production environments, or via Makefile targets and manual Python-based execution, with Docker Compose being the most reliable method.",
+      "env_vars": [
+        {
+          "name": "ENVIRONMENT",
+          "purpose": "Determines configuration behavior (DEVELOPMENT, STAGING, PRODUCTION); used in entrypoint.sh and gunicorn.conf.py to set log levels and settings."
+        },
+        {
+          "name": "POSTGRES_USER",
+          "purpose": "PostgreSQL username for database access; defined in docker-compose files and loaded from .env."
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "purpose": "PostgreSQL password for database authentication; defined in docker-compose files and loaded from .env."
+        },
+        {
+          "name": "POSTGRES_DB",
+          "purpose": "PostgreSQL database name; defined in docker-compose files and loaded from .env."
+        },
+        {
+          "name": "REDIS_PORT",
+          "purpose": "Port to bind Redis to on the host; defaults to 6379, used in docker-compose.yml and derived files."
+        },
+        {
+          "name": "PORT",
+          "purpose": "API service port; defaults to 8000, used in entrypoint.sh and overrides in compose files."
+        },
+        {
+          "name": "HOST",
+          "purpose": "API bind host; defaults to 0.0.0.0, used in entrypoint.sh and compose command overrides."
+        },
+        {
+          "name": "LOG_LEVEL",
+          "purpose": "Logging verbosity level; auto-set by ENVIRONMENT in entrypoint.sh but can be overridden."
+        },
+        {
+          "name": "WORKERS",
+          "purpose": "Number of Gunicorn worker processes; defaults to CPU count in gunicorn.conf.py and can be overridden."
+        }
+      ],
+      "services": [
+        "postgres",
+        "redis",
+        "api-main",
+        "celery-worker-main",
+        "celery-beat-main"
+      ],
+      "files_guide": [
+        {
+          "file": "docker-compose.dev.yml",
+          "purpose": "Development configuration for the API (uvicorn --reload), Celery worker, and beat scheduler with mounted source code volumes; uses docker/Dockerfile with 'development' target."
+        },
+        {
+          "file": "docker-compose.local.yml",
+          "purpose": "Local development setup that mounts the entire project root into containers; uses docker/Dockerfile (development target) and workers/Dockerfile; named 'ramp-' prefixed services."
+        },
+        {
+          "file": "docker-compose.staging.yml",
+          "purpose": "Staging environment configuration, similar to dev.yml but uses environment variables from .env files and includes health checks with interpolated $POSTGRES_USER/$POSTGRES_DB; uses docker/Dockerfile with 'development' target."
+        },
+        {
+          "file": "docker-compose.yml",
+          "purpose": "Production configuration using 'production' stage of docker/Dockerfile; runs Gunicorn via UvicornWorker (no reload), with concurrency set; uses celery-worker-main with --concurrency=4."
+        },
+        {
+          "file": "docker/Dockerfile",
+          "purpose": "Multi-stage Dockerfile with base, dependencies, development, and production stages: development for hot reload (mounting src), production for final optimized image with minimal runtime."
+        },
+        {
+          "file": "workers/Dockerfile",
+          "purpose": "Dockerfile specifically for Celery worker and beat services; uses Python 3.11-slim-bookworm, installs poetry, and runs Celery with fixed queue configuration."
+        },
+        {
+          "file": "Makefile",
+          "purpose": "Task runner for local development: installs dependencies, runs migrations, starts server, runs tests, and lints code using Poetry-managed Python environment."
+        },
+        {
+          "file": "scripts/verify-toolchain.sh",
+          "purpose": "Validation script to ensure Docker, Node.js (via nvm), Python 3.11+, and AWS CLI are installed and configured for deployment readiness."
+        },
+        {
+          "file": "gunicorn.conf.py",
+          "purpose": "Gunicorn configuration file that defines bind, workers, logging, and lifecycle hooks; used in production stage of docker/Dockerfile and invoked by entrypoint.sh."
+        },
+        {
+          "file": "nginx/nginx.conf",
+          "purpose": "Main Nginx configuration for reverse proxy, Gzip compression, security headers, and rate limiting; includes conf.d/*.conf."
+        },
+        {
+          "file": "nginx/conf.d/default.conf",
+          "purpose": "Nginx site-specific configuration for routing traffic to upstream services (api-main, dashboard, display); handles HTTPS redirection and Let's Encrypt challenges."
+        }
+      ],
+      "run_options": [
+        {
+          "name": "Docker Compose (all services)",
+          "reliability": "high",
+          "best_for": "Standard development, staging, or production environments where consistent, isolated, and reproducible setups are required.",
+          "requires": [
+            "docker",
+            "docker-compose"
+          ],
+          "steps": [
+            {
+              "title": "Install Docker and Docker Compose",
+              "description": "Ensure Docker and docker-compose are installed and running.",
+              "command": "docker --version && docker-compose --version",
+              "phase": "dependencies",
+              "source_file": "scripts/verify-toolchain.sh",
+              "verified": true
+            },
+            {
+              "title": "Prepare environment variables",
+              "description": "Create a .env file in the root or apps/api-main/ directory with required variables like POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, REDIS_PORT.",
+              "command": "cp .env.example .env || echo \"Create .env file with required variables from docker-compose files\"",
+              "phase": "env",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            },
+            {
+              "title": "Build and start development environment",
+              "description": "Start the development environment with auto-reload enabled using docker-compose.dev.yml.",
+              "command": "docker-compose -f docker-compose.dev.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.dev.yml",
+              "verified": true
+            },
+            {
+              "title": "Start local development environment",
+              "description": "Start the local environment with source code mounted from project root using docker-compose.local.yml.",
+              "command": "docker-compose -f docker-compose.local.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.local.yml",
+              "verified": true
+            },
+            {
+              "title": "Start staging environment",
+              "description": "Start the staging environment with production-like variables but development build target.",
+              "command": "docker-compose -f docker-compose.staging.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.staging.yml",
+              "verified": true
+            },
+            {
+              "title": "Start production environment",
+              "description": "Build and start the production environment using the production Dockerfile stage and production configuration.",
+              "command": "docker-compose -f docker-compose.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.yml",
+              "verified": true
+            },
+            {
+              "title": "Verify services",
+              "description": "Check if API, Redis, and PostgreSQL are healthy using curl or by checking logs.",
+              "command": "curl http://localhost:8000/health || docker-compose logs api-main",
+              "phase": "verify",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            }
+          ]
+        },
+        {
+          "name": "Makefile-based local setup",
+          "reliability": "medium",
+          "best_for": "Quick local development without containers, when Python 3.11+ and PostgreSQL are already installed.",
+          "requires": [
+            "python",
+            "pip",
+            "postgresql",
+            "redis"
+          ],
+          "steps": [
+            {
+              "title": "Install dependencies using Poetry",
+              "description": "Install project dependencies (including dev) using Poetry, as defined in pyproject.toml.",
+              "command": "make install",
+              "phase": "dependencies",
+              "source_file": "Makefile",
+              "verified": true
+            },
+            {
+              "title": "Apply database migrations",
+              "description": "Run Alembic migrations to initialize or update the PostgreSQL schema.",
+              "command": "make migrate",
+              "phase": "services",
+              "source_file": "Makefile",
+              "verified": true
+            },
+            {
+              "title": "Start FastAPI API server",
+              "description": "Start the API using Uvicorn in development mode with auto-reload enabled.",
+              "command": "make run",
+              "phase": "run",
+              "source_file": "Makefile",
+              "verified": true
+            },
+            {
+              "title": "Start Celery worker",
+              "description": "Start the Celery worker process in a separate terminal using the same dependencies.",
+              "command": "poetry run celery -A src.core.celery_app:app worker -l INFO",
+              "phase": "run",
+              "source_file": "pyproject.toml",
+              "verified": false
+            },
+            {
+              "title": "Start Celery beat scheduler",
+              "description": "Start the Celery beat scheduler to trigger periodic tasks.",
+              "command": "poetry run celery -A src.core.celery_app:app beat -l INFO",
+              "phase": "run",
+              "source_file": "pyproject.toml",
+              "verified": false
+            },
+            {
+              "title": "Verify API endpoint",
+              "description": "Test the running API by accessing a basic endpoint like /health.",
+              "command": "curl http://localhost:8000/health",
+              "phase": "verify",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            }
+          ]
+        },
+        {
+          "name": "Manual local setup with Poetry and standalone services",
+          "reliability": "low",
+          "best_for": "Debugging or experimental changes when you want complete control over each service and package version.",
+          "requires": [
+            "python",
+            "postgresql",
+            "redis",
+            "poetry"
+          ],
+          "steps": [
+            {
+              "title": "Install Poetry if not present",
+              "description": "Ensure Poetry is installed to manage Python dependencies.",
+              "command": "curl -sSL https://install.python-poetry.org | python3 -",
+              "phase": "dependencies",
+              "source_file": "docker/Dockerfile",
+              "verified": true
+            },
+            {
+              "title": "Install project dependencies",
+              "description": "Install all dependencies (core + dev) using Poetry in the project root.",
+              "command": "poetry install",
+              "phase": "dependencies",
+              "source_file": "pyproject.toml",
+              "verified": true
+            },
+            {
+              "title": "Start PostgreSQL service manually",
+              "description": "Manually launch PostgreSQL server on localhost:5432 with user/password/dbname matching .env.",
+              "command": "pg_ctl -D /usr/local/var/postgres start",
+              "phase": "services",
+              "source_file": "docker-compose.local.yml",
+              "verified": false
+            },
+            {
+              "title": "Start Redis service manually",
+              "description": "Launch Redis server on localhost:6379.",
+              "command": "redis-server",
+              "phase": "services",
+              "source_file": "docker-compose.local.yml",
+              "verified": false
+            },
+            {
+              "title": "Initialize database schema",
+              "description": "Apply Alembic migrations to the local PostgreSQL database.",
+              "command": "poetry run alembic upgrade head",
+              "phase": "services",
+              "source_file": "alembic.ini",
+              "verified": false
+            },
+            {
+              "title": "Start API server manually",
+              "description": "Start the FastAPI application using Uvicorn with reload and debug options.",
+              "command": "poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+              "phase": "run",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            },
+            {
+              "title": "Start Celery worker manually",
+              "description": "Manually invoke the Celery worker with specified queues.",
+              "command": "poetry run celery -A src.core.celery_app:app worker --queues=s3-events,default,celery -l INFO",
+              "phase": "run",
+              "source_file": "docker-compose.yml",
+              "verified": false
+            },
+            {
+              "title": "Start Celery beat manually",
+              "description": "Manually invoke the Celery beat scheduler.",
+              "command": "poetry run celery -A src.core.celery_app:app beat -l INFO",
+              "phase": "run",
+              "source_file": "docker-compose.yml",
+              "verified": false
+            },
+            {
+              "title": "Verify services availability",
+              "description": "Check that the services respond via HTTP and that database and Redis connections are valid.",
+              "command": "curl http://localhost:8000/health && redis-cli ping && psql -U user -d dbname -c \"SELECT 1;\"",
+              "phase": "verify",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        "[Docker Compose (all services)] Unverified command: cp .env.example .env || echo \"Create .env file with required variables from docker-compose files\"",
+        "[Docker Compose (all services)] Unverified command: curl http://localhost:8000/health || docker-compose logs api-main",
+        "[Makefile-based local setup] Unverified command: poetry run celery -A src.core.celery_app:app worker -l INFO",
+        "[Makefile-based local setup] Unverified command: poetry run celery -A src.core.celery_app:app beat -l INFO",
+        "[Makefile-based local setup] Unverified command: curl http://localhost:8000/health",
+        "[Manual local setup with Poetry and standalone services] Unverified command: pg_ctl -D /usr/local/var/postgres start",
+        "[Manual local setup with Poetry and standalone services] Unverified command: redis-server",
+        "[Manual local setup with Poetry and standalone services] Unverified command: poetry run alembic upgrade head",
+        "[Manual local setup with Poetry and standalone services] Unverified command: poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+        "[Manual local setup with Poetry and standalone services] Unverified command: poetry run celery -A src.core.celery_app:app worker --queues=s3-events,default,celery -l INFO",
+        "[Manual local setup with Poetry and standalone services] Unverified command: poetry run celery -A src.core.celery_app:app beat -l INFO",
+        "[Manual local setup with Poetry and standalone services] Unverified command: curl http://localhost:8000/health && redis-cli ping && psql -U user -d dbname -c \"SELECT 1;\""
+      ]
+    }
+  },
+  "errors": []
+}

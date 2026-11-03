@@ -1844,104 +1844,6 @@ input LineChangeoverDeviceEventUpdateInput {
 }
 
 ##############################################
-# QC DATA COLLECTION TYPES
-##############################################
-
-type QcEventResponse {
-  id: ID!
-  factory_id: ID
-  device_id: ID
-  plan_id: ID
-  qc_categorisation: String
-  retry_count: Int
-  batch_id: ID
-  created_at: AWSDateTime!
-}
-
-type QcEventBatchResponse {
-  batch_id: ID!
-  factory_id: ID!
-  tenant_id: ID!
-  event_count: Int!
-  inserted_count: Int!
-  failed_count: Int!
-  batch_timestamp: AWSDateTime!
-  processing_time_ms: Int
-  status: String!
-  errors: [BatchError]
-}
-
-input QcEventInput {
-  event_id: ID
-  factory_id: ID!
-  device_id: ID!
-  plan_id: ID
-  qc_categorisation: String
-  retry_count: Int
-  qc_event_timestamp: AWSDateTime!
-}
-
-input QcEventBatchInput {
-  events: [QcEventInput!]!
-}
-
-##############################################
-# QC DEFECTS COLLECTION TYPES
-##############################################
-
-type QcDefectResponse {
-  id: ID!
-  factory_id: ID
-  parent_qc_event_id: ID
-  defect_type: String
-  defect_coordinates: AWSJSON
-  batch_id: ID
-  created_at: AWSDateTime!
-}
-
-type QcDefectBatchResponse {
-  batch_id: ID!
-  factory_id: ID!
-  tenant_id: ID!
-  event_count: Int!
-  inserted_count: Int!
-  failed_count: Int!
-  batch_timestamp: AWSDateTime!
-  processing_time_ms: Int
-  status: String!
-  errors: [BatchError]
-}
-
-type BatchError {
-  event_index: Int
-  error_code: String
-  error_message: String
-  field: String
-}
-
-input DefectCoordinatesInput {
-  x: Float
-  y: Float
-  width: Float
-  height: Float
-  zone: String
-  region: String
-  coordinate_system: String
-}
-
-input QcDefectEventInput {
-  factory_id: ID!
-  parent_qc_event_id: ID
-  defect_type: String
-  defect_coordinates: DefectCoordinatesInput
-  qc_event_timestamp: AWSDateTime!
-}
-
-input QcDefectBatchInput {
-  events: [QcDefectEventInput!]!
-}
-
-##############################################
 # QUERIES
 ##############################################
 
@@ -2054,49 +1956,6 @@ type Query {
   getDevicesByLine(line_id: ID!): [DeviceList!]! @aws_cognito_user_pools
   getDevicesByStatus(factory_id: ID!, operational_status: OperationalStatus!): [DeviceList!]! @aws_cognito_user_pools
   getDeviceByDeviceId(device_id: String!): Device @aws_cognito_user_pools
-
-  # QC Data Collection
-  getQcEvent(event_id: ID!): QcEventResponse @aws_cognito_user_pools
-  getBatchEvents(
-    batch_id: ID!
-    limit: Int = 100
-    offset: Int = 0
-  ): [QcEventResponse!]! @aws_cognito_user_pools
-  getPlanEvents(
-    plan_id: ID!
-    limit: Int = 100
-    offset: Int = 0
-  ): [QcEventResponse!]! @aws_cognito_user_pools
-  listQcEvents(
-    start_date: AWSDateTime
-    end_date: AWSDateTime
-    plan_id: ID
-    qc_categorisation: String
-    device_id: ID
-    limit: Int = 100
-    offset: Int = 0
-  ): [QcEventResponse!]! @aws_cognito_user_pools
-
-  # QC Defects Collection
-  getQcDefect(defect_id: ID!): QcDefectResponse @aws_cognito_user_pools
-  getBatchDefects(
-    batch_id: ID!
-    limit: Int = 100
-    offset: Int = 0
-  ): [QcDefectResponse!]! @aws_cognito_user_pools
-  getParentEventDefects(
-    parent_qc_event_id: ID!
-    limit: Int = 100
-    offset: Int = 0
-  ): [QcDefectResponse!]! @aws_cognito_user_pools
-  listQcDefects(
-    start_date: AWSDateTime
-    end_date: AWSDateTime
-    defect_type: String
-    parent_qc_event_id: ID
-    limit: Int = 100
-    offset: Int = 0
-  ): [QcDefectResponse!]! @aws_cognito_user_pools
 
   # Line Layout
   getLineLayout(line_layout_id: ID!): LineLayout @aws_cognito_user_pools
@@ -2237,12 +2096,6 @@ type Mutation {
   updateDeviceOperationalStatus(device_id: ID!, input: DeviceOperationalStatusUpdateInput!): Device @aws_cognito_user_pools
   reassignDevice(device_id: ID!, input: DeviceReassignmentInput!): Device @aws_cognito_user_pools
   deleteDevice(device_id: ID!): Boolean @aws_cognito_user_pools
-
-  # QC Data Collection
-  submitQcEventBatch(input: QcEventBatchInput!): QcEventBatchResponse @aws_cognito_user_pools
-
-  # QC Defects Collection
-  submitQcDefectBatch(input: QcDefectBatchInput!): QcDefectBatchResponse @aws_cognito_user_pools
 
   # Line Layout
   createLineLayout(input: LineLayoutCreateInput!): LineLayout @aws_cognito_user_pools

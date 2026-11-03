@@ -25,7 +25,12 @@ if [ -f .env ]; then
       value="${value#\"}"
       value="${value%\'}"
       value="${value#\'}"
-      export "$key=$value"
+      # Only set from .env if not already provided by the environment
+      # (e.g. docker-compose `environment` overrides), so container-level
+      # overrides take precedence over the committed .env defaults.
+      if [ -z "${!key+x}" ]; then
+        export "$key=$value"
+      fi
     fi
   done < .env
 fi

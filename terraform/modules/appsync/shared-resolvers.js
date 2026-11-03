@@ -1160,104 +1160,6 @@ const ordersResolvers = {
 };
 
 // ==========================================
-// QC DATA COLLECTION FEATURE
-// ==========================================
-const qcDataCollectionResolvers = {
-  queries: {
-    getQcEvent: {
-      method: "GET",
-      path: "/api/v1/qc-data-collection/events/$event_id",
-      statusCodes: {
-        success: 200,
-      },
-    },
-    getBatchEvents: {
-      method: "GET",
-      path: "/api/v1/qc-data-collection/events/batch/$batch_id",
-      statusCodes: {
-        success: 200,
-      },
-      queryParams: ["limit", "offset"],
-    },
-    getPlanEvents: {
-      method: "GET",
-      path: "/api/v1/qc-data-collection/events/plan/$plan_id",
-      statusCodes: {
-        success: 200,
-      },
-      queryParams: ["limit", "offset"],
-    },
-    listQcEvents: {
-      method: "GET",
-      path: "/api/v1/qc-data-collection/events",
-      statusCodes: {
-        success: 200,
-      },
-      queryParams: ["start_date", "end_date", "plan_id", "qc_categorisation", "device_id", "limit", "offset"],
-    }
-  },
-  mutations: {
-    submitQcEventBatch: {
-      method: "POST",
-      path: "/api/v1/qc-data-collection/events/batch",
-      statusCodes: {
-        success: 200,
-      },
-      hasBody: true,
-    }
-  }
-};
-
-// ==========================================
-// QC DEFECT COLLECTION FEATURE
-// ==========================================
-const qcDefectCollectionResolvers = {
-  queries: {
-    getQcDefect: {
-      method: "GET",
-      path: "/api/v1/qc-defects-collection/defects/$defect_id",
-      statusCodes: {
-        success: 200,
-      },
-    },
-    getBatchDefects: {
-      method: "GET",
-      path: "/api/v1/qc-defects-collection/defects/batch/$batch_id",
-      statusCodes: {
-        success: 200,
-      },
-      queryParams: ["limit", "offset"],
-    },
-    getParentEventDefects: {
-      method: "GET",
-      path: "/api/v1/qc-defects-collection/defects/parent/$parent_qc_event_id",
-      statusCodes: {
-        success: 200,
-      },
-      queryParams: ["limit", "offset"],
-    },
-    listQcDefects: {
-      method: "GET",
-      path: "/api/v1/qc-defects-collection/defects",
-      statusCodes: {
-        success: 200,
-      },
-      queryParams: ["start_date", "end_date", "defect_type", "parent_qc_event_id", "limit", "offset"],
-    }
-  },
-  mutations: {
-    submitQcDefectBatch: {
-      method: "POST",
-      path: "/api/v1/qc-defects-collection/defects/batch",
-      statusCodes: {
-        success: 200,
-      },
-      hasBody: true,
-    }
-  }
-};
-
-// ==========================================
 // PRODUCTION PLANS FEATURE
 // ==========================================
 const productionPlansResolvers = {
@@ -1471,8 +1373,6 @@ const allFeatures = [
   stylesResolvers,
   devicesResolvers,
   ordersResolvers,
-  qcDataCollectionResolvers,
-  qcDefectCollectionResolvers,
   productionPlansResolvers,
   lineChangeoverEventsResolvers,
   deviceEventsResolvers
@@ -1571,8 +1471,6 @@ module.exports = {
   stylesResolvers,
   devicesResolvers,
   ordersResolvers,
-  qcDataCollectionResolvers,
-  qcDefectCollectionResolvers,
   productionPlansResolvers,
   lineChangeoverEventsResolvers,
   deviceEventsResolvers,
