@@ -1,7 +1,7 @@
 """DB model for a generated Storybook.
 
 A Storybook is the output of the Storybook agent (see
-``src.features.ai.story_book_agent``) for one connected repository. It is keyed
+``src.features.storybook.agent.story_book_agent``) for one connected repository. It is keyed
 to a :class:`ConnectedRepository` and persists the full ``book`` dict as JSON so
 it can be fetched later and refreshed when the stored repo changes.
 """

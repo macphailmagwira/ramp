@@ -10,8 +10,7 @@ import uuid
 
 from fastapi import HTTPException
 
-from src.features.ai.repository import StorybookRepository
-from src.features.ai.story_book_agent import generate_storybook
+from src.features.storybook.repository import StorybookRepository
 from src.features.github.repository import (
     ConnectedRepositoryRepository,
     GitHubOAuthTokenRepository,
@@ -35,6 +34,10 @@ class StorybookService:
         return repo
 
     async def _generate_and_persist(self, repo) -> dict:
+        # Imported lazily: the LangGraph agent pulls in heavy deps (langgraph)
+        # that are only needed at generation time, not at app startup.
+        from src.features.storybook.agent.story_book_agent import generate_storybook
+
         rows = await self.file_repo.get_by_repo(repo.id)
         if not rows:
             raise HTTPException(

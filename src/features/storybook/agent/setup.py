@@ -7,7 +7,7 @@ getting-started guide via Qwen on AWS Bedrock:
 
 All names here are prefixed ``setup_`` / ``SETUP_`` so other subgraphs
 (LEARN, BUILD, ...) can live alongside without clashing. The parent graph in
-``src.features.ai.story_book_agent`` imports :func:`build_setup` and
+``src.features.storybook.agent.story_book_agent`` imports :func:`build_setup` and
 :data:`SETUP_NAME` from here.
 """
 

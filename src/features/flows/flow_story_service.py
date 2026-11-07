@@ -11,7 +11,7 @@ import logging
 from typing import Optional
 
 from src.features.ai.bedrock import invoke_qwen
-from src.features.ai.schema import FlowStoryRequest, FlowStoryResponse, FlowStoryStep
+from src.features.flows.schema import FlowStoryRequest, FlowStoryResponse, FlowStoryStep
 
 logger = logging.getLogger("api-main.ai.flow_story_service")
 

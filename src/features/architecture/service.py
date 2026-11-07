@@ -4,7 +4,7 @@ import logging
 import re
 
 from src.features.ai.bedrock import invoke_qwen
-from src.features.ai.schema import ArchitectureStoryResponse
+from src.features.architecture.schema import ArchitectureStoryResponse
 
 logger = logging.getLogger("api-main.ai.service")
 

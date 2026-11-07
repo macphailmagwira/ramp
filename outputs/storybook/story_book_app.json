@@ -1,0 +1,118 @@
+{
+  "project": "app",
+  "sections": {
+    "set_up": {
+      "schema_version": 1,
+      "summary": "This project is a frontend-only Vite + React application with no backend services defined, so it can only be run locally vianpm scripts or manually.",
+      "env_vars": [
+        {
+          "name": "VITE_API_BASE",
+          "purpose": "Specifies the base URL for API requests; defaults to http://localhost:8000/api/v1"
+        }
+      ],
+      "services": [],
+      "files_guide": [],
+      "run_options": [
+        {
+          "name": "Run via npm scripts (dev)",
+          "reliability": "high",
+          "best_for": "local development with Vite hot reload",
+          "requires": [
+            "node.js",
+            "pnpm"
+          ],
+          "steps": [
+            {
+              "title": "Install dependencies",
+              "description": "Install project dependencies using pnpm from pnpm-lock.yaml",
+              "command": "pnpm install",
+              "phase": "dependencies",
+              "source_file": "pnpm-lock.yaml",
+              "verified": true
+            },
+            {
+              "title": "Start development server",
+              "description": "Start Vite dev server using the dev script in package.json",
+              "command": "pnpm run dev",
+              "phase": "run",
+              "source_file": "package.json",
+              "verified": true
+            }
+          ]
+        },
+        {
+          "name": "Run via npm scripts (build and preview)",
+          "reliability": "medium",
+          "best_for": "testing production build locally",
+          "requires": [
+            "node.js",
+            "pnpm"
+          ],
+          "steps": [
+            {
+              "title": "Install dependencies",
+              "description": "Install project dependencies using pnpm from pnpm-lock.yaml",
+              "command": "pnpm install",
+              "phase": "dependencies",
+              "source_file": "pnpm-lock.yaml",
+              "verified": true
+            },
+            {
+              "title": "Build the project",
+              "description": "Compile TypeScript and bundle with Vite using build script",
+              "command": "pnpm run build",
+              "phase": "run",
+              "source_file": "package.json",
+              "verified": true
+            },
+            {
+              "title": "Preview built output",
+              "description": "Start Vite preview server to serve the production build",
+              "command": "pnpm run preview",
+              "phase": "run",
+              "source_file": "package.json",
+              "verified": true
+            }
+          ]
+        },
+        {
+          "name": "Manual local setup with environment",
+          "reliability": "low",
+          "best_for": "users preferring manual control or debugging",
+          "requires": [
+            "node.js",
+            "pnpm"
+          ],
+          "steps": [
+            {
+              "title": "Copy environment template",
+              "description": "Create .env file from .env.example to set API base URL",
+              "command": "cp .env.example .env",
+              "phase": "env",
+              "source_file": ".env.example",
+              "verified": true
+            },
+            {
+              "title": "Install dependencies",
+              "description": "Install project dependencies using pnpm from pnpm-lock.yaml",
+              "command": "pnpm install",
+              "phase": "dependencies",
+              "source_file": "pnpm-lock.yaml",
+              "verified": true
+            },
+            {
+              "title": "Start development server",
+              "description": "Start Vite dev server manually",
+              "command": "pnpm run dev",
+              "phase": "run",
+              "source_file": "package.json",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "errors": []
+}

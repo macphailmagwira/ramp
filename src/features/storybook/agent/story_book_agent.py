@@ -3,8 +3,8 @@ interactive guide that walks a developer through getting a project running.
 
 This module is the *orchestrator*. It fans out one subgraph per "section" and
 then assembles + persists the result. The actual section logic lives in their
-own modules (see ``src.features.ai.storybook``); today the only section is SET UP
-(``src.features.ai.storybook.setup``), but LEARN / BUILD can slot in later by
+own modules (see ``src.features.storybook.agent``); today the only section is SET UP
+(``src.features.storybook.agent.setup``), but LEARN / BUILD can slot in later by
 appending to ``SUBGRAPHS``.
 
 The LLM call goes to Qwen on AWS Bedrock (``invoke_qwen`` in
@@ -25,7 +25,7 @@ from typing import Annotated, Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-from src.features.ai.storybook.setup import SETUP_NAME, build_setup
+from src.features.storybook.agent.setup import SETUP_NAME, build_setup
 
 logger = logging.getLogger("api-main.ai.story_book_agent")
 

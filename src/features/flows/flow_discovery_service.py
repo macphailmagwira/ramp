@@ -5,7 +5,7 @@ import json
 import logging
 
 from src.features.ai.bedrock import invoke_qwen
-from src.features.ai.schema import (
+from src.features.flows.schema import (
     DiscoverFlowsRequest,
     DiscoverFlowsResponse,
     DiscoveredFlowSummary,

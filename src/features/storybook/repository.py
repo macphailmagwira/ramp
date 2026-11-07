@@ -7,7 +7,7 @@ from typing import Optional
 from sqlalchemy import select
 
 from src.common.base_repository import BaseRepository
-from src.features.ai.models import Storybook
+from src.features.storybook.models import Storybook
 
 
 class StorybookRepository(BaseRepository):
