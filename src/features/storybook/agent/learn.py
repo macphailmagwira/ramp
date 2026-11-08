@@ -59,6 +59,9 @@ LEARN_MAX_ENDPOINTS_PER_GROUP = 40
 # and dropped every detail field).
 LEARN_API_BATCH = 6
 LEARN_API_MAX_TOKENS = 4000
+# Endpoints sent to the LLM per feature-grouping call (after per-endpoint docs are
+# done). Kept large enough for coherent feature clusters, small enough to fit tokens.
+LEARN_API_GROUP_CHUNK = 60
 
 
 class LearnState(TypedDict, total=False):  # PRIVATE to this subgraph
@@ -836,6 +839,117 @@ Return JSON:
 
 
 # =============================================================================
+# LLM: area 3b - re-group enriched endpoints by feature / use-case
+# =============================================================================
+def _learn_norm_feature(name: str) -> str:
+    """Normalise a feature/use-case group name for cross-chunk de-duplication."""
+    name = _learn_str(name).strip()
+    name = re.sub(r"\s+", " ", name)
+    return name.lower()
+
+
+def _learn_chunks(seq: list, n: int):
+    for i in range(0, len(seq), n):
+        yield seq[i:i + n]
+
+
+async def _learn_feature_group_batch(state: LearnState, eps: list) -> list:
+    """Ask the LLM to cluster a slice of enriched endpoints into feature groups.
+
+    Returns a list of {"group": str, "endpoints": [{"method", "path"}]}. Returns []
+    on any failure so the caller can fall back gracefully.
+    """
+    lines = [f"  {e.get('method')} {e.get('path')}  —  {e.get('summary') or ''}" for e in eps]
+    prompt = (
+        "These API endpoints belong to one codebase:\n"
+        + "\n".join(lines)
+        + "\n\nGroup them by FEATURE or USE-CASE. Endpoints that serve the same "
+          "user-facing capability or business feature belong in the same group. "
+          "Use short, consistent group names (2-5 words, Title Case). Each endpoint "
+          "must appear in exactly one group.\n\n"
+          "Return ONLY valid compact JSON (no markdown, no commentary):\n"
+          '{"groups": [{"group": str, "endpoints": [{"method": str, "path": str}]}]}'
+    )
+    try:
+        raw = await asyncio.to_thread(invoke_qwen, prompt, LEARN_SYSTEM, LEARN_API_MAX_TOKENS)
+        data = parse_json(raw)
+    except Exception as e:
+        state.setdefault("overview", {})
+        state["overview"].setdefault("warnings", []).append(
+            f"{LEARN_NAME}: api feature grouping failed ({e}); kept module grouping"
+        )
+        return []
+    out = []
+    for g in _learn_list(data.get("groups")):
+        if not isinstance(g, dict):
+            continue
+        refs = [
+            {"method": _learn_str(r.get("method")), "path": _learn_str(r.get("path"))}
+            for r in _learn_list(g.get("endpoints"))
+            if isinstance(r, dict)
+        ]
+        refs = [r for r in refs if r["method"] and r["path"]]
+        if refs:
+            out.append({"group": _learn_str(g.get("group")), "endpoints": refs})
+    return out
+
+
+async def learn_group_apis_node(state: LearnState):
+    """Re-group enriched endpoints by feature/use-case (LLM-driven).
+
+    ``api_explore`` groups endpoints by module. This step asks the LLM to cluster
+    them into feature/use-case groups so the UI can present a clickable feature
+    list instead of one flat module list. Falls back to the existing module
+    grouping if the LLM step yields nothing usable.
+    """
+    apis_in = state.get("apis") or []
+    flat = []
+    for grp in apis_in:
+        for ep in _learn_list(grp.get("endpoints")):
+            if isinstance(ep, dict) and ep.get("method") and ep.get("path"):
+                flat.append(ep)
+    if not flat:
+        return {"apis": []}
+
+    by_key = {(e.get("method"), e.get("path")): e for e in flat}
+    merged: dict = {}
+    seen: set = set()
+    for chunk in _learn_chunks(flat, LEARN_API_GROUP_CHUNK):
+        for g in await _learn_feature_group_batch(state, chunk):
+            name = _learn_norm_feature(g["group"])
+            if not name:
+                continue
+            bucket = merged.setdefault(name, {"group": g["group"], "endpoints": []})
+            for ref in g["endpoints"]:
+                key = (ref.get("method"), ref.get("path"))
+                if key in seen:
+                    continue
+                doc = by_key.get(key)
+                if doc:
+                    bucket["endpoints"].append(doc)
+                    seen.add(key)
+
+    if not merged:
+        # LLM grouping produced nothing usable: keep module grouping.
+        return {"apis": apis_in}
+
+    missing = [by_key[k] for k in by_key if k not in seen]
+    if missing:
+        other = merged.setdefault("other", {"group": "Other", "endpoints": []})
+        other["endpoints"].extend(missing)
+
+    result = sorted(merged.values(), key=lambda b: -len(b["endpoints"]))
+    if len(result) > LEARN_MAX_API_GROUPS:
+        overflow = result[LEARN_MAX_API_GROUPS:]
+        result = result[:LEARN_MAX_API_GROUPS]
+        other = result[-1]
+        other["group"] = "Other"
+        for b in overflow:
+            other["endpoints"].extend(b["endpoints"])
+    return {"apis": result}
+
+
+# =============================================================================
 # Deterministic: area 4 - codebase explorer
 # =============================================================================
 def learn_codebase_node(state: LearnState):
@@ -1073,6 +1187,7 @@ def build_learn():
     g.add_node("enrich_flows", learn_enrich_flows_node)
     g.add_node("build_flow_graph", learn_build_flow_graph_node)
     g.add_node("api_explore", learn_api_explore_node)
+    g.add_node("group_apis", learn_group_apis_node)
     g.add_node("codebase_explore", learn_codebase_node)
     g.add_node("validate", learn_validate_node)
     g.add_edge(START, "collect")
@@ -1081,7 +1196,8 @@ def build_learn():
     g.add_edge("discover_flows", "enrich_flows")
     g.add_edge("enrich_flows", "build_flow_graph")
     g.add_edge("build_flow_graph", "api_explore")
-    g.add_edge("api_explore", "codebase_explore")
+    g.add_edge("api_explore", "group_apis")
+    g.add_edge("group_apis", "codebase_explore")
     g.add_edge("codebase_explore", "validate")
     g.add_edge("validate", END)
     return g.compile()
