@@ -69,6 +69,16 @@ JS_IMPORT = re.compile(r"""(?:import|export)\s+.*?from\s+['"]([^'"]+)['"]""", re
 # Example match: "const x = require('./config')" -> captures "./config"
 JS_REQUIRE = re.compile(r"""require\s*\(\s*['"]([^'"]+)['"]\s*\)""", re.MULTILINE)
 
+# --- Go / Rust / Java imports (multi-language support) ---
+# Go: import "pkg/path"  or  import ( "a" "b" )
+GO_IMPORT = re.compile(r'\bimport\s*(?:\(|\s*)\s*"([^"]+)"')
+# Rust: `mod foo;` declares an in-crate submodule file
+RUST_MOD = re.compile(r'\bmod\s+([A-Za-z_][\w]*)')
+# Rust: `use crate::a::b;` / `use super::x;` / `use self::x;` / `use a::b;`
+RUST_USE = re.compile(r'\buse\s+((?:crate|super|self|[\w]+)(?:::[\w*]+)+)')
+# Java: import com.foo.Bar;  (wildcards `import x.*;` are skipped upstream)
+JAVA_IMPORT = re.compile(r'\bimport\s+(?:static\s+)?([\w.]+(?:\.\*)?)\s*;')
+
 
 def parse_dependencies(file_path: str, content: str) -> List[Tuple[str, str]]:
     """
@@ -132,6 +142,24 @@ def parse_dependencies(file_path: str, content: str) -> List[Tuple[str, str]]:
             path = match.group(1)
             if _is_relative_js(path):
                 results.append((path, "require"))
+
+    elif ext == ".go":
+        for match in GO_IMPORT.finditer(content):
+            results.append((match.group(1), "go_import"))
+
+    elif ext == ".rs":
+        for match in RUST_MOD.finditer(content):
+            results.append((match.group(1), "rust_mod"))
+        for match in RUST_USE.finditer(content):
+            # Convert crate/super/self to a path-like string for resolution.
+            results.append((match.group(1).replace("::", "/"), "rust_use"))
+
+    elif ext == ".java":
+        for match in JAVA_IMPORT.finditer(content):
+            raw = match.group(1)
+            if raw.endswith(".*"):
+                continue  # wildcard package import — can't resolve to a file
+            results.append((raw.replace(".", "/"), "java_import"))
 
     else:
         # We don't have a parser for this file type (e.g. .md, .json,
@@ -205,6 +233,14 @@ def resolve_import_to_path(
 
     if import_type in ("esm_import", "require"):
         resolved = _resolve_js_import(source_dir, raw_import, all_paths)
+    elif import_type == "go_import":
+        resolved = _resolve_go_import(raw_import, all_paths)
+    elif import_type == "rust_mod":
+        resolved = _resolve_rust_mod(source_file, raw_import, all_paths)
+    elif import_type == "rust_use":
+        resolved = _resolve_rust_use(raw_import, all_paths)
+    elif import_type == "java_import":
+        resolved = _resolve_java_import(raw_import, all_paths)
     else:
         resolved = _resolve_python_import(raw_import, all_paths)
 
@@ -398,6 +434,76 @@ def _resolve_python_import(module: str, all_paths: List[str]) -> str | None:
             # like "src/myapp/models/user.py".
             if _normalize(p).endswith(_normalize(candidate)):
                 return p
+    return None
+
+
+def _resolve_go_import(raw: str, all_paths: List[str]) -> str | None:
+    """Go imports point at a *package directory*. Return the first file that
+    lives inside that package so the edge has a concrete target.
+
+    The Go module prefix (e.g. ``github.com/owner/repo``) rarely matches the
+    repo's on-disk layout, so we also try the path with leading segments
+    progressively stripped.
+    """
+    base = _normalize(raw).lstrip("/")
+    segs = base.split("/")
+    for i in range(len(segs)):
+        cand = "/".join(segs[i:])
+        norm = _normalize(cand)
+        for p in all_paths:
+            np = _normalize(p)
+            if np == norm or np.startswith(norm + "/") or np.endswith("/" + norm):
+                return p
+    # Fallback: the final path segment is the package directory name; match any
+    # file that lives inside such a directory (layout independent of module root).
+    last = segs[-1]
+    for p in all_paths:
+        np = _normalize(p)
+        if f"/{last}/" in np or np.endswith(f"/{last}") or np == last:
+            return p
+    return None
+
+
+def _resolve_rust_mod(source_file: str, raw: str, all_paths: List[str]) -> str | None:
+    """`mod foo;` in a file declares `foo.rs` (or `foo/mod.rs`) next to it."""
+    source_dir = str(Path(source_file).parent).replace("\\", "/")
+    base = f"{source_dir}/{raw}"
+    for candidate in (base + ".rs", base + "/mod.rs"):
+        n = _normalize(candidate).lstrip("./")
+        for p in all_paths:
+            if _normalize(p) == n:
+                return p
+    return None
+
+
+def _resolve_rust_use(raw: str, all_paths: List[str]) -> str | None:
+    """`use crate::a::b;` -> module `a` (last segment is the item name)."""
+    parts = [p for p in raw.split("/") if p not in ("crate", "self", "super")]
+    if not parts:
+        return None
+    module = "/".join(parts[:-1]) if len(parts) > 1 else parts[0]
+    for candidate in (module + ".rs", module + "/mod.rs"):
+        n = _normalize(candidate).lstrip("./")
+        for p in all_paths:
+            if _normalize(p).endswith(n):
+                return p
+    return None
+
+
+def _resolve_java_import(raw: str, all_paths: List[str]) -> str | None:
+    """Java import `com/foo/Bar` -> `com/foo/Bar.java` if it exists in repo.
+
+    Falls back to matching by file basename when the package directory layout
+    isn't mirrored on disk.
+    """
+    n = _normalize(raw + ".java").lstrip("./")
+    for p in all_paths:
+        if _normalize(p).endswith(n):
+            return p
+    base = raw.split("/")[-1] + ".java"
+    for p in all_paths:
+        if p.split("/")[-1] == base:
+            return p
     return None
 
 

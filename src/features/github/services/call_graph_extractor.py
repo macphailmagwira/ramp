@@ -43,6 +43,8 @@ def extract_calls(
             return _extract_python_calls(content, known_names)
         if ext in (".ts", ".tsx", ".js", ".jsx"):
             return _extract_js_ts_calls(content, known_names)
+        if ext in (".go", ".rs", ".java"):
+            return _extract_generic_calls(content, known_names)
     except Exception:
         logger.debug("Call extraction failed | file=%s", file_path, exc_info=True)
     return []
@@ -195,5 +197,80 @@ def _extract_js_ts_calls(content: str, known_names: set[str]) -> list[CallEdge]:
 
         if caller and caller != callee:
             edges.append((caller, callee, line))
+
+    return edges
+
+
+# ---------------------------------------------------------------------------
+# Go / Rust / Java — generic regex extraction (mirrors the JS/TS approach)
+# ---------------------------------------------------------------------------
+
+_GO_FUNC_DEF = re.compile(r"func\s+(?:\([^)]*\)\s*)?([A-Za-z_][\w]*)\s*\(")
+_RUST_FUNC_DEF = re.compile(r"\bfn\s+([A-Za-z_][\w]*)\s*\(")
+_JAVA_FUNC_DEF = re.compile(
+    r"(?:public|private|protected|static|final|abstract|synchronized|native|volatile|\s)*"
+    r"\b([A-Za-z_][\w.]*)\s+([A-Za-z_][\w]*)\s*\("
+)
+_JAVA_CTRL = frozenset(
+    {
+        "if", "for", "while", "switch", "catch", "return", "throw", "new",
+        "synchronized", "try", "do", "else", "case", "default", "super", "this",
+    }
+)
+# Language-agnostic call-site matcher (name followed by `(`), shared with JS/TS.
+_GENERIC_KEYWORDS = frozenset(
+    {
+        "if", "for", "while", "switch", "catch", "return", "typeof", "instanceof",
+        "new", "delete", "void", "throw", "await", "yield", "async", "function",
+        "class", "import", "export", "from", "const", "let", "var", "of", "in",
+        "super", "this", "true", "false", "null", "undefined",
+        # extra control/keyword tokens for Go / Rust / Java
+        "func", "fn", "else", "range", "match", "loop", "defer", "go", "select",
+        "struct", "enum", "trait", "impl", "interface", "public", "private",
+        "protected", "static", "final", "void", "try", "synchronized", "using",
+        "with", "unsafe", "move", "package", "type", "do", "case", "default",
+    }
+)
+
+
+def _strip_generic_comments(s: str) -> str:
+    s = _MULTI_LINE_COMMENT.sub("", s)
+    s = re.sub(r"//[^\n]*", "", s)
+    s = re.sub(r"#[^\n]*", "", s)
+    return s
+
+
+def _extract_generic_calls(content: str, known_names: set[str]) -> list[CallEdge]:
+    """Detect function calls for Go / Rust / Java.
+
+    Reuses the JS/TS call-site regex plus language-specific function-definition
+    regexes to attribute each call to its nearest enclosing function. Unresolved
+    (stdlib / third-party) calls are filtered via *known_names*.
+    """
+    stripped = _strip_generic_comments(content)
+    func_defs: list[tuple[str, int]] = []
+    for pat in (_GO_FUNC_DEF, _RUST_FUNC_DEF):
+        for m in pat.finditer(stripped):
+            func_defs.append((m.group(1), m.start()))
+    for m in _JAVA_FUNC_DEF.finditer(stripped):
+        ret, name = m.group(1), m.group(2)
+        if name in _JAVA_CTRL or ret in _JAVA_CTRL:
+            continue
+        func_defs.append((name, m.start()))
+    func_defs.sort(key=lambda x: x[1])
+
+    edges: list[CallEdge] = []
+    for m in _TS_CALL.finditer(stripped):
+        callee = m.group("n")
+        if callee in _GENERIC_KEYWORDS or callee not in known_names:
+            continue
+        call_pos = m.start()
+        caller: str | None = None
+        for fname, fstart in reversed(func_defs):
+            if fstart < call_pos:
+                caller = fname
+                break
+        if caller and caller != callee:
+            edges.append((caller, callee, _line_of(stripped, call_pos)))
 
     return edges

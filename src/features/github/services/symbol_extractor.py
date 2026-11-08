@@ -40,6 +40,12 @@ def extract_symbols(file_path: str, content: str) -> list[dict[str, Any]]:
             return _extract_python(content)
         if ext in (".ts", ".tsx", ".js", ".jsx"):
             return _extract_js_ts(content)
+        if ext == ".go":
+            return _extract_go(content)
+        if ext == ".rs":
+            return _extract_rust(content)
+        if ext == ".java":
+            return _extract_java(content)
     except Exception:
         logger.debug("Symbol extraction failed | file=%s", file_path, exc_info=True)
     return []
@@ -347,6 +353,120 @@ def _extract_js_ts(content: str) -> list[dict[str, Any]]:
             deduped.append(s)
 
     return deduped
+
+
+# ---------------------------------------------------------------------------
+# Go / Rust / Java extraction — regex-based (mirrors the JS/TS approach).
+# These are best-effort: we capture function/method/class names + line numbers
+# so the call graph and code-graph features work across languages. Source code
+# is not sliced for these (braces make it unreliable); the LLM narration in the
+# Learn step works from names + the call graph instead.
+# ---------------------------------------------------------------------------
+
+_GO_FUNC = re.compile(r"func\s+(?:\([^)]*\)\s*)?([A-Za-z_][\w]*)\s*\(")
+_GO_STRUCT = re.compile(r"\btype\s+([A-Za-z_][\w]*)\s+struct\b")
+_RUST_FN = re.compile(r"\bfn\s+([A-Za-z_][\w]*)\s*\(")
+_RUST_TYPE = re.compile(r"\b(?:struct|enum|trait)\s+([A-Za-z_][\w]*)")
+_JAVA_CLASS = re.compile(
+    r"\b(?:public\s+)?(?:final\s+)?(?:class|interface|enum)\s+([A-Za-z_][\w]*)"
+)
+_JAVA_METHOD = re.compile(
+    r"(?:public|private|protected|static|final|abstract|synchronized|native|volatile|\s)*"
+    r"\b([A-Za-z_][\w.]*)\s+([A-Za-z_][\w]*)\s*\("
+)
+_JAVA_CTRL = frozenset(
+    {
+        "if", "for", "while", "switch", "catch", "return", "throw", "new",
+        "synchronized", "try", "do", "else", "case", "default", "super", "this",
+    }
+)
+
+
+def _line_of(content: str, pos: int) -> int:
+    return content.count("\n", 0, pos) + 1
+
+
+def _extract_go(content: str) -> list[dict[str, Any]]:
+    symbols: list[dict[str, Any]] = []
+    for m in _GO_STRUCT.finditer(content):
+        line = _line_of(content, m.start())
+        symbols.append(_make_symbol(
+            name=m.group(1), qualified_name=m.group(1), symbol_type="class",
+            parameters=None, return_type=None, docstring=None,
+            line_start=line, line_end=None, class_name=None,
+            is_async=False, source_code=None,
+        ))
+    for m in _GO_FUNC.finditer(content):
+        whole = m.group(0)
+        name = m.group(1)
+        line = _line_of(content, m.start())
+        # A receiver present (between `func` and the name) => method.
+        is_method = "(" in whole[: whole.index(name)]
+        symbols.append(_make_symbol(
+            name=name, qualified_name=name,
+            symbol_type="method" if is_method else "function",
+            parameters=None, return_type=None, docstring=None,
+            line_start=line, line_end=None, class_name=None,
+            is_async=False, source_code=None,
+        ))
+    return _dedupe_symbols(symbols)
+
+
+def _extract_rust(content: str) -> list[dict[str, Any]]:
+    symbols: list[dict[str, Any]] = []
+    for m in _RUST_TYPE.finditer(content):
+        line = _line_of(content, m.start())
+        symbols.append(_make_symbol(
+            name=m.group(1), qualified_name=m.group(1), symbol_type="class",
+            parameters=None, return_type=None, docstring=None,
+            line_start=line, line_end=None, class_name=None,
+            is_async=False, source_code=None,
+        ))
+    for m in _RUST_FN.finditer(content):
+        line = _line_of(content, m.start())
+        symbols.append(_make_symbol(
+            name=m.group(1), qualified_name=m.group(1), symbol_type="function",
+            parameters=None, return_type=None, docstring=None,
+            line_start=line, line_end=None, class_name=None,
+            is_async=False, source_code=None,
+        ))
+    return _dedupe_symbols(symbols)
+
+
+def _extract_java(content: str) -> list[dict[str, Any]]:
+    symbols: list[dict[str, Any]] = []
+    for m in _JAVA_CLASS.finditer(content):
+        line = _line_of(content, m.start())
+        symbols.append(_make_symbol(
+            name=m.group(1), qualified_name=m.group(1), symbol_type="class",
+            parameters=None, return_type=None, docstring=None,
+            line_start=line, line_end=None, class_name=None,
+            is_async=False, source_code=None,
+        ))
+    for m in _JAVA_METHOD.finditer(content):
+        return_type = m.group(1)
+        name = m.group(2)
+        if name in _JAVA_CTRL or return_type in _JAVA_CTRL:
+            continue
+        line = _line_of(content, m.start())
+        symbols.append(_make_symbol(
+            name=name, qualified_name=name, symbol_type="method",
+            parameters=None, return_type=return_type, docstring=None,
+            line_start=line, line_end=None, class_name=None,
+            is_async=False, source_code=None,
+        ))
+    return _dedupe_symbols(symbols)
+
+
+def _dedupe_symbols(symbols: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen: set[tuple] = set()
+    out = []
+    for s in symbols:
+        key = (s["name"], s["line_start"], s["symbol_type"])
+        if key not in seen:
+            seen.add(key)
+            out.append(s)
+    return out
 
 
 # ---------------------------------------------------------------------------

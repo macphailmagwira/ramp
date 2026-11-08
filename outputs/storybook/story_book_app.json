@@ -3,116 +3,314 @@
   "sections": {
     "set_up": {
       "schema_version": 1,
-      "summary": "This project is a frontend-only Vite + React application with no backend services defined, so it can only be run locally vianpm scripts or manually.",
+      "summary": "This project can be run using Docker Compose configurations for development, local, staging, or production environments, or via Makefile targets and manual setup with Poetery and Python.",
       "env_vars": [
         {
-          "name": "VITE_API_BASE",
-          "purpose": "Specifies the base URL for API requests; defaults to http://localhost:8000/api/v1"
+          "name": "ENVIRONMENT",
+          "purpose": "Sets the application environment (DEVELOPMENT, STAGING, PRODUCTION) to configure log levels and behavior."
+        },
+        {
+          "name": "REDIS_PORT",
+          "purpose": "Overrides the default Redis port (6379) for local or isolated development."
+        },
+        {
+          "name": "POSTGRES_USER",
+          "purpose": "Specifies the PostgreSQL username for database authentication (default: user)."
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "purpose": "Specifies the PostgreSQL password for database authentication (default: password)."
+        },
+        {
+          "name": "POSTGRES_DB",
+          "purpose": "Specifies the PostgreSQL database name (default: dbname)."
+        },
+        {
+          "name": "PORT",
+          "purpose": "Overrides the API server port (default: 8000)."
+        },
+        {
+          "name": "HOST",
+          "purpose": "Overrides the API server host (default: 0.0.0.0)."
+        },
+        {
+          "name": "WORKERS",
+          "purpose": "Overrides the number of Uvicorn/Gunicorn workers (default: 4)."
+        },
+        {
+          "name": "LOG_LEVEL",
+          "purpose": "Explicitly sets the application log level, overriding the default based on ENVIRONMENT."
         }
       ],
-      "services": [],
-      "files_guide": [],
+      "services": [
+        "postgres",
+        "redis",
+        "api-main",
+        "celery-worker-main",
+        "celery-beat-main"
+      ],
+      "files_guide": [
+        {
+          "file": "docker-compose.yml",
+          "purpose": "Production-grade compose file with optimized build target 'production', no reload, and worker concurrency set."
+        },
+        {
+          "file": "docker-compose.dev.yml",
+          "purpose": "Development compose file with code volumes, reload enabled, and explicit paths to app folders for FastAPI development."
+        },
+        {
+          "file": "docker-compose.local.yml",
+          "purpose": "Local development alternative using single context root with Dockerfile in ./docker and source mounted directly from project root."
+        },
+        {
+          "file": "docker-compose.staging.yml",
+          "purpose": "Staging environment compose file, identical to dev but uses environment variables from .env files for staging-specific configs."
+        },
+        {
+          "file": "docker/Dockerfile",
+          "purpose": "Multi-stage Dockerfile for building API-main; contains base, dependencies, development, and production stages."
+        },
+        {
+          "file": "workers/Dockerfile",
+          "purpose": "Dockerfile for Celery worker and beat services, focused on Python and Celery dependencies with SQS and AWS support."
+        },
+        {
+          "file": "gunicorn.conf.py",
+          "purpose": "Gunicorn configuration file used in production mode to manage Uvicorn workers, logging, and process behavior."
+        },
+        {
+          "file": "alembic.ini",
+          "purpose": "Configuration file for database migrations using Alembic, pointing to the migrations/ directory."
+        },
+        {
+          "file": "makefile",
+          "purpose": "Task runner with aliases for installing dependencies, running tests, linting, formatting, and running the API locally."
+        },
+        {
+          "file": "scripts/verify-toolchain.sh",
+          "purpose": "Script to verify system dependencies (Docker, Node.js, Python 3.11+, AWS CLI) before running the project."
+        },
+        {
+          "file": "nginx/nginx.conf",
+          "purpose": "Main Nginx server configuration for production, includes rate limiting, gzip, SSL, and security headers."
+        },
+        {
+          "file": "nginx/conf.d/default.conf",
+          "purpose": "Nginx site configuration for routing traffic to backend services (api-main, web-dashboard, pwa-display-app) and enforcing HTTPS."
+        },
+        {
+          "file": "docker/entrypoint.sh",
+          "purpose": "Entry point script that loads .env, normalizes ENVIRONMENT, verifies Python packages, and starts Uvicorn or Gunicorn."
+        }
+      ],
       "run_options": [
         {
-          "name": "Run via npm scripts (dev)",
+          "name": "Docker Compose (all services)",
           "reliability": "high",
-          "best_for": "local development with Vite hot reload",
+          "best_for": "Consistent, isolated development, staging, or production environments with full stack in containers.",
           "requires": [
-            "node.js",
-            "pnpm"
+            "docker"
           ],
           "steps": [
             {
-              "title": "Install dependencies",
-              "description": "Install project dependencies using pnpm from pnpm-lock.yaml",
-              "command": "pnpm install",
+              "title": "Ensure Docker is running",
+              "description": "Verify Docker daemon is active.",
+              "command": "docker info",
               "phase": "dependencies",
-              "source_file": "pnpm-lock.yaml",
+              "source_file": "scripts/verify-toolchain.sh",
               "verified": true
             },
             {
-              "title": "Start development server",
-              "description": "Start Vite dev server using the dev script in package.json",
-              "command": "pnpm run dev",
-              "phase": "run",
-              "source_file": "package.json",
+              "title": "Build and start services in development mode",
+              "description": "Use dev compose file with code volumes for live reloading during development.",
+              "command": "docker-compose -f docker-compose.dev.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.dev.yml",
               "verified": true
+            },
+            {
+              "title": "Build and start services in local mode",
+              "description": "Use local compose file with project root mounted, ideal for Python devs with local virtual environments.",
+              "command": "docker-compose -f docker-compose.local.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.local.yml",
+              "verified": true
+            },
+            {
+              "title": "Build and start services in staging mode",
+              "description": "Use staging compose file with environment variables from .env for non-prod deployments.",
+              "command": "docker-compose -f docker-compose.staging.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.staging.yml",
+              "verified": true
+            },
+            {
+              "title": "Build and start services in production mode",
+              "description": "Use production compose file with optimized images, no reload, and Gunicorn workers.",
+              "command": "docker-compose -f docker-compose.yml up --build",
+              "phase": "services",
+              "source_file": "docker-compose.yml",
+              "verified": true
+            },
+            {
+              "title": "Verify services are healthy",
+              "description": "Check that PostgreSQL and Redis are ready, then access API at localhost:8000/docs.",
+              "command": "docker-compose -f docker-compose.dev.yml logs -f api-main && sleep 5 && curl http://localhost:8000/docs",
+              "phase": "verify",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
             }
           ]
         },
         {
-          "name": "Run via npm scripts (build and preview)",
+          "name": "Makefile (local development)",
           "reliability": "medium",
-          "best_for": "testing production build locally",
+          "best_for": "Quick local testing without Docker, when Python 3.11+ and dependencies are already installed.",
           "requires": [
-            "node.js",
-            "pnpm"
+            "python",
+            "poetry"
           ],
           "steps": [
             {
-              "title": "Install dependencies",
-              "description": "Install project dependencies using pnpm from pnpm-lock.yaml",
-              "command": "pnpm install",
+              "title": "Install project dependencies",
+              "description": "Install all Python dependencies using Poetry (dev and main).",
+              "command": "make install",
               "phase": "dependencies",
-              "source_file": "pnpm-lock.yaml",
+              "source_file": "makefile",
               "verified": true
             },
             {
-              "title": "Build the project",
-              "description": "Compile TypeScript and bundle with Vite using build script",
-              "command": "pnpm run build",
-              "phase": "run",
-              "source_file": "package.json",
+              "title": "Set environment variables",
+              "description": "Copy .env.example to .env and set required variables.",
+              "command": "cp apps/api-main/.env.example apps/api-main/.env",
+              "phase": "env",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            },
+            {
+              "title": "Run database migrations",
+              "description": "Apply Alembic migrations to initialize the database schema.",
+              "command": "make migrate",
+              "phase": "services",
+              "source_file": "makefile",
               "verified": true
             },
             {
-              "title": "Preview built output",
-              "description": "Start Vite preview server to serve the production build",
-              "command": "pnpm run preview",
+              "title": "Start the API server",
+              "description": "Launch FastAPI with Uvicorn in development mode with auto-reload.",
+              "command": "make run",
               "phase": "run",
-              "source_file": "package.json",
+              "source_file": "makefile",
               "verified": true
+            },
+            {
+              "title": "Start Celery worker",
+              "description": "Run the Celery worker in background for async tasks.",
+              "command": "poetry run celery -A src.core.celery_app:app worker -l INFO --queues=s3-events,default,celery",
+              "phase": "run",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            },
+            {
+              "title": "Start Celery beat scheduler",
+              "description": "Run the Celery beat scheduler for periodic tasks.",
+              "command": "poetry run celery -A src.core.celery_app:app beat -l INFO",
+              "phase": "run",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
             }
           ]
         },
         {
-          "name": "Manual local setup with environment",
+          "name": "Manual local setup (Python + Poetry)",
           "reliability": "low",
-          "best_for": "users preferring manual control or debugging",
+          "best_for": "Debugging dependencies or running in non-standard environments where Docker/Makefile cannot be used.",
           "requires": [
-            "node.js",
-            "pnpm"
+            "python",
+            "poetry"
           ],
           "steps": [
             {
-              "title": "Copy environment template",
-              "description": "Create .env file from .env.example to set API base URL",
-              "command": "cp .env.example .env",
+              "title": "Install Poetry if not present",
+              "description": "Install Poetry using the official installer.",
+              "command": "curl -sSL https://install.python-poetry.org | python3 -",
+              "phase": "dependencies",
+              "source_file": "docker/Dockerfile",
+              "verified": true
+            },
+            {
+              "title": "Clone and navigate to project",
+              "description": "Ensure you are in the project root directory.",
+              "command": "cd /path/to/project",
               "phase": "env",
-              "source_file": ".env.example",
+              "source_file": "pyproject.toml",
               "verified": true
             },
             {
               "title": "Install dependencies",
-              "description": "Install project dependencies using pnpm from pnpm-lock.yaml",
-              "command": "pnpm install",
+              "description": "Install all packages from poetry.lock.",
+              "command": "poetry install",
               "phase": "dependencies",
-              "source_file": "pnpm-lock.yaml",
+              "source_file": "poetry.lock",
               "verified": true
             },
             {
-              "title": "Start development server",
-              "description": "Start Vite dev server manually",
-              "command": "pnpm run dev",
-              "phase": "run",
-              "source_file": "package.json",
+              "title": "Set environment variables",
+              "description": "Create .env file with minimum required values.",
+              "command": "echo \"ENVIRONMENT=DEVELOPMENT\\nPOSTGRES_URL=postgresql+asyncpg://user:password@localhost:5432/dbname\\nREDIS_URL=redis://localhost:6379/0\" > .env",
+              "phase": "env",
+              "source_file": "docker-compose.dev.yml",
               "verified": true
+            },
+            {
+              "title": "Run database migrations",
+              "description": "Apply Alembic migrations to setup tables.",
+              "command": "poetry run alembic upgrade head",
+              "phase": "services",
+              "source_file": "alembic.ini",
+              "verified": false
+            },
+            {
+              "title": "Start FastAPI server",
+              "description": "Run Uvicorn directly with specified module and reload.",
+              "command": "poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+              "phase": "run",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            },
+            {
+              "title": "Start Celery worker",
+              "description": "Start worker process for background tasks.",
+              "command": "poetry run celery -A src.core.celery_app:app worker -l INFO --queues=s3-events,default,celery",
+              "phase": "run",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
+            },
+            {
+              "title": "Start Celery beat",
+              "description": "Start periodic task scheduler.",
+              "command": "poetry run celery -A src.core.celery_app:app beat -l INFO",
+              "phase": "run",
+              "source_file": "docker-compose.dev.yml",
+              "verified": false
             }
           ]
         }
       ],
-      "warnings": []
-    }
+      "warnings": [
+        "[Docker Compose (all services)] Unverified command: docker-compose -f docker-compose.dev.yml logs -f api-main && sleep 5 && curl http://localhost:8000/docs",
+        "[Makefile (local development)] Unverified command: cp apps/api-main/.env.example apps/api-main/.env",
+        "[Makefile (local development)] Unverified command: poetry run celery -A src.core.celery_app:app worker -l INFO --queues=s3-events,default,celery",
+        "[Makefile (local development)] Unverified command: poetry run celery -A src.core.celery_app:app beat -l INFO",
+        "[Manual local setup (Python + Poetry)] Unverified command: poetry run alembic upgrade head",
+        "[Manual local setup (Python + Poetry)] Unverified command: poetry run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+        "[Manual local setup (Python + Poetry)] Unverified command: poetry run celery -A src.core.celery_app:app worker -l INFO --queues=s3-events,default,celery",
+        "[Manual local setup (Python + Poetry)] Unverified command: poetry run celery -A src.core.celery_app:app beat -l INFO"
+      ]
+    },
+    "learn": {}
   },
-  "errors": []
+  "errors": [
+    "learn: cannot access local variable 'data' where it is not associated with a value"
+  ]
 }

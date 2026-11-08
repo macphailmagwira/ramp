@@ -18,7 +18,7 @@ from src.features.github.services.symbol_extractor import extract_symbols
 
 logger = logging.getLogger(f"{API_MAIN_LOGGER_NAME_PREFIX}.symbol_service")
 
-PARSEABLE = {".py", ".ts", ".tsx", ".js", ".jsx"}
+PARSEABLE = {".py", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs", ".java"}
 
 
 class SymbolExtractionService:

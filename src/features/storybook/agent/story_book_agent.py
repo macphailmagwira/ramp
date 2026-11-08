@@ -26,6 +26,7 @@ from typing import Annotated, Optional, TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from src.features.storybook.agent.setup import SETUP_NAME, build_setup
+from src.features.storybook.agent.learn import LEARN_NAME, build_learn
 
 logger = logging.getLogger("api-main.ai.story_book_agent")
 
@@ -96,7 +97,7 @@ def build_parent():
 
 SUBGRAPHS = [
     (SETUP_NAME, build_setup),
-    # (LEARN_NAME, build_learn),   # later
+    (LEARN_NAME, build_learn),
     # (BUILD_NAME, build_build),   # later
 ]
 
@@ -111,6 +112,23 @@ async def generate_storybook(project_root=None, files=None, output_dir=OUTPUT_DI
     from already-indexed repository content in the database.
     """
     result = await GRAPH.ainvoke({
+        "project_root": str(project_root) if project_root else "",
+        "files": files,
+        "output_dir": output_dir,
+        "sections": {}, "errors": [], "book": None,
+    })
+    return result["book"]
+
+
+def generate_storybook_sync(project_root=None, files=None, output_dir=OUTPUT_DIR):
+    """Synchronous variant of :func:`generate_storybook`.
+
+    Use this from environments where awaiting the graph raises the CPython 3.14
+    ``RuntimeError: Timeout should be used inside a task`` (e.g. a Jupyter
+    top-level ``await``). LangGraph's sync entrypoint drives the async nodes via
+    its own event loop, which sidesteps that scheduling issue.
+    """
+    result = GRAPH.invoke({
         "project_root": str(project_root) if project_root else "",
         "files": files,
         "output_dir": output_dir,

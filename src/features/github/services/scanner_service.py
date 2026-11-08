@@ -353,7 +353,7 @@ class RepoScannerService:
             logger.debug("Temporary scan directory removed | tmpdir=%s", tmpdir)
 
     # Extensions we have real code parsers for (dependency/symbol/call graph).
-    PARSEABLE = {".py", ".ts", ".tsx", ".js", ".jsx"}
+    PARSEABLE = {".py", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs", ".java"}
 
     # Don't persist the text of files larger than this (avoids bloating the DB
     # on data files, lockfiles, minified bundles, etc.).

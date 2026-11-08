@@ -40,9 +40,35 @@ def invoke_qwen(prompt: str, system: str, max_tokens: int = 4000) -> str:
 
 
 def parse_json(raw: str) -> dict:
-    """Parse an AI reply into a dict (strips ```json fences if present)."""
-    raw = raw.strip()
+    """Parse an AI reply into a dict.
+
+    Tolerates ```json fences and any non-JSON prose around the first JSON value
+    (the model sometimes prepends a short explanation). Raises ValueError if no
+    valid JSON object/array can be found.
+    """
+    raw = (raw or "").strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         raw = raw[4:] if raw.startswith("json") else raw
-    return json.loads(raw.strip())
+        raw = raw.strip()
+    if not raw:
+        raise ValueError("Empty response: no JSON found")
+
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        pass
+
+    # Fallback: decode only the first complete JSON value, ignoring trailing text.
+    start = min(
+        (i for i in (raw.find("{"), raw.find("[")) if i != -1),
+        default=-1,
+    )
+    if start != -1:
+        try:
+            obj, _ = json.JSONDecoder().raw_decode(raw[start:])
+            return obj
+        except Exception:
+            pass
+
+    raise ValueError("Could not parse JSON from model response")
