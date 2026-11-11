@@ -3,12 +3,18 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class StoryStep(BaseModel):
-    title: str
-    description: str
-    highlight_nodes: List[str]
-    highlight_edges: List[List[str]]
+class ArchNode(BaseModel):
+    id: str
+    label: str
+    type: str
+    description: str = ""
+    file_path: Optional[str] = None
     insight: Optional[str] = None
+    children: List["ArchNode"] = []
+    edges: List[List[str]] = []
+
+
+ArchNode.model_rebuild()
 
 
 class ArchitectureStoryRequest(BaseModel):
@@ -17,6 +23,6 @@ class ArchitectureStoryRequest(BaseModel):
     edges: List[dict]
 
 
-class ArchitectureStoryResponse(BaseModel):
-    steps: List[StoryStep]
+class ArchitectureGraphResponse(BaseModel):
     summary: str
+    root: ArchNode

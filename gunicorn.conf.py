@@ -16,7 +16,10 @@ worker_class = "uvicorn.workers.UvicornWorker"
 worker_connections = 1000
 max_requests = 1000
 max_requests_jitter = 50
-timeout = 30
+# LLM-backed endpoints (architecture grouping, storybook) fan out into many
+# sequential model calls that can exceed the default 30s; a short timeout
+# SIGABRTs the worker and orphans its DB transaction. Allow generous headroom.
+timeout = 300
 keepalive = 2
 
 # Logging
@@ -43,7 +46,7 @@ group = None
 tmp_upload_dir = None
 
 # Restart workers gracefully
-graceful_timeout = 30
+graceful_timeout = 300
 preload_app = False  # Set to True for faster worker spawning
 
 # Server hooks

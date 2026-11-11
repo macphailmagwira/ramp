@@ -1,0 +1,2734 @@
+{
+  "summary": "This codebase follows a layered architecture where the UI frontend interacts solely with the API layer to fetch and submit data. The API layer orchestrates business logic and data access, while business logic handles core workflows and may invoke external services. All layers rely on shared utilities and configuration, and tests span across multiple layers to ensure correctness and integration.",
+  "root": {
+    "id": "root",
+    "label": "Architecture",
+    "type": "system",
+    "description": "This codebase follows a layered architecture where the UI frontend interacts solely with the API layer to fetch and submit data. The API layer orchestrates business logic and data access, while business logic handles core workflows and may invoke external services. All layers rely on shared utilities and configuration, and tests span across multiple layers to ensure correctness and integration.",
+    "file_path": null,
+    "insight": null,
+    "children": [
+      {
+        "id": "ui",
+        "label": "UI / Frontend",
+        "type": "feature",
+        "description": "The user_invite.html template renders the email body for user invitations sent via AWS SES, formatted with dynamic placeholders for user-specific data pulled from the API response.",
+        "file_path": null,
+        "insight": "Tight coupling: This template directly depends on API response fields without a templating abstraction layer, making it fragile to API schema changes.",
+        "children": [
+          {
+            "id": "terraform/modules/ses/templates/user_invite.html",
+            "label": "user_invite.html",
+            "type": "file",
+            "description": "",
+            "file_path": "terraform/modules/ses/templates/user_invite.html",
+            "insight": null,
+            "children": [],
+            "edges": []
+          }
+        ],
+        "edges": []
+      },
+      {
+        "id": "api",
+        "label": "API",
+        "type": "feature",
+        "description": "The API component orchestrates HTTP and GraphQL endpoints using AppSync and Lambda, managing authentication via IAM, TLS via ACM, and data connectivity to DynamoDB and ElastiCache through secured network policies.",
+        "file_path": null,
+        "insight": "tight coupling between appsync/schema.graphql and appsync/generate-from-openapi.js creates a fragile codegen dependency",
+        "children": [
+          {
+            "id": "api:terraform",
+            "label": "terraform",
+            "type": "component",
+            "description": "The terraform component manages AWS infrastructure as code for core services including Lambda, IAM, DynamoDB, AppSync, and security groups, providing modular, reusable configurations for API-level resources.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "api:terraform/modules",
+                "label": "modules",
+                "type": "component",
+                "description": "The modules component provides reusable, self-contained Terraform modules for AWS resources like IAM, Lambda, ACM, DynamoDB, AppSync, and security groups, enabling consistent and scalable infrastructure provisioning across environments.",
+                "file_path": null,
+                "insight": "clean separation",
+                "children": [
+                  {
+                    "id": "api:terraform/modules/appsync",
+                    "label": "appsync",
+                    "type": "component",
+                    "description": "The AppSync module configures a GraphQL API using AWS AppSync, generating resolvers and schema from OpenAPI specifications and VTL templates, enabling serverless API endpoints with integrated data sources.",
+                    "file_path": null,
+                    "insight": "generate-from-openapi.js and generate-vtl.js form the entry point, tightly coupling schema generation with resolver logic",
+                    "children": [
+                      {
+                        "id": "terraform/modules/appsync/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/shared-resolvers.js",
+                        "label": "shared-resolvers.js",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/shared-resolvers.js",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/generate-from-openapi.js",
+                        "label": "generate-from-openapi.js",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/generate-from-openapi.js",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/generate-vtl.js",
+                        "label": "generate-vtl.js",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/generate-vtl.js",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/schema.graphql",
+                        "label": "schema.graphql",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/schema.graphql",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/appsync/README.md",
+                        "label": "README.md",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/appsync/README.md",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": [
+                      [
+                        "terraform/modules/appsync/generate-vtl.js",
+                        "terraform/modules/appsync/shared-resolvers.js"
+                      ]
+                    ]
+                  },
+                  {
+                    "id": "api:terraform/modules/ses",
+                    "label": "ses",
+                    "type": "component",
+                    "description": "This component manages AWS SES (Simple Email Service) resources and associated IAM permissions, providing a reusable module for email sending capabilities with proper access control.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/ses/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ses/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ses/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ses/README.md",
+                        "label": "README.md",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/README.md",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ses/iam/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/iam/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ses/iam/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/iam/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ses/iam/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ses/iam/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/security_groups",
+                    "label": "security_groups",
+                    "type": "component",
+                    "description": "The security_groups component defines and manages AWS security groups as reusable modules, centralizing inbound and outbound rule configurations for consistent network access control across environments.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/security_groups/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/security_groups/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/security_groups/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/security_groups/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/security_groups/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/security_groups/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/lambda",
+                    "label": "lambda",
+                    "type": "component",
+                    "description": "The lambda component defines a reusable AWS Lambda function infrastructure, encapsulating configuration, permissions, and deployment settings in a modular format for consistent reuse across environments.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/lambda/variable.tf",
+                        "label": "variable.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/lambda/variable.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/lambda/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/lambda/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/lambda/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/lambda/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/iam",
+                    "label": "iam",
+                    "type": "component",
+                    "description": "The iam component defines and manages IAM roles, policies, and permissions in AWS, serving as a reusable module for granting least-privilege access to other services or applications.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/iam/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/iam/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/iam/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/iam/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/iam/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/iam/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/acm",
+                    "label": "acm",
+                    "type": "component",
+                    "description": "The ACM component manages AWS Certificate Manager certificates, provisioning and validating SSL/TLS certificates for use in other AWS services. It serves as a reusable, isolated module for certificate lifecycle management.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/acm/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/acm/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/acm/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/acm/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/acm/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/acm/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/dynamodb",
+                    "label": "dynamodb",
+                    "type": "component",
+                    "description": "This component defines a reusable AWS DynamoDB table configuration with customizable parameters such as throughput, attributes, and encryption. It serves as a self-contained module for provisioning DynamoDB tables across different environments.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/dynamodb/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/dynamodb/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/dynamodb/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/dynamodb/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/dynamodb/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/dynamodb/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/elasticache",
+                    "label": "elasticache",
+                    "type": "component",
+                    "description": "The elasticache component manages AWS ElastiCache Redis clusters, defining configuration inputs, resource creation, and output exports in a reusable module structure. It encapsulates all ElastiCache logic for consistent deployment across environments.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/elasticache/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/elasticache/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/elasticache/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/elasticache/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/elasticache/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/elasticache/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/secrets_manager",
+                    "label": "secrets_manager",
+                    "type": "component",
+                    "description": "The secrets_manager component manages AWS Secrets Manager resources, abstracting the creation and configuration of secrets, permissions, and rotation policies. It serves as a reusable module for securely storing and retrieving sensitive data across other infrastructure components.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/secrets_manager/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/secrets_manager/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/secrets_manager/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/secrets_manager/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/secrets_manager/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/secrets_manager/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/route53",
+                    "label": "route53",
+                    "type": "component",
+                    "description": "The route53 component manages AWS Route 53 DNS records and hosted zones, abstracting DNS configuration into reusable Terraform modules. It serves as a standalone, self-contained module for defining and provisioning DNS resources without external dependencies.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/route53/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/route53/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/route53/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/route53/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/route53/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/route53/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/ecr",
+                    "label": "ecr",
+                    "type": "component",
+                    "description": "The ECR component defines and manages Amazon Elastic Container Registry repositories, providing a reusable module for creating and configuring container image repositories with optional lifecycle policies and encryption.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/ecr/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ecr/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ecr/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ecr/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ecr/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ecr/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/modules/__other__",
+                    "label": "other",
+                    "type": "component",
+                    "description": "This component is a collection of reusable Terraform modules that provision core AWS infrastructure resources such as VPC, EC2, RDS, ALB, EBS, SSM, SQS, SNS, and Cognito. Each module encapsulates a single resource type with clear inputs, outputs, and logic, enabling consistent and scalable infrastructure deployment.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/modules/alb/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/alb/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/alb/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/alb/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/alb/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/alb/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ebs_volumes/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ebs_volumes/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ebs_volumes/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ebs_volumes/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ebs_volumes/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ebs_volumes/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ssm/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ssm/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ssm/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ssm/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ssm/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ssm/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/vpc/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/vpc/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/vpc/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/vpc/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/vpc/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/vpc/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ec2/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ec2/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ec2/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ec2/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/ec2/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/ec2/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/sqs/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/sqs/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/sqs/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/sqs/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/sqs/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/sqs/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/rds/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/rds/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/rds/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/rds/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/rds/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/rds/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/cognito/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/cognito/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/cognito/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/cognito/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/cognito/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/cognito/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/sns/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/sns/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/sns/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/sns/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/sns/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/sns/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/network_interface/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/network_interface/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/network_interface/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/network_interface/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/network_interface/outputs.tf",
+                        "label": "outputs.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/network_interface/outputs.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/modules/s3/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/modules/s3/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  }
+                ],
+                "edges": []
+              },
+              {
+                "id": "api:terraform/envs",
+                "label": "envs",
+                "type": "component",
+                "description": "The envs component manages Terraform configurations for multiple environments (prod, dev, staging), each with isolated state and variable definitions to ensure environment-specific infrastructure provisioning. It enforces separation of concerns by maintaining independent directories for each environment.",
+                "file_path": null,
+                "insight": "clean separation",
+                "children": [
+                  {
+                    "id": "api:terraform/envs/prod",
+                    "label": "prod",
+                    "type": "component",
+                    "description": "This component defines the production environment for infrastructure provisioning using Terraform, specifying backend configuration, variables, and resource definitions required for production-grade deployments.",
+                    "file_path": null,
+                    "insight": "main.tf is the god file, as it likely contains all production resource declarations with no child modules.",
+                    "children": [
+                      {
+                        "id": "terraform/envs/prod/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/prod/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/prod/backend.tf",
+                        "label": "backend.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/prod/backend.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/prod/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/prod/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/prod/terraform.tfvars",
+                        "label": "terraform.tfvars",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/prod/terraform.tfvars",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/prod/.terraform.lock.hcl",
+                        "label": ".terraform.lock.hcl",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/prod/.terraform.lock.hcl",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/envs/dev",
+                    "label": "dev",
+                    "type": "component",
+                    "description": "The dev component configures the development environment using Terraform, defining infrastructure variables, backend settings, and main resources for isolated testing. It serves as the entry point for provisioning dev-stage resources without dependencies on other environments.",
+                    "file_path": null,
+                    "insight": "Entry point: main.tf",
+                    "children": [
+                      {
+                        "id": "terraform/envs/dev/tfplan",
+                        "label": "tfplan",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/dev/tfplan",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/dev/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/dev/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/dev/backend.tf",
+                        "label": "backend.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/dev/backend.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/dev/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/dev/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/dev/.terraform.lock.hcl",
+                        "label": ".terraform.lock.hcl",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/dev/.terraform.lock.hcl",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "api:terraform/envs/staging",
+                    "label": "staging",
+                    "type": "component",
+                    "description": "The staging component configures the infrastructure for the staging environment using Terraform, with isolated variables, backend settings, and main configuration to ensure environmental parity without impacting production.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "terraform/envs/staging/variables.tf",
+                        "label": "variables.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/staging/variables.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/staging/backend.tf",
+                        "label": "backend.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/staging/backend.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/staging/main.tf",
+                        "label": "main.tf",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/staging/main.tf",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/staging/terraform.tfvars",
+                        "label": "terraform.tfvars",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/staging/terraform.tfvars",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "terraform/envs/staging/.terraform.lock.hcl",
+                        "label": ".terraform.lock.hcl",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "terraform/envs/staging/.terraform.lock.hcl",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  }
+                ],
+                "edges": []
+              }
+            ],
+            "edges": []
+          },
+          {
+            "id": "api:src",
+            "label": "src",
+            "type": "component",
+            "description": "The src component serves as the core API backend, organizing endpoint routes, authentication logic, and feature modules under a clean hierarchical structure. It acts as the entry point for HTTP requests via main.py and routes them through versioned API routers.",
+            "file_path": null,
+            "insight": "entry point",
+            "children": [
+              {
+                "id": "api:src/features",
+                "label": "features",
+                "type": "component",
+                "description": "The features component organizes business logic modules for GitHub, user, and AI functionalities, each encapsulated in its own subpackage with dedicated routers and schemas. It serves as the core domain layer that exposes endpoints to the API layer while depending on auth for authorization.",
+                "file_path": null,
+                "insight": "clean separation",
+                "children": [
+                  {
+                    "id": "src/features/github/router.py",
+                    "label": "router.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/github/router.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/github/__init__.py",
+                    "label": "__init__.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/github/__init__.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/github/schema.py",
+                    "label": "schema.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/github/schema.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/user/router.py",
+                    "label": "router.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/user/router.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/user/__init__.py",
+                    "label": "__init__.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/user/__init__.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/user/schema.py",
+                    "label": "schema.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/user/schema.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/ai/router.py",
+                    "label": "router.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/ai/router.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/ai/schema.py",
+                    "label": "schema.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/ai/schema.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  }
+                ],
+                "edges": [
+                  [
+                    "src/features/ai/router.py",
+                    "src/features/ai/schema.py"
+                  ],
+                  [
+                    "src/features/github/router.py",
+                    "src/features/github/schema.py"
+                  ],
+                  [
+                    "src/features/user/router.py",
+                    "src/features/user/schema.py"
+                  ]
+                ]
+              },
+              {
+                "id": "api:src/auth",
+                "label": "auth",
+                "type": "component",
+                "description": "The auth component handles authentication and authorization logic, including JWT token generation/validation and AWS Cognito integration, serving as the central gateway for user identity verification across the application.",
+                "file_path": null,
+                "insight": "clean separation",
+                "children": [
+                  {
+                    "id": "src/auth/permissions.py",
+                    "label": "permissions.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/auth/permissions.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/auth/__init__.py",
+                    "label": "__init__.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/auth/__init__.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/auth/jwt.py",
+                    "label": "jwt.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/auth/jwt.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/auth/cognito.py",
+                    "label": "cognito.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/auth/cognito.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  }
+                ],
+                "edges": []
+              },
+              {
+                "id": "api:src/api",
+                "label": "api",
+                "type": "component",
+                "description": "The api component exposes REST endpoints via a v1_router that organizes and routes HTTP requests, acting as the entry point for external API consumers. It abstracts business logic from the web framework by depending on the features and common modules.",
+                "file_path": null,
+                "insight": "entry point",
+                "children": [
+                  {
+                    "id": "src/api/__init__.py",
+                    "label": "__init__.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/api/__init__.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/api/v1_router.py",
+                    "label": "v1_router.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/api/v1_router.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  }
+                ],
+                "edges": []
+              },
+              {
+                "id": "api:src/common",
+                "label": "common",
+                "type": "component",
+                "description": "The common component provides shared infrastructure for request routing and error handling, acting as a centralized foundation for consistent API behavior across the application. It is used by both the api and main.py modules to standardize responses and error outcomes.",
+                "file_path": null,
+                "insight": "clean separation",
+                "children": [
+                  {
+                    "id": "src/common/router.py",
+                    "label": "router.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/common/router.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/common/error_handlers.py",
+                    "label": "error_handlers.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/common/error_handlers.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  }
+                ],
+                "edges": []
+              },
+              {
+                "id": "src/__init__.py",
+                "label": "__init__.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/__init__.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/main.py",
+                "label": "main.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/main.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": [
+              [
+                "api:src/api",
+                "api:src/common"
+              ],
+              [
+                "api:src/api",
+                "api:src/features"
+              ],
+              [
+                "api:src/common",
+                "api:src/auth"
+              ],
+              [
+                "api:src/features",
+                "api:src/auth"
+              ],
+              [
+                "src/main.py",
+                "api:src/api"
+              ],
+              [
+                "src/main.py",
+                "api:src/common"
+              ]
+            ]
+          }
+        ],
+        "edges": []
+      },
+      {
+        "id": "services",
+        "label": "Business Logic",
+        "type": "feature",
+        "description": "The Business Logic component encapsulates the core application workflows and rules, serving as the intermediary between the API layer and underlying Data & Storage services. It processes requests, enforces business rules, and coordinates interactions with external services and shared configurations.",
+        "file_path": null,
+        "insight": "Tight coupling between business logic and Data & Storage via direct module imports, with minimal abstraction, creates fragile integration points.",
+        "children": [
+          {
+            "id": "services:src",
+            "label": "src",
+            "type": "component",
+            "description": "The src component houses the core business logic for GitHub repository analysis and AI-driven flow discovery, orchestrating services that parse code, extract symbols, build call graphs, and generate architectural overviews.",
+            "file_path": null,
+            "insight": "tight coupling between service modules in src/features/github/services, which all depend on shared parsing logic without clear abstraction boundaries",
+            "children": [
+              {
+                "id": "services:src/features",
+                "label": "features",
+                "type": "component",
+                "description": "The features component orchestrates domain-specific logic for GitHub code analysis and AI-driven flow discovery, serving as a modular hub for services that extract, parse, and interpret code structure and behavioral patterns. It acts as an intermediary layer between Celery task queues and downstream analysis services.",
+                "file_path": null,
+                "insight": "Clean separation",
+                "children": [
+                  {
+                    "id": "services:src/features/github",
+                    "label": "github",
+                    "type": "component",
+                    "description": "The github component analyzes code repositories by extracting symbols, dependencies, and call graphs to build architectural overviews and flow models. It serves as the core engine for understanding code structure from GitHub-hosted projects.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "src/features/github/tasks.py",
+                        "label": "tasks.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/tasks.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/dependency_parser.py",
+                        "label": "dependency_parser.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/dependency_parser.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/__init__.py",
+                        "label": "__init__.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/__init__.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/service.py",
+                        "label": "service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/symbol_service.py",
+                        "label": "symbol_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/symbol_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/architecture_service.py",
+                        "label": "architecture_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/architecture_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/flow_service.py",
+                        "label": "flow_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/flow_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/overview_service.py",
+                        "label": "overview_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/overview_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/scanner_service.py",
+                        "label": "scanner_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/scanner_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/symbol_extractor.py",
+                        "label": "symbol_extractor.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/symbol_extractor.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/call_graph_extractor.py",
+                        "label": "call_graph_extractor.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/call_graph_extractor.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/github/services/dependency_service.py",
+                        "label": "dependency_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/github/services/dependency_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": [
+                      [
+                        "src/features/github/services/dependency_service.py",
+                        "src/features/github/services/dependency_parser.py"
+                      ],
+                      [
+                        "src/features/github/services/scanner_service.py",
+                        "src/features/github/services/dependency_service.py"
+                      ],
+                      [
+                        "src/features/github/services/scanner_service.py",
+                        "src/features/github/services/symbol_service.py"
+                      ],
+                      [
+                        "src/features/github/services/service.py",
+                        "src/features/github/tasks.py"
+                      ],
+                      [
+                        "src/features/github/services/symbol_service.py",
+                        "src/features/github/services/call_graph_extractor.py"
+                      ],
+                      [
+                        "src/features/github/services/symbol_service.py",
+                        "src/features/github/services/symbol_extractor.py"
+                      ],
+                      [
+                        "src/features/github/tasks.py",
+                        "src/features/github/services/scanner_service.py"
+                      ]
+                    ]
+                  },
+                  {
+                    "id": "services:src/features/ai",
+                    "label": "ai",
+                    "type": "component",
+                    "description": "The ai component orchestrates AI-driven workflows by discovering and processing flow narratives through dedicated services for flow discovery and story generation. It serves as a modular hub for AI logic without external dependencies.",
+                    "file_path": null,
+                    "insight": "clean separation",
+                    "children": [
+                      {
+                        "id": "src/features/ai/flow_discovery_service.py",
+                        "label": "flow_discovery_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/ai/flow_discovery_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/ai/service.py",
+                        "label": "service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/ai/service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      },
+                      {
+                        "id": "src/features/ai/flow_story_service.py",
+                        "label": "flow_story_service.py",
+                        "type": "file",
+                        "description": "",
+                        "file_path": "src/features/ai/flow_story_service.py",
+                        "insight": null,
+                        "children": [],
+                        "edges": []
+                      }
+                    ],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/__init__.py",
+                    "label": "__init__.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/__init__.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  },
+                  {
+                    "id": "src/features/user/service.py",
+                    "label": "service.py",
+                    "type": "file",
+                    "description": "",
+                    "file_path": "src/features/user/service.py",
+                    "insight": null,
+                    "children": [],
+                    "edges": []
+                  }
+                ],
+                "edges": []
+              },
+              {
+                "id": "src/core/celery_app.py",
+                "label": "celery_app.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/core/celery_app.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/tasks/__init__.py",
+                "label": "__init__.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/tasks/__init__.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": [
+              [
+                "services:src/features",
+                "src/core/celery_app.py"
+              ]
+            ]
+          },
+          {
+            "id": "services:terraform",
+            "label": "terraform",
+            "type": "component",
+            "description": "This component manages infrastructure provisioning via Terraform, providing environment-specific scripts for setting up and cleaning up development environments, along with templated EC2 startup scripts for different deployment stages.",
+            "file_path": null,
+            "insight": "Tight coupling between environment scripts and EC2 startup templates, as changes in one often require coordinated updates in the other.",
+            "children": [
+              {
+                "id": "terraform/.terraform.lock.hcl",
+                "label": ".terraform.lock.hcl",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/.terraform.lock.hcl",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/envs/dev/scripts/cleanup-dev-env.sh",
+                "label": "cleanup-dev-env.sh",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/envs/dev/scripts/cleanup-dev-env.sh",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/envs/dev/scripts/setup-dev-env-prerequisites.sh",
+                "label": "setup-dev-env-prerequisites.sh",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/envs/dev/scripts/setup-dev-env-prerequisites.sh",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/envs/dev/scripts/README.md",
+                "label": "README.md",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/envs/dev/scripts/README.md",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/scripts/ec2_startup_script.sh.tmpl",
+                "label": "ec2_startup_script.sh.tmpl",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/scripts/ec2_startup_script.sh.tmpl",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/scripts/ec2_startup_script_staging.sh.tmpl",
+                "label": "ec2_startup_script_staging.sh.tmpl",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/scripts/ec2_startup_script_staging.sh.tmpl",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/scripts/ec2_startup_script_production.sh.tmpl",
+                "label": "ec2_startup_script_production.sh.tmpl",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/scripts/ec2_startup_script_production.sh.tmpl",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "terraform/scripts/ec2_startup_script_dev.sh.tmpl",
+                "label": "ec2_startup_script_dev.sh.tmpl",
+                "type": "file",
+                "description": "",
+                "file_path": "terraform/scripts/ec2_startup_script_dev.sh.tmpl",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": []
+          },
+          {
+            "id": "services:docker",
+            "label": "docker",
+            "type": "component",
+            "description": "The docker component packages the application into a container using a custom Dockerfile and entrypoint script, ensuring consistent runtime environments across deployments. It serves as the foundational deployment unit for the entire system.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "docker/Dockerfile",
+                "label": "Dockerfile",
+                "type": "file",
+                "description": "",
+                "file_path": "docker/Dockerfile",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "docker/entrypoint.sh",
+                "label": "entrypoint.sh",
+                "type": "file",
+                "description": "",
+                "file_path": "docker/entrypoint.sh",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": []
+          },
+          {
+            "id": "services:scripts",
+            "label": "scripts",
+            "type": "component",
+            "description": "The scripts component contains utility scripts for pulling the staging environment configuration and verifying the local toolchain setup, serving as lightweight automation tools for environment preparation and development sanity checks.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "scripts/pull-staging-env.py",
+                "label": "pull-staging-env.py",
+                "type": "file",
+                "description": "",
+                "file_path": "scripts/pull-staging-env.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "scripts/verify-toolchain.sh",
+                "label": "verify-toolchain.sh",
+                "type": "file",
+                "description": "",
+                "file_path": "scripts/verify-toolchain.sh",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": []
+          },
+          {
+            "id": "docker-compose.dev.yml",
+            "label": "docker-compose.dev.yml",
+            "type": "file",
+            "description": "",
+            "file_path": "docker-compose.dev.yml",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "docker-compose.staging.yml",
+            "label": "docker-compose.staging.yml",
+            "type": "file",
+            "description": "",
+            "file_path": "docker-compose.staging.yml",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "alembic.ini",
+            "label": "alembic.ini",
+            "type": "file",
+            "description": "",
+            "file_path": "alembic.ini",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "gunicorn.conf.py",
+            "label": "gunicorn.conf.py",
+            "type": "file",
+            "description": "",
+            "file_path": "gunicorn.conf.py",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "makefile",
+            "label": "makefile",
+            "type": "file",
+            "description": "",
+            "file_path": "makefile",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "pyproject.toml",
+            "label": "pyproject.toml",
+            "type": "file",
+            "description": "",
+            "file_path": "pyproject.toml",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "docker-compose.yml",
+            "label": "docker-compose.yml",
+            "type": "file",
+            "description": "",
+            "file_path": "docker-compose.yml",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "docker-compose.local.yml",
+            "label": "docker-compose.local.yml",
+            "type": "file",
+            "description": "",
+            "file_path": "docker-compose.local.yml",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": ".gitignore",
+            "label": ".gitignore",
+            "type": "file",
+            "description": "",
+            "file_path": ".gitignore",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "pyrightconfig.json",
+            "label": "pyrightconfig.json",
+            "type": "file",
+            "description": "",
+            "file_path": "pyrightconfig.json",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "poetry.lock",
+            "label": "poetry.lock",
+            "type": "file",
+            "description": "",
+            "file_path": "poetry.lock",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "README.md",
+            "label": "README.md",
+            "type": "file",
+            "description": "",
+            "file_path": "README.md",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "workers/Dockerfile",
+            "label": "Dockerfile",
+            "type": "file",
+            "description": "",
+            "file_path": "workers/Dockerfile",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "nginx/conf.d/default.conf",
+            "label": "default.conf",
+            "type": "file",
+            "description": "",
+            "file_path": "nginx/conf.d/default.conf",
+            "insight": null,
+            "children": [],
+            "edges": []
+          }
+        ],
+        "edges": []
+      },
+      {
+        "id": "data",
+        "label": "Data & Storage",
+        "type": "feature",
+        "description": "This component manages database schema evolution and data persistence through Alembic migrations and ORM models, serving as the authoritative source of truth for application data structures and storage operations.",
+        "file_path": null,
+        "insight": "tight coupling between migration scripts and model definitions, making schema changes risky without coordinated updates across src/db/ and migrations/versions/",
+        "children": [
+          {
+            "id": "data:migrations",
+            "label": "migrations",
+            "type": "component",
+            "description": "The migrations component manages database schema updates through versioned migration scripts, ensuring controlled and reversible changes to the data layer. It serves as the authoritative source of structural evolution for the application's PostgreSQL database.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "migrations/script.py.mako",
+                "label": "script.py.mako",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/script.py.mako",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/7c8d9e0f1a2b_add_qc_events_and_qc_defects_tables.py",
+                "label": "7c8d9e0f1a2b_add_qc_events_and_qc_defects_tables.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/7c8d9e0f1a2b_add_qc_events_and_qc_defects_tables.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/env.py",
+                "label": "env.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/env.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/README",
+                "label": "README",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/README",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/830a9166a089_add_file_dependencies.py",
+                "label": "830a9166a089_add_file_dependencies.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/830a9166a089_add_file_dependencies.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/3a7f1c2d8e90_add_source_code_to_repository_functions.py",
+                "label": "3a7f1c2d8e90_add_source_code_to_repository_functions.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/3a7f1c2d8e90_add_source_code_to_repository_functions.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/9f1b2c3d4e5f_add_hashed_password_to_user_table.py",
+                "label": "9f1b2c3d4e5f_add_hashed_password_to_user_table.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/9f1b2c3d4e5f_add_hashed_password_to_user_table.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/1268d9d76ea7_add_symbol_and_call_graph_tables.py",
+                "label": "1268d9d76ea7_add_symbol_and_call_graph_tables.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/1268d9d76ea7_add_symbol_and_call_graph_tables.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/1a2b3c4d5e6f_add_scan_status_to_connected_repository.py",
+                "label": "1a2b3c4d5e6f_add_scan_status_to_connected_repository.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/1a2b3c4d5e6f_add_scan_status_to_connected_repository.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/8f9acacad7aa_create_repository_files_table.py",
+                "label": "8f9acacad7aa_create_repository_files_table.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/8f9acacad7aa_create_repository_files_table.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "migrations/versions/6b8f89dd47bc_add_github_oauth_and_connected_.py",
+                "label": "6b8f89dd47bc_add_github_oauth_and_connected_.py",
+                "type": "file",
+                "description": "",
+                "file_path": "migrations/versions/6b8f89dd47bc_add_github_oauth_and_connected_.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": []
+          },
+          {
+            "id": "data:src",
+            "label": "src",
+            "type": "component",
+            "description": "This component handles data persistence and repository patterns for user and GitHub-related entities, providing a structured interface between SQLAlchemy models and business logic. It serves as the foundational storage layer for the application's domain models.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "src/common/base_repository.py",
+                "label": "base_repository.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/common/base_repository.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/db/session.py",
+                "label": "session.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/db/session.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/db/base_class.py",
+                "label": "base_class.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/db/base_class.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/db/base.py",
+                "label": "base.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/db/base.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/db/model_mixins.py",
+                "label": "model_mixins.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/db/model_mixins.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/features/github/models.py",
+                "label": "models.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/features/github/models.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/features/github/repository.py",
+                "label": "repository.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/features/github/repository.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/features/user/models.py",
+                "label": "models.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/features/user/models.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/features/user/repository.py",
+                "label": "repository.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/features/user/repository.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": [
+              [
+                "src/common/base_repository.py",
+                "src/db/session.py"
+              ],
+              [
+                "src/db/base.py",
+                "src/db/base_class.py"
+              ],
+              [
+                "src/db/base.py",
+                "src/features/user/models.py"
+              ],
+              [
+                "src/db/base.py",
+                "src/features/github/models.py"
+              ],
+              [
+                "src/db/session.py",
+                "src/db/base.py"
+              ],
+              [
+                "src/features/github/models.py",
+                "src/db/base_class.py"
+              ],
+              [
+                "src/features/github/models.py",
+                "src/db/model_mixins.py"
+              ],
+              [
+                "src/features/github/repository.py",
+                "src/common/base_repository.py"
+              ],
+              [
+                "src/features/github/repository.py",
+                "src/features/github/models.py"
+              ],
+              [
+                "src/features/user/models.py",
+                "src/db/base_class.py"
+              ],
+              [
+                "src/features/user/models.py",
+                "src/db/model_mixins.py"
+              ],
+              [
+                "src/features/user/repository.py",
+                "src/common/base_repository.py"
+              ],
+              [
+                "src/features/user/repository.py",
+                "src/features/user/models.py"
+              ]
+            ]
+          }
+        ],
+        "edges": [
+          [
+            "data:migrations",
+            "data:src"
+          ]
+        ]
+      },
+      {
+        "id": "external",
+        "label": "External Services",
+        "type": "feature",
+        "description": "This component orchestrates the transfer of files from S3 to a Celery task queue via a Lambda function, while managing S3 configuration and integrating with AWS Bedrock for AI processing. It acts as the bridge between storage and AI-driven business logic.",
+        "file_path": null,
+        "insight": "tightly coupled: s3_to_celery.py is the only entry point that links S3 triggers, Celery, and Bedrock logic, creating a single point of failure",
+        "children": [
+          {
+            "id": "terraform/modules/lambda/src/s3_to_celery.py",
+            "label": "s3_to_celery.py",
+            "type": "file",
+            "description": "",
+            "file_path": "terraform/modules/lambda/src/s3_to_celery.py",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "terraform/modules/s3/variables.tf",
+            "label": "variables.tf",
+            "type": "file",
+            "description": "",
+            "file_path": "terraform/modules/s3/variables.tf",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "terraform/modules/s3/outputs.tf",
+            "label": "outputs.tf",
+            "type": "file",
+            "description": "",
+            "file_path": "terraform/modules/s3/outputs.tf",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "src/features/ai/bedrock.py",
+            "label": "bedrock.py",
+            "type": "file",
+            "description": "",
+            "file_path": "src/features/ai/bedrock.py",
+            "insight": null,
+            "children": [],
+            "edges": []
+          }
+        ],
+        "edges": []
+      },
+      {
+        "id": "shared",
+        "label": "Shared & Config",
+        "type": "feature",
+        "description": "This component provides centralized configuration management, utility functions, and middleware logic for authentication, logging, and request handling across the entire system, serving as the foundational glue between core services.",
+        "file_path": null,
+        "insight": "tight coupling between base_config and environment-specific configs (dev/prod/staging) creates risky implicit dependencies",
+        "children": [
+          {
+            "id": "shared:src/config",
+            "label": "config",
+            "type": "component",
+            "description": "This component defines environment-specific configuration settings (dev, staging, prod) and shared constants, serving as the single source of truth for application settings. It abstracts configuration logic to ensure consistent behavior across environments.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "src/config/staging_config.py",
+                "label": "staging_config.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/staging_config.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/config/dev_config.py",
+                "label": "dev_config.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/dev_config.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/config/constants.py",
+                "label": "constants.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/constants.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/config/prod_config.py",
+                "label": "prod_config.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/prod_config.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/config/base_config.py",
+                "label": "base_config.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/base_config.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/config/__init__.py",
+                "label": "__init__.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/__init__.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/config/logging_config.py",
+                "label": "logging_config.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/config/logging_config.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": [
+              [
+                "src/config/dev_config.py",
+                "src/config/base_config.py"
+              ],
+              [
+                "src/config/__init__.py",
+                "src/config/base_config.py"
+              ],
+              [
+                "src/config/__init__.py",
+                "src/config/dev_config.py"
+              ],
+              [
+                "src/config/__init__.py",
+                "src/config/prod_config.py"
+              ],
+              [
+                "src/config/__init__.py",
+                "src/config/staging_config.py"
+              ],
+              [
+                "src/config/logging_config.py",
+                "src/config/__init__.py"
+              ],
+              [
+                "src/config/prod_config.py",
+                "src/config/base_config.py"
+              ],
+              [
+                "src/config/staging_config.py",
+                "src/config/base_config.py"
+              ]
+            ]
+          },
+          {
+            "id": "shared:src/utils",
+            "label": "utils",
+            "type": "component",
+            "description": "The utils component provides foundational utility functions for authentication, logging, and JWT validation, serving as a shared dependency layer for configuration-driven operations. It is intentionally isolated and not used by other components at this level, indicating it's a future-proof infrastructure module.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "src/utils/auth_middleware.py",
+                "label": "auth_middleware.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/utils/auth_middleware.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/utils/__init__.py",
+                "label": "__init__.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/utils/__init__.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/utils/jwt_verifier.py",
+                "label": "jwt_verifier.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/utils/jwt_verifier.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/utils/logger.py",
+                "label": "logger.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/utils/logger.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/utils/README.md",
+                "label": "README.md",
+                "type": "file",
+                "description": "",
+                "file_path": "src/utils/README.md",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": [
+              [
+                "src/utils/auth_middleware.py",
+                "src/utils/jwt_verifier.py"
+              ]
+            ]
+          },
+          {
+            "id": "shared:src/middleware",
+            "label": "middleware",
+            "type": "component",
+            "description": "The middleware component provides reusable request-processing logic including user context extraction, CORS handling, rate limiting, and request logging, acting as a filter layer between incoming HTTP requests and application routes.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "src/middleware/__init__.py",
+                "label": "__init__.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/middleware/__init__.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/middleware/user_context.py",
+                "label": "user_context.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/middleware/user_context.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/middleware/cors.py",
+                "label": "cors.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/middleware/cors.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/middleware/rate_limit.py",
+                "label": "rate_limit.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/middleware/rate_limit.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/middleware/request_logging.py",
+                "label": "request_logging.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/middleware/request_logging.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": []
+          },
+          {
+            "id": "shared:src/common",
+            "label": "common",
+            "type": "component",
+            "description": "The common component provides foundational exceptions and initialization logic shared across the codebase, serving as a lightweight utility layer for error definitions and module setup. It acts as a stable, independent foundation with no runtime dependencies.",
+            "file_path": null,
+            "insight": "clean separation",
+            "children": [
+              {
+                "id": "src/common/exceptions.py",
+                "label": "exceptions.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/common/exceptions.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              },
+              {
+                "id": "src/common/__init__.py",
+                "label": "__init__.py",
+                "type": "file",
+                "description": "",
+                "file_path": "src/common/__init__.py",
+                "insight": null,
+                "children": [],
+                "edges": []
+              }
+            ],
+            "edges": []
+          }
+        ],
+        "edges": [
+          [
+            "shared:src/middleware",
+            "shared:src/config"
+          ],
+          [
+            "shared:src/utils",
+            "shared:src/config"
+          ]
+        ]
+      },
+      {
+        "id": "tests",
+        "label": "Tests",
+        "type": "feature",
+        "description": "This component contains test infrastructure and configuration for validating the API, Data & Storage, and Shared & Config modules, using pytest with a dedicated Nginx test environment to simulate real-world proxy behavior.",
+        "file_path": null,
+        "insight": "tests/conftest.py is the entry point that sets up the entire test fixture lifecycle, including Nginx container configuration.",
+        "children": [
+          {
+            "id": "tests/__init__.py",
+            "label": "__init__.py",
+            "type": "file",
+            "description": "",
+            "file_path": "tests/__init__.py",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "tests/conftest.py",
+            "label": "conftest.py",
+            "type": "file",
+            "description": "",
+            "file_path": "tests/conftest.py",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "nginx/nginx.conf",
+            "label": "nginx.conf",
+            "type": "file",
+            "description": "",
+            "file_path": "nginx/nginx.conf",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "nginx/test-config.sh",
+            "label": "test-config.sh",
+            "type": "file",
+            "description": "",
+            "file_path": "nginx/test-config.sh",
+            "insight": null,
+            "children": [],
+            "edges": []
+          },
+          {
+            "id": "nginx/README.md",
+            "label": "README.md",
+            "type": "file",
+            "description": "",
+            "file_path": "nginx/README.md",
+            "insight": null,
+            "children": [],
+            "edges": []
+          }
+        ],
+        "edges": []
+      }
+    ],
+    "edges": [
+      [
+        "services",
+        "shared"
+      ],
+      [
+        "data",
+        "shared"
+      ],
+      [
+        "api",
+        "shared"
+      ],
+      [
+        "external",
+        "shared"
+      ],
+      [
+        "services",
+        "external"
+      ],
+      [
+        "services",
+        "api"
+      ],
+      [
+        "api",
+        "services"
+      ],
+      [
+        "data",
+        "api"
+      ],
+      [
+        "api",
+        "data"
+      ],
+      [
+        "services",
+        "data"
+      ],
+      [
+        "shared",
+        "api"
+      ],
+      [
+        "shared",
+        "data"
+      ],
+      [
+        "tests",
+        "shared"
+      ],
+      [
+        "tests",
+        "data"
+      ],
+      [
+        "tests",
+        "api"
+      ],
+      [
+        "ui",
+        "api"
+      ]
+    ]
+  }
+}

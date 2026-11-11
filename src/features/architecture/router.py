@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 from src.features.architecture.schema import (
     ArchitectureStoryRequest,
-    ArchitectureStoryResponse,
+    ArchitectureGraphResponse,
 )
 from src.features.architecture.service import generate_architecture_story
 
@@ -16,7 +16,7 @@ architecture_router = APIRouter(tags=["ai-architecture"])
 
 @architecture_router.post(
     "/architecture-story",
-    response_model=ArchitectureStoryResponse,
+    response_model=ArchitectureGraphResponse,
     operation_id="generateArchitectureStory",
 )
 async def architecture_story(request: ArchitectureStoryRequest):
