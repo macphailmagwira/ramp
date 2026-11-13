@@ -21,8 +21,8 @@ from src.features.architecture.schema import (
 
 logger = logging.getLogger("api-main.ai.service")
 
-LEAF_MAX = 12            # a group with <= this many files shows files directly
-MAX_GROUPS = 12          # max sibling groups on one level; the rest go into "other"
+MAX_GROUPS = 24          # max sibling folders on one level; extra folders are nested under "N more folders"
+BUNDLE_MIN = 4           # this many loose files next to folders are bundled into one "<dir> files" node
 CONCURRENCY = 8          # parallel LLM calls
 MAX_DESCRIBED = 60       # describe the largest N non-file nodes; others keep a fallback
 MAX_FILES_IN_PROMPT = 25
@@ -31,6 +31,8 @@ MAX_FILES_IN_PROMPT = 25
 DESCRIBE_DEADLINE = 200
 
 SYSTEM_PROMPT = """You are a senior software engineer explaining a codebase to a new developer.
+Describe only what the file names, folder names and dependencies you are given support. Never name
+frameworks, services or technologies that do not appear in them, and never guess at coupling or quality.
 Be specific and concrete; reference real file names. Respond with valid JSON only, no markdown."""
 
 # ---------------------------------------------------------------------------
@@ -44,6 +46,7 @@ LAYERS = [
     ("services", "Business Logic", "Core application logic and workflows."),
     ("data", "Data & Storage", "Models, database access and persistence."),
     ("external", "External Services", "Clients and integrations with third-party systems."),
+    ("infra", "Infrastructure & Tooling", "Terraform, Docker, Nginx, scripts and project-level configuration."),
     ("shared", "Shared & Config", "Utilities, configuration and cross-cutting helpers."),
     ("tests", "Tests", "Automated tests."),
 ]
@@ -60,7 +63,7 @@ _KEYWORDS = {
                 "bedrock s3 aws stripe sentry email smtp sms",
     "services": "service services usecase usecases domain core logic business "
                 "worker workers task tasks job jobs engine",
-    "shared": "util utils helper helpers common config settings constants lib logging middleware",
+    "shared": "util utils helper helpers common config settings constants lib logging middleware auth",
 }
 _TOKEN_LAYER = {tok: layer for layer, words in _KEYWORDS.items() for tok in words.split()}
 _UI_EXT = {".tsx", ".jsx", ".vue", ".svelte", ".css", ".scss", ".html"}
@@ -70,7 +73,34 @@ def _split_tokens(s: str) -> list[str]:
     return [t for t in re.split(r"[^a-z0-9]+", s.lower()) if t]
 
 
+# Infrastructure & tooling: decided from the path alone, before any keyword matching,
+# so e.g. terraform/**/main.tf or nginx/test-config.sh can never be mistaken for app code.
+_INFRA_DIRS = {
+    "terraform", "docker", "nginx", "workers", "scripts", "infra", "infrastructure",
+    "deploy", "deployment", "k8s", "helm", ".github", ".circleci", "notebooks", "docs", "outputs",
+}
+_INFRA_EXT = {".tf", ".tfvars", ".hcl", ".tmpl"}
+_INFRA_NAMES = {
+    "dockerfile", "makefile", "gunicorn.conf.py", ".gitignore", ".dockerignore",
+    ".env.example", "tfplan", "procfile",
+}
+_ROOT_CONFIG_EXT = {".yml", ".yaml", ".toml", ".ini", ".cfg", ".lock", ".md", ".json", ".sh", ".txt"}
+
+
+def _is_infra(path: str) -> bool:
+    parts = path.split("/")
+    name = parts[-1].lower()
+    ext = os.path.splitext(name)[1]
+    if len(parts) > 1 and parts[0].lower() in _INFRA_DIRS:
+        return True
+    if name in _INFRA_NAMES or ext in _INFRA_EXT or name.startswith("docker-compose"):
+        return True
+    return len(parts) == 1 and ext in _ROOT_CONFIG_EXT  # root-level config such as pyproject.toml
+
+
 def _layer_by_path(path: str) -> str | None:
+    if _is_infra(path):
+        return "infra"
     parts = path.split("/")
     stem, ext = os.path.splitext(parts[-1])
     if ext.lower() in _UI_EXT:
@@ -105,9 +135,9 @@ def _classify_files(files: list[str], pairs: list[tuple[str, str]]) -> dict[str,
                 continue
             votes: Counter[str] = Counter()
             for n in neighbors[f] + by_dir[os.path.dirname(f)]:
-                l = layer[n]
-                if n != f and l and l != "shared":
-                    votes[l] += 1
+                vote = layer[n]
+                if n != f and vote and vote != "shared":
+                    votes[vote] += 1
             if votes:
                 layer[f] = min(votes, key=lambda x: (-votes[x], _ORDER[x]))
                 changed = True
@@ -166,8 +196,8 @@ def _ensure_connected(ids: list[str], edges: list[list[str]]) -> list[list[str]]
     return edges + [[a, b] for a, b in zip(reps, reps[1:])]
 
 
-def _file_node(f: str) -> dict:
-    return {"id": f, "label": f.split("/")[-1], "type": "file", "file_path": f,
+def _file_node(f: str, label: str | None = None) -> dict:
+    return {"id": f, "label": label or f.split("/")[-1], "type": "file", "file_path": f,
             "files": [f], "children": [], "edges": []}
 
 
@@ -180,13 +210,17 @@ def _group_node(scope: str, path: str, label: str, files: list[str], pairs, forc
 
 
 def _build_level(files: list[str], pairs, scope: str, force_leaf=False):
-    """Return (child nodes, edges between those children) for a set of files."""
+    """Return (child nodes, edges between those children) for a set of files.
+
+    Files are grouped by sub-folder whenever they span more than one folder, so identically
+    named files from different folders (router.py, schema.py, main.tf ...) are never shown
+    side by side in one flat list. Files are only listed directly when they share one folder."""
     dirs = {f: f.split("/")[:-1] for f in files}
     common = _common_prefix(list(dirs.values()))
 
     groups: dict[tuple, list[str]] = defaultdict(list)
     loose: list[str] = []
-    if not force_leaf and len(files) > LEAF_MAX:
+    if not force_leaf:
         for f in files:
             d = dirs[f]
             if len(d) > len(common):
@@ -194,28 +228,109 @@ def _build_level(files: list[str], pairs, scope: str, force_leaf=False):
             else:
                 loose.append(f)
 
-    if not groups:  # leaf level: show the files themselves
+    if not groups:  # every file is in the same folder: list them
         return [_file_node(f) for f in files], _aggregate(pairs, {f: f for f in files})
 
-    ordered = sorted(groups.items(), key=lambda kv: -len(kv[1]))
+    ordered = sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0]))
     if len(ordered) > MAX_GROUPS:
         big, rest = ordered[: MAX_GROUPS - 1], ordered[MAX_GROUPS - 1:]
     else:
         big, rest = ordered, []
 
     nodes: list[dict] = []
-    for key, gfiles in big:
+    for key, gfiles in sorted(big, key=lambda kv: kv[0]):
         if len(gfiles) == 1:
-            loose.append(gfiles[0])
+            f = gfiles[0]  # keep the folder in the label: "user/service.py", not just "service.py"
+            nodes.append(_file_node(f, "/".join(f.split("/")[len(common):])))
         else:
             nodes.append(_group_node(scope, "/".join(key), key[-1], gfiles, pairs))
     if rest:
-        other = [f for _, fs in rest for f in fs]
-        nodes.append(_group_node(scope, "/".join(common + ["__other__"]), "other", other, pairs, force_leaf=True))
-    nodes += [_file_node(f) for f in loose]
+        more = [f for _, fs in rest for f in fs]
+        nodes.append(_group_node(scope, "/".join(common + [f"__more_{len(rest)}__"]), f"{len(rest)} more folders", more, pairs))
+    if len(loose) >= BUNDLE_MIN:
+        where = common[-1] if common else "root"
+        nodes.append(_group_node(scope, "/".join(common + ["__files__"]), f"{where} files", loose, pairs, force_leaf=True))
+    else:
+        nodes += [_file_node(f) for f in loose]
 
     owner = {f: n["id"] for n in nodes for f in n["files"]}
     return nodes, _aggregate(pairs, owner)
+
+
+# --- insights: facts computed from the real import graph, never written by the LLM ---------
+
+def _cycles(ids: list[str], edges: list[tuple[str, str]]) -> list[list[str]]:
+    """Strongly connected components with more than one member (= circular imports)."""
+    out: dict[str, list[str]] = defaultdict(list)
+    inn: dict[str, list[str]] = defaultdict(list)
+    for a, b in edges:
+        out[a].append(b)
+        inn[b].append(a)
+
+    order: list[str] = []
+    seen: set[str] = set()
+    for s0 in ids:
+        if s0 in seen:
+            continue
+        seen.add(s0)
+        stack = [(s0, iter(out[s0]))]
+        while stack:
+            n, it = stack[-1]
+            for m in it:
+                if m not in seen:
+                    seen.add(m)
+                    stack.append((m, iter(out[m])))
+                    break
+            else:
+                order.append(n)
+                stack.pop()
+
+    comp: set[str] = set()
+    result: list[list[str]] = []
+    for s0 in reversed(order):
+        if s0 in comp:
+            continue
+        group, todo = [s0], [s0]
+        comp.add(s0)
+        while todo:
+            n = todo.pop()
+            for m in inn[n]:
+                if m not in comp:
+                    comp.add(m)
+                    group.append(m)
+                    todo.append(m)
+        if len(group) > 1:
+            result.append(group)
+    return result
+
+
+def _name_list(names: list[str]) -> str:
+    if len(names) <= 3:
+        return ", ".join(names[:-1]) + (" and " if len(names) > 1 else "") + names[-1]
+    return f"{', '.join(names[:3])} and {len(names) - 3} more"
+
+
+def _add_insights(node: dict) -> None:
+    kids = node["children"]
+    if node["type"] == "file" or not kids:
+        return
+    by_id = {k["id"]: k for k in kids}
+    pairs = [(a, b) for a, b in node["edges"] if a in by_id and b in by_id and a != b]
+
+    cyc = _cycles([k["id"] for k in kids], pairs)
+    if cyc:
+        members = set(max(cyc, key=len))
+        names = [k["label"] for k in kids if k["id"] in members]
+        node["insight"] = f"Circular dependency: {_name_list(names)} import each other."
+    else:
+        indeg: Counter[str] = Counter(b for _, b in pairs)
+        if indeg:
+            top, n = indeg.most_common(1)[0]
+            if n >= 3 and n >= 0.4 * (len(kids) - 1):
+                node["insight"] = f"{by_id[top]['label']} is imported by {n} of its {len(kids) - 1} neighbours."
+
+    for k in kids:
+        _add_insights(k)
 
 
 def _build_architecture(files: list[str], edges: list[dict]) -> dict:
@@ -245,8 +360,10 @@ def _build_architecture(files: list[str], edges: list[dict]) -> dict:
     top_edges = _aggregate(pairs, layer_of)
     top_edges = _ensure_connected([n["id"] for n in layer_nodes], top_edges)
 
-    return {"id": "root", "label": "Architecture", "type": "system", "description": "",
+    root = {"id": "root", "label": "Architecture", "type": "system", "description": "",
             "files": files, "children": layer_nodes, "edges": top_edges}
+    _add_insights(root)
+    return root
 
 
 # ---------------------------------------------------------------------------
@@ -291,8 +408,7 @@ Depends on: {', '.join(dict.fromkeys(n['uses'])) or 'nothing at this level'}
 Used by: {', '.join(dict.fromkeys(n['used_by'])) or 'nothing at this level'}
 
 Respond with exactly this JSON:
-{{"description": "1-2 sentences: what this component does and its role",
-  "insight": "one short sharp observation (entry point, god file, clean separation, tight coupling) or empty string"}}"""
+{{"description": "1-2 plain sentences: what this component is for and where it sits in the system"}}"""
 
 
 def _summary_prompt(root: dict) -> str:
@@ -344,8 +460,6 @@ async def _describe_tree(root: dict) -> None:
         data = await _ask(_node_prompt(n), sem)
         if _text(data.get("description")):
             n["description"] = _text(data["description"])
-        if _text(data.get("insight")):
-            n["insight"] = _text(data["insight"])
 
     async def summarise() -> None:
         data = await _ask(_summary_prompt(root), sem)

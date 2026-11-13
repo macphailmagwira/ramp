@@ -17,12 +17,6 @@ class ArchNode(BaseModel):
 ArchNode.model_rebuild()
 
 
-class ArchitectureStoryRequest(BaseModel):
-    repo_id: str
-    files: List[str]
-    edges: List[dict]
-
-
 class ArchitectureGraphResponse(BaseModel):
     summary: str
     root: ArchNode
