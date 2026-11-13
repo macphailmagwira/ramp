@@ -1,7 +1,8 @@
 """Architecture graph generation.
 
 Code builds the structure (layers -> folders -> files, edges from real imports).
-The LLM only writes descriptions, so it can't break the graph.
+The LLM writes descriptions, and optionally resolves the layer of folders the keyword
+rules could not place. It can never change the graph structure.
 
 Tree: root (system) -> layers ("feature") -> folders ("component") -> ... -> files ("file")
 Every node has `children` and `edges` between those children.
@@ -12,11 +13,21 @@ import logging
 import os
 import re
 from collections import Counter, defaultdict
+from uuid import UUID
+
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.features.ai.bedrock import invoke_qwen
+from src.features.architecture.repository import ArchitectureResultRepository
 from src.features.architecture.schema import (
     ArchNode,
     ArchitectureGraphResponse,
+)
+from src.features.github.repository import (
+    ConnectedRepositoryRepository,
+    FileDependencyRepository,
+    RepositoryFileRepository,
 )
 
 logger = logging.getLogger("api-main.ai.service")
@@ -26,6 +37,9 @@ BUNDLE_MIN = 4           # this many loose files next to folders are bundled int
 CONCURRENCY = 8          # parallel LLM calls
 MAX_DESCRIBED = 60       # describe the largest N non-file nodes; others keep a fallback
 MAX_FILES_IN_PROMPT = 25
+MAX_DIRS_PER_PLACEMENT_CALL = 40
+MAX_FILES_PER_DIR_IN_PLACEMENT = 8
+PLACEMENT_DEADLINE = 40  # seconds; on timeout the heuristic placement is kept
 # Kept under the gunicorn worker timeout. Structure is built before this clock
 # matters, so a timeout only costs some descriptions.
 DESCRIBE_DEADLINE = 200
@@ -33,17 +47,19 @@ DESCRIBE_DEADLINE = 200
 SYSTEM_PROMPT = """You are a senior software engineer explaining a codebase to a new developer.
 Describe only what the file names, folder names and dependencies you are given support. Never name
 frameworks, services or technologies that do not appear in them, and never guess at coupling or quality.
-Be specific and concrete; reference real file names. Respond with valid JSON only, no markdown."""
+Folder and feature names (for example "storybook" or "architecture") are this project's own domain terms,
+not the well-known tools of the same name. Be specific and concrete; reference real file names.
+Respond with valid JSON only, no markdown."""
 
 # ---------------------------------------------------------------------------
-# 1. Layer classification (deterministic)
+# 1. Layer classification (deterministic, with an optional LLM pass for unknowns)
 # ---------------------------------------------------------------------------
 
 # (id, label, default description). Order = order in the system map.
 LAYERS = [
     ("ui", "UI / Frontend", "User-facing screens and components."),
     ("api", "API", "HTTP entry points: routes, controllers and request/response schemas."),
-    ("services", "Business Logic", "Core application logic and workflows."),
+    ("services", "Business Logic", "Core application logic, workflows and agents."),
     ("data", "Data & Storage", "Models, database access and persistence."),
     ("external", "External Services", "Clients and integrations with third-party systems."),
     ("infra", "Infrastructure & Tooling", "Terraform, Docker, Nginx, scripts and project-level configuration."),
@@ -51,6 +67,7 @@ LAYERS = [
     ("tests", "Tests", "Automated tests."),
 ]
 _ORDER = {lid: i for i, (lid, _, _) in enumerate(LAYERS)}
+_LAYER_IDS = set(_ORDER)
 
 _KEYWORDS = {
     "tests": "test tests testing spec specs conftest e2e",
@@ -62,7 +79,8 @@ _KEYWORDS = {
     "external": "client clients integration integrations sdk gateway adapter adapters "
                 "bedrock s3 aws stripe sentry email smtp sms",
     "services": "service services usecase usecases domain core logic business "
-                "worker workers task tasks job jobs engine",
+                "worker workers task tasks job jobs engine "
+                "agent agents learn learning pipeline pipelines workflow workflows orchestrator",
     "shared": "util utils helper helpers common config settings constants lib logging middleware auth",
 }
 _TOKEN_LAYER = {tok: layer for layer, words in _KEYWORDS.items() for tok in words.split()}
@@ -79,7 +97,7 @@ _INFRA_DIRS = {
     "terraform", "docker", "nginx", "workers", "scripts", "infra", "infrastructure",
     "deploy", "deployment", "k8s", "helm", ".github", ".circleci", "notebooks", "docs", "outputs",
 }
-_INFRA_EXT = {".tf", ".tfvars", ".hcl", ".tmpl"}
+_INFRA_EXT = {".tf", ".tfvars", ".hcl", ".tmpl", ".ipynb"}
 _INFRA_NAMES = {
     "dockerfile", "makefile", "gunicorn.conf.py", ".gitignore", ".dockerignore",
     ".env.example", "tfplan", "procfile",
@@ -115,26 +133,39 @@ def _layer_by_path(path: str) -> str | None:
     return None
 
 
-def _classify_files(files: list[str], pairs: list[tuple[str, str]]) -> dict[str, str]:
-    layer: dict[str, str | None] = {f: _layer_by_path(f) for f in files}
+def _classify_files(files: list[str], pairs: list[tuple[str, str]]) -> tuple[dict[str, str], set[str]]:
+    """Return (layer per file, files whose layer was only guessed).
 
-    neighbors: dict[str, list[str]] = defaultdict(list)
+    A file is "guessed" when no keyword matched its path and its layer came from
+    neighbour voting or the final default. Those are the ones worth a second opinion.
+    """
+    layer: dict[str, str | None] = {f: _layer_by_path(f) for f in files}
+    guessed: set[str] = {f for f in files if layer[f] is None}
+
+    importers: dict[str, list[str]] = defaultdict(list)  # who imports f
+    imported: dict[str, list[str]] = defaultdict(list)   # what f imports
     for s, t in pairs:
-        neighbors[s].append(t)
-        neighbors[t].append(s)
+        imported[s].append(t)
+        importers[t].append(s)
     by_dir: dict[str, list[str]] = defaultdict(list)
     for f in files:
         by_dir[os.path.dirname(f)].append(f)
 
-    # Unknown files take the majority layer of their import neighbours and folder
-    # siblings. "shared" votes are ignored because everything imports utils.
+    # Unknown files take the majority layer of their import neighbours and folder siblings.
+    # - "shared" votes are ignored everywhere, because everything imports utils.
+    # - "external" is never inherited through imports: a file that *calls* an AI/S3/email
+    #   client is not itself an external service. Only folder siblings may vote external.
     for _ in range(3):
         changed = False
         for f in files:
             if layer[f]:
                 continue
             votes: Counter[str] = Counter()
-            for n in neighbors[f] + by_dir[os.path.dirname(f)]:
+            for n in importers[f] + imported[f]:
+                vote = layer[n]
+                if n != f and vote and vote not in ("shared", "external"):
+                    votes[vote] += 1
+            for n in by_dir[os.path.dirname(f)]:
                 vote = layer[n]
                 if n != f and vote and vote != "shared":
                     votes[vote] += 1
@@ -144,7 +175,81 @@ def _classify_files(files: list[str], pairs: list[tuple[str, str]]) -> dict[str,
         if not changed:
             break
 
-    return {f: layer[f] or "services" for f in files}
+    return {f: layer[f] or "services" for f in files}, guessed
+
+
+def _placement_prompt(chunk: list[tuple[str, list[str], str]]) -> str:
+    layers = "\n".join(f"  {lid}: {label} - {desc}" for lid, label, desc in LAYERS)
+    lines = []
+    for d, names, guess in chunk:
+        shown = ", ".join(names[:MAX_FILES_PER_DIR_IN_PLACEMENT])
+        extra = f" (+{len(names) - MAX_FILES_PER_DIR_IN_PLACEMENT} more)" if len(names) > MAX_FILES_PER_DIR_IN_PLACEMENT else ""
+        lines.append(f"  {d or '(root)'}: {shown}{extra}  [current guess: {guess}]")
+    folders = "\n".join(lines)
+    return f"""Assign each folder to exactly one architecture layer.
+
+Layers (use the id):
+{layers}
+
+Rules:
+- Code that calls an AI model, database, queue or third-party API is still Business Logic;
+  only the thin client/wrapper itself is External Services.
+- Agents, pipelines, workflows and orchestration are Business Logic.
+- Judge by folder and file names only.
+
+Folders:
+{folders}
+
+Respond with exactly this JSON, using the folder paths above as keys:
+{{"placements": {{"<folder path>": "<layer id>"}}}}"""
+
+
+async def _refine_guessed(
+    files: list[str],
+    layer_of: dict[str, str],
+    guessed: set[str],
+) -> dict[str, str]:
+    """Ask the LLM to place folders whose layer was only guessed. Unknown/invalid answers are ignored."""
+    by_dir: dict[str, list[str]] = defaultdict(list)
+    for f in files:
+        by_dir[os.path.dirname(f)].append(f)
+
+    todo: list[tuple[str, list[str], str]] = []
+    for d, dfiles in by_dir.items():
+        if any(f in guessed for f in dfiles):
+            guess = Counter(layer_of[f] for f in dfiles if f in guessed).most_common(1)[0][0]
+            todo.append((d, [os.path.basename(f) for f in sorted(dfiles)], guess))
+    if not todo:
+        return layer_of
+
+    sem = asyncio.Semaphore(CONCURRENCY)
+    refined = dict(layer_of)
+
+    async def run(chunk: list[tuple[str, list[str], str]]) -> None:
+        async with sem:
+            try:
+                raw = await asyncio.to_thread(
+                    invoke_qwen, prompt=_placement_prompt(chunk), system=SYSTEM_PROMPT, max_tokens=1500
+                )
+            except Exception as e:
+                logger.warning("LLM placement call failed | error=%s", e)
+                return
+        placements = _parse_obj(raw).get("placements")
+        if not isinstance(placements, dict):
+            return
+        known_dirs = {d for d, _, _ in chunk}
+        for d, lid in placements.items():
+            if d not in known_dirs and d == "(root)":
+                d = ""
+            if d not in known_dirs or lid not in _LAYER_IDS:
+                continue
+            for f in by_dir[d]:
+                if f in guessed:  # keyword-matched files are never overridden
+                    refined[f] = lid
+
+    chunks = [todo[i:i + MAX_DIRS_PER_PLACEMENT_CALL] for i in range(0, len(todo), MAX_DIRS_PER_PLACEMENT_CALL)]
+    await asyncio.gather(*[run(c) for c in chunks])
+    return refined
 
 
 # ---------------------------------------------------------------------------
@@ -305,6 +410,8 @@ def _cycles(ids: list[str], edges: list[tuple[str, str]]) -> list[list[str]]:
 
 
 def _name_list(names: list[str]) -> str:
+    if not names:
+        return ""
     if len(names) <= 3:
         return ", ".join(names[:-1]) + (" and " if len(names) > 1 else "") + names[-1]
     return f"{', '.join(names[:3])} and {len(names) - 3} more"
@@ -333,7 +440,7 @@ def _add_insights(node: dict) -> None:
         _add_insights(k)
 
 
-def _build_architecture(files: list[str], edges: list[dict]) -> dict:
+def _build_architecture(files: list[str], edges: list[dict], layer_of: dict[str, str] | None = None) -> dict:
     files = list(dict.fromkeys(files))
     fset = set(files)
     pairs = list(dict.fromkeys(
@@ -341,7 +448,8 @@ def _build_architecture(files: list[str], edges: list[dict]) -> dict:
         if e["source"] in fset and e["target"] in fset and e["source"] != e["target"]
     ))
 
-    layer_of = _classify_files(files, pairs)
+    if layer_of is None:
+        layer_of, _ = _classify_files(files, pairs)
     by_layer: dict[str, list[str]] = defaultdict(list)
     for f in files:
         by_layer[layer_of[f]].append(f)
@@ -397,11 +505,12 @@ def _annotate(node: dict) -> None:
         _annotate(k)
 
 
-def _node_prompt(n: dict) -> str:
+def _node_prompt(n: dict, project_context: str) -> str:
     files = n["files"][:MAX_FILES_IN_PROMPT]
     more = len(n["files"]) - len(files)
     file_lines = "\n".join(f"  {f}" for f in files) + (f"\n  ... and {more} more" if more else "")
-    return f"""Component: {n['label']}  (inside: {n['parent']})
+    context = f"Project context:\n{project_context}\n\n" if project_context else ""
+    return f"""{context}Component: {n['label']}  (inside: {n['parent']})
 Files ({len(n['files'])}):
 {file_lines}
 Depends on: {', '.join(dict.fromkeys(n['uses'])) or 'nothing at this level'}
@@ -411,11 +520,12 @@ Respond with exactly this JSON:
 {{"description": "1-2 plain sentences: what this component is for and where it sits in the system"}}"""
 
 
-def _summary_prompt(root: dict) -> str:
+def _summary_prompt(root: dict, project_context: str) -> str:
     labels = {n["id"]: n["label"] for n in root["children"]}
     layers = "\n".join(f"  {n['label']} ({len(n['files'])} files): {n['description']}" for n in root["children"])
     edges = "\n".join(f"  {labels[a]} -> {labels[b]}" for a, b in root["edges"] if a in labels and b in labels)
-    return f"""Layers of a codebase:
+    context = f"Project context:\n{project_context}\n\n" if project_context else ""
+    return f"""{context}Layers of a codebase:
 {layers}
 
 Dependencies between layers:
@@ -435,7 +545,7 @@ async def _ask(prompt: str, sem: asyncio.Semaphore) -> dict:
     return _parse_obj(raw)
 
 
-async def _describe_tree(root: dict) -> None:
+async def _describe_tree(root: dict, project_context: str = "") -> None:
     """Mutates root in place. Safe to cancel: finished descriptions are kept, the rest have fallbacks."""
     _annotate(root)
 
@@ -457,12 +567,12 @@ async def _describe_tree(root: dict) -> None:
     sem = asyncio.Semaphore(CONCURRENCY)
 
     async def describe_node(n: dict) -> None:
-        data = await _ask(_node_prompt(n), sem)
+        data = await _ask(_node_prompt(n, project_context), sem)
         if _text(data.get("description")):
             n["description"] = _text(data["description"])
 
     async def summarise() -> None:
-        data = await _ask(_summary_prompt(root), sem)
+        data = await _ask(_summary_prompt(root, project_context), sem)
         if _text(data.get("summary")):
             root["description"] = _text(data["summary"])
 
@@ -490,17 +600,91 @@ async def generate_architecture_story(
     files: list[str],
     edges: list[dict],
     max_retries: int = 2,  # unused; kept so existing callers don't break
+    project_context: str = "",  # optional: short README excerpt to ground the descriptions
 ) -> ArchitectureGraphResponse:
-    tree = _build_architecture(files, edges)
+    files = list(dict.fromkeys(files))
+    fset = set(files)
+    pairs = list(dict.fromkeys(
+        (e["source"], e["target"]) for e in edges
+        if e["source"] in fset and e["target"] in fset and e["source"] != e["target"]
+    ))
+
+    layer_of, guessed = _classify_files(files, pairs)
+    if guessed:
+        try:
+            async with asyncio.timeout(PLACEMENT_DEADLINE):
+                layer_of = await _refine_guessed(files, layer_of, guessed)
+        except asyncio.TimeoutError:
+            logger.warning("Placement pass hit %ds deadline; keeping heuristic layers", PLACEMENT_DEADLINE)
+
+    tree = _build_architecture(files, edges, layer_of)
     logger.info(
-        "Architecture built | files=%d edges=%d layers=%d",
-        len(files), len(edges), len(tree["children"]),
+        "Architecture built | files=%d edges=%d layers=%d guessed=%d",
+        len(files), len(edges), len(tree["children"]), len(guessed),
     )
 
     try:
         async with asyncio.timeout(DESCRIBE_DEADLINE):
-            await _describe_tree(tree)
+            await _describe_tree(tree, project_context[:1500])
     except asyncio.TimeoutError:
         logger.warning("Description pass hit %ds deadline; returning partial descriptions", DESCRIBE_DEADLINE)
 
     return ArchitectureGraphResponse(summary=tree["description"], root=_to_arch(tree))
+
+
+# ---------------------------------------------------------------------------
+# 5. Repo entry point (used by the API router)
+# ---------------------------------------------------------------------------
+
+async def generate_architecture_for_repo(
+    db: AsyncSession,
+    connected_repo_id: UUID,
+    regenerate: bool = False,
+) -> ArchitectureGraphResponse:
+    """Build (and cache) the architecture story for a connected repo.
+
+    When ``regenerate`` is False an already stored result is returned as-is.
+    Otherwise the graph is rebuilt from the repo's indexed files and import
+    edges, persisted, and returned."""
+    result_repo = ArchitectureResultRepository(db)
+
+    if not regenerate:
+        existing = await result_repo.get_latest(connected_repo_id)
+        if existing:
+            return ArchitectureGraphResponse(**json.loads(existing.graph))
+
+    repo = await ConnectedRepositoryRepository(db).get_by_id(repo_id=connected_repo_id)
+    if not repo:
+        raise HTTPException(status_code=404, detail="Connected repository not found.")
+
+    files = [
+        f for f in await RepositoryFileRepository(db).get_by_repo(connected_repo_id)
+        if not f.is_binary
+    ]
+    if not files:
+        raise HTTPException(status_code=404, detail="No files found for this repository.")
+
+    deps = await FileDependencyRepository(db).get_by_repo(connected_repo_id)
+    file_by_id = {f.id: f for f in files}
+    edges = [
+        {"source": file_by_id[d.source_file_id].path,
+         "target": file_by_id[d.target_file_id].path}
+        for d in deps
+        if d.source_file_id in file_by_id and d.target_file_id in file_by_id
+    ]
+
+    context_parts = [p for p in (repo.description, repo.framework, repo.tech_stack) if p]
+    project_context = "\n".join(context_parts)
+
+    graph = await generate_architecture_story(
+        files=[f.path for f in files],
+        edges=edges,
+        project_context=project_context,
+    )
+
+    await result_repo.upsert_by_repo(
+        connected_repo_id=connected_repo_id,
+        user_id=repo.user_id,
+        graph=graph.model_dump(),
+    )
+    return graph
