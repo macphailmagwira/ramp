@@ -81,3 +81,32 @@ class StorybookService:
         )
 
         return await self._generate_and_persist(repo)
+
+    async def get_file_content(self, connected_repo_id: uuid.UUID, path: str) -> dict:
+        """Return the full (uncapped) indexed content of one file in the repo.
+
+        ``path`` is matched after stripping a leading slash so it lines up with the
+        paths the storybook stores. Returns a dict for ``StorybookFileContentResponse``."""
+        await self._load_repo(connected_repo_id)
+
+        row = await self.file_repo.get_by_path(connected_repo_id, path.lstrip("/"))
+        if not row:
+            raise HTTPException(status_code=404, detail=f"File not found: {path}")
+        if row.content is None:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Content unavailable for {path} "
+                    "(binary, larger than 1MB, or unreadable at scan time)."
+                ),
+            )
+
+        return {
+            "path": row.path,
+            "content": row.content,
+            "language": row.language,
+            "extension": row.extension,
+            "size_bytes": row.size_bytes,
+            "is_binary": row.is_binary,
+            "line_count": row.content.count("\n") + (1 if row.content else 0),
+        }

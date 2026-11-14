@@ -1,11 +1,15 @@
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.session import get_db_session
-from src.features.storybook.schema import StorybookGenerateRequest, StorybookResponse
+from src.features.storybook.schema import (
+    StorybookFileContentResponse,
+    StorybookGenerateRequest,
+    StorybookResponse,
+)
 from src.features.storybook.service import StorybookService
 
 
@@ -68,4 +72,24 @@ async def refresh_storybook_endpoint(
         raise
     except Exception as e:
         logger.exception("Failed to refresh storybook | error=%s", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@storybook_router.get(
+    "/storybook/{connected_repo_id}/file-content",
+    response_model=StorybookFileContentResponse,
+    operation_id="getStorybookFileContent",
+    summary="Fetch the full indexed content of a file referenced by the storybook",
+)
+async def get_storybook_file_content_endpoint(
+    connected_repo_id: UUID,
+    path: str = Query(..., description="File path within the repository, as referenced by the storybook"),
+    db: AsyncSession = Depends(get_db_session),
+):
+    try:
+        return await StorybookService(db).get_file_content(connected_repo_id, path)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Failed to fetch storybook file content | error=%s", str(e))
         raise HTTPException(status_code=500, detail=str(e))

@@ -142,6 +142,18 @@ class RepositoryFileRepository(BaseRepository):
             .order_by(RepositoryFile.path)
         )
         return list(result.scalars().all())
+
+    async def get_by_path(
+        self, connected_repo_id: uuid.UUID, path: str
+    ) -> Optional[RepositoryFile]:
+        """Return the single file row for ``path`` in a repo, or None."""
+        result = await self.db.execute(
+            select(RepositoryFile).where(
+                RepositoryFile.connected_repo_id == connected_repo_id,
+                RepositoryFile.path == path,
+            )
+        )
+        return result.scalar_one_or_none()
     
 
 class FileDependencyRepository(BaseRepository):
