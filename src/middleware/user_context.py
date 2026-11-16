@@ -115,19 +115,39 @@ class UserContextMiddleware(BaseHTTPMiddleware):
             request.state.user = enriched_user
             logger.debug(f"User context: {enriched_user.to_dict()}")
 
-            return await call_next(request)
+            response = await call_next(request)
+
+            # Persist any writes performed during the request. The session is
+            # created fresh here (should_close_db=True), so we own its lifecycle
+            # and must commit/rollback before closing it. Sessions reused from
+            # request.state.db / the test harness are managed elsewhere.
+            if should_close_db:
+                if response.status_code < 400:
+                    await db.commit()
+                else:
+                    await db.rollback()
+
+            return response
 
         except HTTPException as e:
             logger.warning(f"Auth error: {e.detail}")
+            if should_close_db:
+                await db.rollback()
             return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
         except SQLAlchemyError as e:
             logger.error(f"Database error: {str(e)}")
+            if should_close_db:
+                await db.rollback()
             return JSONResponse(status_code=500, content={"detail": "Internal database error"})
         except (ValueError, ValidationError) as e:
             logger.error(f"Validation error: {str(e)}")
+            if should_close_db:
+                await db.rollback()
             return JSONResponse(status_code=422, content={"detail": str(e)})
         except Exception as e:
             logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            if should_close_db:
+                await db.rollback()
             return JSONResponse(status_code=500, content={"detail": "Internal server error"})
         finally:
             if should_close_db:

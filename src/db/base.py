@@ -8,4 +8,10 @@ from src.features.github.models import RepositoryFunction  # noqa: F401
 from src.features.github.models import FunctionCall  # noqa: F401
 from src.features.storybook.models import Storybook  # noqa: F401
 from src.features.architecture.models import ArchitectureResult  # noqa: F401
- 
+from src.features.docs.models import (  # noqa: F401
+    Workspace,
+    WorkspaceMember,
+    Node,
+    NodeContent,
+    DocVersion,
+)

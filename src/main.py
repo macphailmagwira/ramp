@@ -15,6 +15,7 @@ from starlette.responses import JSONResponse
 from .api.v1_router import router
 from .common.error_handlers import generic_exception_handler
 from .config import settings
+from src.features.docs.exceptions import VersionConflict
 
 # ------------------------------
 # Configure logging
@@ -47,6 +48,11 @@ setup_rate_limiting(app)
 
 # Exception handlers
 app.add_exception_handler(Exception, generic_exception_handler)
+
+
+@app.exception_handler(VersionConflict)
+async def version_conflict_handler(request: Request, exc: VersionConflict):
+    return JSONResponse(status_code=409, content={"version": exc.version, "blocks": exc.blocks})
 
 
 @app.exception_handler(RequestValidationError)
