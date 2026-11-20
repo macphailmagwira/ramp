@@ -3,10 +3,9 @@
 import uuid
 
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.common.base_repository import BaseRepository
-from src.features.docs.enums import WorkspaceRole
+from src.features.docs.enums import NodeType, WorkspaceRole
 from src.features.docs.models import (
     DocVersion,
     Node,
@@ -16,45 +15,91 @@ from src.features.docs.models import (
 )
 from src.features.user.models import User
 
+DEFAULT_WORKSPACE_LABEL = "Engineering"
+DEFAULT_WORKSPACE_ICON = "⚙️"
+
+DEFAULT_FOLDER_LABELS = (
+    "Product Requirements",
+    "Technical Designs",
+    "Implementation Plans",
+    "Testing & QA",
+    "Engineering Decisions",
+    "Releases",
+)
+
 
 class DocsRepository(BaseRepository):
     # ---- workspaces ----
-    async def create_workspace(self, owner_id: uuid.UUID, label: str, icon: str | None) -> Workspace:
-        ws = Workspace(owner_id=owner_id, label=label, icon=icon)
+    async def create_workspace(
+        self,
+        owner_id: uuid.UUID,
+        account_id: uuid.UUID,
+        label: str,
+        icon: str | None,
+        repo: str | None = None,
+        connected_repository_id: uuid.UUID | None = None,
+    ) -> Workspace:
+        ws = Workspace(
+            owner_id=owner_id,
+            account_id=account_id,
+            label=label,
+            icon=icon,
+            repo=repo,
+            connected_repository_id=connected_repository_id,
+        )
         self.db.add(ws)
         await self.db.flush()
         self.db.add(WorkspaceMember(workspace_id=ws.id, user_id=owner_id, role=WorkspaceRole.OWNER))
         await self.db.flush()
+        await self._create_default_folders(ws.id)
         return ws
+
+    async def _create_default_folders(self, ws_id: uuid.UUID) -> None:
+        self.db.add_all(
+            Node(
+                workspace_id=ws_id,
+                parent_id=None,
+                type=NodeType.FOLDER,
+                label=label,
+                title=label,
+            )
+            for label in DEFAULT_FOLDER_LABELS
+        )
+        await self.db.flush()
 
     async def get_workspace(self, ws_id: uuid.UUID) -> Workspace | None:
         return (
             await self.db.execute(select(Workspace).where(Workspace.id == ws_id))
         ).scalar_one_or_none()
 
-    async def list_user_workspaces(self, user_id: uuid.UUID) -> list[Workspace]:
-        owned = (
-            await self.db.execute(select(Workspace).where(Workspace.owner_id == user_id))
-        ).scalars().all()
-        member_ids = (
+    async def get_workspace_for_repo(
+        self, connected_repository_id: uuid.UUID
+    ) -> Workspace | None:
+        return (
             await self.db.execute(
-                select(WorkspaceMember.workspace_id).where(WorkspaceMember.user_id == user_id)
+                select(Workspace).where(
+                    Workspace.connected_repository_id == connected_repository_id
+                )
             )
-        ).scalars().all()
-        result = {w.id: w for w in owned}
-        if member_ids:
-            member_ws = (
-                await self.db.execute(select(Workspace).where(Workspace.id.in_(member_ids)))
-            ).scalars().all()
-            for w in member_ws:
-                result[w.id] = w
-        return list(result.values())
+        ).scalar_one_or_none()
 
-    async def update_workspace(self, ws: Workspace, label: str | None, icon: str | None) -> Workspace:
+    async def list_workspaces(
+        self, account_id: uuid.UUID, repo: str | None = None
+    ) -> list[Workspace]:
+        cond = [Workspace.account_id == account_id]
+        if repo is not None:
+            cond.append(Workspace.repo == repo)
+        return list((await self.db.execute(select(Workspace).where(*cond))).scalars().all())
+
+    async def update_workspace(
+        self, ws: Workspace, label: str | None, icon: str | None, repo: str | None = None
+    ) -> Workspace:
         if label is not None:
             ws.label = label
         if icon is not None:
             ws.icon = icon
+        if repo is not None:
+            ws.repo = repo
         await self.db.flush()
         return ws
 
@@ -97,14 +142,20 @@ class DocsRepository(BaseRepository):
             )
         )
 
-    async def resolve_role(self, ws_id: uuid.UUID, user_id: uuid.UUID) -> WorkspaceRole | None:
+    async def resolve_role(
+        self, ws_id: uuid.UUID, user_id: uuid.UUID, account_id: uuid.UUID | None = None
+    ) -> WorkspaceRole | None:
         ws = await self.get_workspace(ws_id)
         if ws is None:
             return None
         if ws.owner_id == user_id:
             return WorkspaceRole.OWNER
         member = await self.get_member(ws_id, user_id)
-        return member.role if member else None
+        if member:
+            return member.role
+        if account_id is not None and ws.account_id == account_id:
+            return WorkspaceRole.EDITOR
+        return None
 
     async def get_user_by_email(self, email: str) -> User | None:
         return (
@@ -113,17 +164,52 @@ class DocsRepository(BaseRepository):
 
     # ---- nodes ----
     async def create_node(
-        self, ws_id: uuid.UUID, parent_id: uuid.UUID | None, type: str, label: str
+        self,
+        ws_id: uuid.UUID,
+        parent_id: uuid.UUID | None,
+        type: str,
+        label: str,
+        title: str,
+        shared: bool = False,
     ) -> Node:
-        node = Node(workspace_id=ws_id, parent_id=parent_id, type=type, label=label)
+        node = Node(
+            workspace_id=ws_id,
+            parent_id=parent_id,
+            type=type,
+            label=label,
+            title=title,
+            shared=shared,
+        )
         self.db.add(node)
         await self.db.flush()
         return node
 
-    async def list_nodes(self, ws_id: uuid.UUID) -> list[Node]:
+    async def list_nodes(self, ws_id: uuid.UUID, account_id: uuid.UUID) -> list[Node]:
+        # Own nodes plus shared nodes from other workspaces in the same account.
         return list(
             (
-                await self.db.execute(select(Node).where(Node.workspace_id == ws_id))
+                await self.db.execute(
+                    select(Node)
+                    .join(Workspace, Workspace.id == Node.workspace_id)
+                    .where(
+                        (Node.workspace_id == ws_id)
+                        | ((Node.shared == True) & (Workspace.account_id == account_id))  # noqa: E712
+                    )
+                )
+            ).scalars().all()
+        )
+
+    async def list_shared_nodes(self, account_id: uuid.UUID) -> list[Node]:
+        return list(
+            (
+                await self.db.execute(
+                    select(Node)
+                    .join(Workspace, Workspace.id == Node.workspace_id)
+                    .where(
+                        Node.shared == True,  # noqa: E712
+                        Workspace.account_id == account_id,
+                    )
+                )
             ).scalars().all()
         )
 
@@ -139,13 +225,23 @@ class DocsRepository(BaseRepository):
             )
         ).scalar_one_or_none()
 
-    async def rename_node(self, node: Node, label: str) -> Node:
-        node.label = label
+    async def rename_node(
+        self, node: Node, label: str | None = None, title: str | None = None
+    ) -> Node:
+        if label is not None:
+            node.label = label
+        if title is not None:
+            node.title = title
         await self.db.flush()
         return node
 
     async def set_parent(self, node: Node, parent_id: uuid.UUID | None) -> Node:
         node.parent_id = parent_id
+        await self.db.flush()
+        return node
+
+    async def set_shared(self, node: Node, shared: bool) -> Node:
+        node.shared = shared
         await self.db.flush()
         return node
 

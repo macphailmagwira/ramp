@@ -69,6 +69,7 @@ class ConnectRepositoryRequestSchema(BaseModel):
 
 class ConnectedRepositoryRetrieveSchema(BaseModel):
     id: uuid.UUID
+    account_id: uuid.UUID
     user_id: uuid.UUID
     repo_id: str
     owner: str

@@ -254,13 +254,14 @@ class GitHubRepositoryService:
         return GitHubRepoListSchema(repositories=repos, total=len(repos))
 
     async def connect_repository(
-    self,
-    user_id: uuid.UUID,
-    request: ConnectRepositoryRequestSchema,
-) -> ConnectedRepository:
-        access_token = await self._get_access_token(user_id)  
+        self,
+        user_id: uuid.UUID,
+        account_id: uuid.UUID,
+        request: ConnectRepositoryRequestSchema,
+    ) -> ConnectedRepository:
+        access_token = await self._get_access_token(user_id)
 
-        existing = await self.repo_repo.get_by_user_and_repo(user_id, request.full_name)
+        existing = await self.repo_repo.get_by_account_and_repo(account_id, request.full_name)
         if existing:
             if existing.is_active:
                 raise HTTPException(
@@ -272,7 +273,30 @@ class GitHubRepositoryService:
             await self.repo_repo.db.refresh(existing)
             repo = existing
         else:
-            repo = await self.repo_repo.create(data=request, user_id=user_id)
+            repo = await self.repo_repo.create(
+                data=request, user_id=user_id, account_id=account_id
+            )
+
+        from src.features.docs.repository import (
+            DEFAULT_WORKSPACE_ICON,
+            DEFAULT_WORKSPACE_LABEL,
+            DocsRepository,
+        )
+        from src.features.docs.schema import WorkspaceCreate
+        from src.features.docs.service import DocsService
+
+        docs_repo = DocsRepository(self.repo_repo.db)
+        if await docs_repo.get_workspace_for_repo(repo.id) is None:
+            await DocsService(self.repo_repo.db).create_workspace(
+                owner_id=user_id,
+                account_id=account_id,
+                payload=WorkspaceCreate(
+                    label=DEFAULT_WORKSPACE_LABEL,
+                    icon=DEFAULT_WORKSPACE_ICON,
+                    repo=request.full_name,
+                ),
+                connected_repository_id=repo.id,
+            )
 
         scan_repository_task.delay( # type: ignore[attr-defined]
             connected_repo_id=str(repo.id),
@@ -286,21 +310,20 @@ class GitHubRepositoryService:
     
 
 
-    async def disconnect_repository(self, repo_id: uuid.UUID, user_id: uuid.UUID) -> None:
-            """Soft-delete a connected repository."""
-            repo = await self.repo_repo.get_by_id(repo_id=repo_id)
-            if not repo:
-                raise HTTPException(status_code=404, detail="Connected repository not found.")
-            if repo.user_id != user_id:
-                raise HTTPException(status_code=403, detail="Not authorized to disconnect this repository.")
+    async def disconnect_repository(self, repo_id: uuid.UUID, account_id: uuid.UUID) -> None:
+        """Soft-delete a connected repository."""
+        repo = await self.repo_repo.get_by_id(repo_id=repo_id)
+        if not repo:
+            raise HTTPException(status_code=404, detail="Connected repository not found.")
+        if repo.account_id != account_id:
+            raise HTTPException(status_code=403, detail="Not authorized to disconnect this repository.")
 
-            await self.repo_repo.soft_delete(repo_id)
+        await self.repo_repo.soft_delete(repo_id)
 
-        
     async def list_connected_repositories(
-            self, user_id: uuid.UUID
-        ) -> List[ConnectedRepository]:
-            return list(await self.repo_repo.get_by_user_id(user_id))
+        self, account_id: uuid.UUID
+    ) -> List[ConnectedRepository]:
+        return list(await self.repo_repo.get_by_account_id(account_id))
 
 
 # ---------------------------------------------------------------------------

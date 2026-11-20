@@ -30,10 +30,11 @@ class OverviewService:
         self,
         connected_repo_id: uuid.UUID,
         user_id: uuid.UUID,
+        account_id: uuid.UUID,
         since: Optional[str] = None,
         until: Optional[str] = None,
     ) -> OverviewResponseSchema:
-        repo = await self._get_repo(connected_repo_id, user_id)
+        repo = await self._get_repo(connected_repo_id, account_id)
         stats = await self._get_stats(connected_repo_id)
         commits = await self._get_recent_commits(repo, since, until)
         language = await self._get_language(connected_repo_id)
@@ -47,13 +48,13 @@ class OverviewService:
         )
 
     async def _get_repo(
-        self, repo_id: uuid.UUID, user_id: uuid.UUID
+        self, repo_id: uuid.UUID, account_id: uuid.UUID
     ) -> ConnectedRepository:
         result = await self.db.execute(
             select(ConnectedRepository).where(
                 ConnectedRepository.id == repo_id,
-                ConnectedRepository.user_id == user_id,
-                ConnectedRepository.is_active == True,
+                ConnectedRepository.account_id == account_id,
+                ConnectedRepository.is_active == True,  # noqa: E712
             )
         )
         repo = result.scalar_one_or_none()

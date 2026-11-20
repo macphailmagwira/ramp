@@ -20,7 +20,7 @@ class ArchitectureResult(BaseDbModelMixin, Base):
     connected_repo_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("connected_repository.id", ondelete="CASCADE"),
         nullable=False,
-        index=True,
+        unique=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(index=True)
 

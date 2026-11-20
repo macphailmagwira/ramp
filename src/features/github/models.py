@@ -29,9 +29,12 @@ class GitHubOAuthToken(BaseDbModelMixin, Base):
 class ConnectedRepository(BaseDbModelMixin, Base):
     __tablename__ = "connected_repository"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE"),
-        nullable=False,
+    account_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("account.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("user.id", ondelete="SET NULL"),
+        nullable=True,
         index=True,
     )
     repo_id: Mapped[str] = mapped_column(String(128), nullable=False)

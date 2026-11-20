@@ -9,9 +9,11 @@ from src.features.docs.enums import WorkspaceRole
 from src.features.docs.permissions import require_workspace_role
 from src.features.docs.schema import (
     ContentResponse,
+    KnowledgeNode,
     MoveRequest,
     NodeCreate,
     NodeRename,
+    NodeShareToggle,
     PutContentRequest,
     VersionDetail,
     VersionSummary,
@@ -24,7 +26,6 @@ from src.features.docs.schema import (
 from src.features.docs.service import DocsService
 from src.middleware.user_context import EnrichedUserContext, get_current_user
 
-
 logger = logging.getLogger("api-main.docs.router")
 
 docs_router = APIRouter(prefix="/workspaces", tags=["docs"])
@@ -33,10 +34,19 @@ docs_router = APIRouter(prefix="/workspaces", tags=["docs"])
 # ---------------- workspaces ----------------
 @docs_router.get("")
 async def list_workspaces(
+    repo: str | None = None,
     user: EnrichedUserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ) -> list[WorkspaceResponse]:
-    return await DocsService(db).list_workspaces(user.id)
+    return await DocsService(db).list_workspaces(user.id, user.account_id, repo)
+
+
+@docs_router.get("/shared")
+async def list_shared(
+    user: EnrichedUserContext = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_session),
+) -> list[KnowledgeNode]:
+    return await DocsService(db).list_shared_nodes(user.account_id)
 
 
 @docs_router.post("")
@@ -45,7 +55,7 @@ async def create_workspace(
     user: EnrichedUserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ) -> WorkspaceResponse:
-    return await DocsService(db).create_workspace(user.id, payload)
+    return await DocsService(db).create_workspace(user.id, user.account_id, payload)
 
 
 @docs_router.patch(
@@ -58,7 +68,7 @@ async def update_workspace(
     user: EnrichedUserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ) -> WorkspaceResponse:
-    return await DocsService(db).update_workspace(workspace_id, user.id, payload)
+    return await DocsService(db).update_workspace(workspace_id, user.id, user.account_id, payload)
 
 
 @docs_router.delete(
@@ -71,7 +81,7 @@ async def delete_workspace(
     user: EnrichedUserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):
-    await DocsService(db).delete_workspace(workspace_id, user.id)
+    await DocsService(db).delete_workspace(workspace_id, user.id, user.account_id)
 
 
 # ---------------- members ----------------
@@ -132,9 +142,10 @@ async def remove_member(
 )
 async def list_nodes(
     workspace_id: UUID,
+    user: EnrichedUserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):
-    return await DocsService(db).list_nodes(workspace_id)
+    return await DocsService(db).list_nodes(workspace_id, user.account_id)
 
 
 @docs_router.post(
@@ -149,7 +160,13 @@ async def create_node(
     db: AsyncSession = Depends(get_db_session),
 ):
     return await DocsService(db).create_node(
-        workspace_id, user.id, payload.parent_id, payload.type.value, payload.label
+        workspace_id,
+        user.id,
+        payload.parent_id,
+        payload.type.value,
+        payload.label,
+        payload.title,
+        payload.shared,
     )
 
 
@@ -163,7 +180,9 @@ async def rename_node(
     payload: NodeRename,
     db: AsyncSession = Depends(get_db_session),
 ):
-    return await DocsService(db).rename_node(workspace_id, node_id, payload.label)
+    return await DocsService(db).rename_node(
+        workspace_id, node_id, payload.label, payload.title, payload.shared
+    )
 
 
 @docs_router.delete(
@@ -191,6 +210,19 @@ async def move_node(
     db: AsyncSession = Depends(get_db_session),
 ):
     await DocsService(db).move_node(workspace_id, node_id, payload.new_parent_id)
+
+
+@docs_router.post(
+    "/{workspace_id}/nodes/{node_id}/share",
+    dependencies=[Depends(require_workspace_role(WorkspaceRole.EDITOR))],
+)
+async def share_node(
+    workspace_id: UUID,
+    node_id: UUID,
+    payload: NodeShareToggle,
+    db: AsyncSession = Depends(get_db_session),
+) -> KnowledgeNode:
+    return await DocsService(db).share_node(workspace_id, node_id, payload.shared)
 
 
 # ---------------- content + versions ----------------

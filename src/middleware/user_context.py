@@ -13,6 +13,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from src.auth.jwt import decode_access_token
 from src.config.constants import API_MAIN_LOGGER_NAME_PREFIX, PUBLIC_PATHS
 from src.db.session import get_db
+from src.features.account.enums import AccountRole
 from src.features.user.models import User
 
 logger = logging.getLogger(f"{API_MAIN_LOGGER_NAME_PREFIX}.middleware")
@@ -43,12 +44,25 @@ class EnrichedUserContext:
     def last_name(self) -> str:
         return self.db_user.last_name if self.db_user else None
 
+    @property
+    def account_id(self):
+        return self.db_user.account_id if self.db_user else None
+
+    @property
+    def account_role(self) -> AccountRole | None:
+        return self.db_user.account_role if self.db_user else None
+
+    @property
+    def is_account_admin(self) -> bool:
+        return self.account_role == AccountRole.ADMIN
+
     def to_dict(self) -> dict:
         return {
             "user_id": str(self.id) if self.id else None,
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "account_id": str(self.account_id) if self.account_id else None,
         }
 
 

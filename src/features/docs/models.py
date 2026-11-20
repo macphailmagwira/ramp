@@ -1,7 +1,16 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum as SAEnum, ForeignKey, Integer, String, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Enum as SAEnum,
+    ForeignKey,
+    Integer,
+    String,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -14,8 +23,15 @@ class Workspace(BaseDbModelMixin, Base):
     __tablename__ = "workspace"
 
     owner_id: Mapped[uuid.UUID] = mapped_column(index=True, nullable=False)
+    account_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("account.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    connected_repository_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("connected_repository.id", ondelete="SET NULL"), index=True, nullable=True
+    )
     label: Mapped[str] = mapped_column(String(120), nullable=False)
     icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    repo: Mapped[str | None] = mapped_column(String(512), index=True, nullable=True)
 
 
 class WorkspaceMember(Base):
@@ -53,8 +69,14 @@ class Node(BaseDbModelMixin, Base):
         nullable=False,
     )
     label: Mapped[str] = mapped_column(String(300), nullable=False)
+    title: Mapped[str] = mapped_column(
+        String(300), nullable=False, default="Title", server_default=text("'Title'")
+    )
     version: Mapped[int] = mapped_column(Integer, server_default="0", nullable=False)
     updated_by: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
+    shared: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false"), default=False
+    )
 
 
 class NodeContent(Base):

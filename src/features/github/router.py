@@ -185,6 +185,7 @@ async def connect_repository(
     """
     return await service.connect_repository(
         user_id=current_user.id,
+        account_id=current_user.account_id,
         request=request,
     )
 
@@ -201,7 +202,7 @@ async def list_connected_repositories(
 ):
     logger.info("Listing connected repositories for user_id=%s", current_user.id)
     """Returns all active repository connections for the current user."""
-    return await service.list_connected_repositories(user_id=current_user.id)
+    return await service.list_connected_repositories(current_user.account_id)
 
 
 @github_router.delete(
@@ -217,7 +218,7 @@ async def disconnect_repository(
 ):
     """Soft-deletes a connected repository record."""
     logger.info("Disconnecting repository %s for user_id=%s", repo_id, current_user.id)
-    await service.disconnect_repository(repo_id=repo_id, user_id=current_user.id)
+    await service.disconnect_repository(repo_id=repo_id, account_id=current_user.account_id)
 
 
 # ---------------------------------------------------------------------------
@@ -383,7 +384,7 @@ async def get_repository_overview(
     """Returns aggregated overview data: stats from architecture/flow graphs and recent commits."""
     logger.info("Fetching overview for repo_id=%s, since=%s, until=%s, user_id=%s", repo_id, since, until, current_user.id)
     service = OverviewService(db)
-    return await service.get_overview(repo_id, current_user.id, since, until)
+    return await service.get_overview(repo_id, current_user.id, current_user.account_id, since, until)
 
 
 # ---------------------------------------------------------------------------
@@ -410,7 +411,7 @@ async def get_scan_status(
     result = await db.execute(
         select(ConnectedRepository).where(
             ConnectedRepository.id == repo_id,
-            ConnectedRepository.user_id == current_user.id,
+            ConnectedRepository.account_id == current_user.account_id,
         )
     )
     repo = result.scalar_one_or_none()
@@ -457,7 +458,7 @@ async def rescan_repository(
     result = await db.execute(
         select(ConnectedRepository).where(
             ConnectedRepository.id == repo_id,
-            ConnectedRepository.user_id == current_user.id,
+            ConnectedRepository.account_id == current_user.account_id,
         )
     )
     repo = result.scalar_one_or_none()
@@ -510,7 +511,7 @@ async def get_sync_status(
     result = await db.execute(
         select(ConnectedRepository).where(
             ConnectedRepository.id == repo_id,
-            ConnectedRepository.user_id == current_user.id,
+            ConnectedRepository.account_id == current_user.account_id,
         )
     )
     repo = result.scalar_one_or_none()

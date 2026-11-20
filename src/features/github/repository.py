@@ -53,8 +53,10 @@ class ConnectedRepositoryRepository(BaseRepository):
     async def create(self, **kwargs) -> ConnectedRepository:
         data = kwargs['data']
         user_id = kwargs['user_id']
-        
+        account_id = kwargs['account_id']
+
         repo = ConnectedRepository(
+            account_id=account_id,
             user_id=user_id,
             repo_id=data.repo_id,
             owner=data.owner,
@@ -77,21 +79,21 @@ class ConnectedRepositoryRepository(BaseRepository):
         )
         return result.scalar_one_or_none()
 
-    async def get_by_user_id(self, user_id: uuid.UUID) -> Sequence[ConnectedRepository]:
+    async def get_by_account_id(self, account_id: uuid.UUID) -> Sequence[ConnectedRepository]:
         result = await self.db.execute(
             select(ConnectedRepository).where(
-                ConnectedRepository.user_id == user_id,
+                ConnectedRepository.account_id == account_id,
                 ConnectedRepository.is_active == True,  # noqa: E712
             )
         )
         return result.scalars().all()
 
-    async def get_by_user_and_repo(
-        self, user_id: uuid.UUID, full_name: str
+    async def get_by_account_and_repo(
+        self, account_id: uuid.UUID, full_name: str
     ) -> ConnectedRepository | None:
         result = await self.db.execute(
             select(ConnectedRepository).where(
-                ConnectedRepository.user_id == user_id,
+                ConnectedRepository.account_id == account_id,
                 ConnectedRepository.full_name == full_name,
             )
         )

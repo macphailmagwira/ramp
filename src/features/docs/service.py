@@ -8,7 +8,6 @@ each other. A mismatch returns a VersionConflict (409).
 import uuid
 
 from fastapi import HTTPException
-
 from sqlalchemy import select
 
 from src.common.base_repository import BaseRepository
@@ -16,7 +15,6 @@ from src.features.docs.enums import WorkspaceRole
 from src.features.docs.exceptions import VersionConflict
 from src.features.docs.models import Node, Workspace
 from src.features.docs.repository import DocsRepository
-from src.features.user.models import User
 from src.features.docs.schema import (
     ContentResponse,
     DocBlock,
@@ -30,39 +28,59 @@ from src.features.docs.schema import (
     WorkspaceResponse,
     WorkspaceUpdate,
 )
+from src.features.user.models import User
 
 
 class DocsService(BaseRepository):
     # ---------- workspaces ----------
-    async def create_workspace(self, owner_id: uuid.UUID, payload: WorkspaceCreate) -> WorkspaceResponse:
+    async def create_workspace(
+        self,
+        owner_id: uuid.UUID,
+        account_id: uuid.UUID,
+        payload: WorkspaceCreate,
+        connected_repository_id: uuid.UUID | None = None,
+    ) -> WorkspaceResponse:
         repo = DocsRepository(self.db)
-        ws = await repo.create_workspace(owner_id, payload.label, payload.icon)
+        ws = await repo.create_workspace(
+            owner_id,
+            account_id,
+            payload.label,
+            payload.icon,
+            payload.repo,
+            connected_repository_id,
+        )
         await self.db.commit()
         await self.db.refresh(ws)
         return _workspace_response(ws, WorkspaceRole.OWNER)
 
-    async def list_workspaces(self, user_id: uuid.UUID) -> list[WorkspaceResponse]:
-        repo = DocsRepository(self.db)
-        wss = await repo.list_user_workspaces(user_id)
+    async def list_workspaces(
+        self, user_id: uuid.UUID, account_id: uuid.UUID, repo: str | None = None
+    ) -> list[WorkspaceResponse]:
+        repo_ = DocsRepository(self.db)
+        wss = await repo_.list_workspaces(account_id, repo)
         out = []
         for ws in wss:
-            role = await repo.resolve_role(ws.id, user_id) or WorkspaceRole.VIEWER
+            role = await repo_.resolve_role(ws.id, user_id, account_id) or WorkspaceRole.EDITOR
             out.append(_workspace_response(ws, role))
         return out
 
+    async def list_shared_nodes(self, account_id: uuid.UUID) -> list[KnowledgeNode]:
+        repo = DocsRepository(self.db)
+        return [_node_response(n) for n in await repo.list_shared_nodes(account_id)]
+
     async def update_workspace(
-        self, ws_id: uuid.UUID, user_id: uuid.UUID, payload: WorkspaceUpdate
+        self, ws_id: uuid.UUID, user_id: uuid.UUID, account_id: uuid.UUID, payload: WorkspaceUpdate
     ) -> WorkspaceResponse:
         repo = DocsRepository(self.db)
-        ws = await self._require_workspace(repo, ws_id, user_id)
-        ws = await repo.update_workspace(ws, payload.label, payload.icon)
+        ws = await self._require_workspace(repo, ws_id, user_id, account_id)
+        ws = await repo.update_workspace(ws, payload.label, payload.icon, payload.repo)
         await self.db.commit()
         await self.db.refresh(ws)
         return _workspace_response(ws, WorkspaceRole.OWNER)
 
-    async def delete_workspace(self, ws_id: uuid.UUID, user_id: uuid.UUID) -> None:
+    async def delete_workspace(self, ws_id: uuid.UUID, user_id: uuid.UUID, account_id: uuid.UUID) -> None:
         repo = DocsRepository(self.db)
-        ws = await self._require_workspace(repo, ws_id, user_id)
+        ws = await self._require_workspace(repo, ws_id, user_id, account_id)
         if ws.owner_id != user_id:
             raise HTTPException(status_code=403, detail="Only the workspace owner can delete it")
         await repo.delete_workspace(ws_id)
@@ -125,26 +143,37 @@ class DocsService(BaseRepository):
 
     # ---------- nodes ----------
     async def create_node(
-        self, ws_id: uuid.UUID, user_id: uuid.UUID, parent_id, ntype, label
+        self, ws_id: uuid.UUID, user_id: uuid.UUID, parent_id, ntype, label, title=None, shared=False
     ) -> KnowledgeNode:
         repo = DocsRepository(self.db)
         if parent_id is not None:
             parent = await repo.get_node(parent_id)
             if parent is None or parent.workspace_id != ws_id:
                 raise HTTPException(status_code=400, detail="Invalid parent_id")
-        node = await repo.create_node(ws_id, parent_id, ntype, label)
+        node = await repo.create_node(
+            ws_id, parent_id, ntype, label, title if title is not None else "Title", shared
+        )
         await self.db.commit()
         await self.db.refresh(node)
         return _node_response(node)
 
-    async def list_nodes(self, ws_id: uuid.UUID) -> list[KnowledgeNode]:
+    async def list_nodes(self, ws_id: uuid.UUID, account_id: uuid.UUID) -> list[KnowledgeNode]:
         repo = DocsRepository(self.db)
-        return [_node_response(n) for n in await repo.list_nodes(ws_id)]
+        return [_node_response(n) for n in await repo.list_nodes(ws_id, account_id)]
 
-    async def rename_node(self, ws_id: uuid.UUID, node_id: uuid.UUID, label: str) -> KnowledgeNode:
+    async def rename_node(
+        self,
+        ws_id: uuid.UUID,
+        node_id: uuid.UUID,
+        label: str | None = None,
+        title: str | None = None,
+        shared: bool | None = None,
+    ) -> KnowledgeNode:
         repo = DocsRepository(self.db)
         node = await self._require_node(repo, ws_id, node_id)
-        node = await repo.rename_node(node, label)
+        node = await repo.rename_node(node, label, title)
+        if shared is not None:
+            node = await repo.set_shared(node, shared)
         await self.db.commit()
         await self.db.refresh(node)
         return _node_response(node)
@@ -154,6 +183,15 @@ class DocsService(BaseRepository):
         await self._require_node(repo, ws_id, node_id)
         await repo.delete_node(node_id)
         await self.db.commit()
+
+    async def share_node(self, ws_id: uuid.UUID, node_id: uuid.UUID, shared: bool) -> KnowledgeNode:
+        # Only the owning workspace may change a node's shared flag.
+        repo = DocsRepository(self.db)
+        node = await self._require_node(repo, ws_id, node_id)
+        node = await repo.set_shared(node, shared)
+        await self.db.commit()
+        await self.db.refresh(node)
+        return _node_response(node)
 
     async def move_node(
         self, ws_id: uuid.UUID, node_id: uuid.UUID, new_parent_id: uuid.UUID | None
@@ -177,7 +215,7 @@ class DocsService(BaseRepository):
     # ---------- content + versions ----------
     async def get_content(self, ws_id: uuid.UUID, node_id: uuid.UUID) -> ContentResponse:
         repo = DocsRepository(self.db)
-        await self._require_node(repo, ws_id, node_id)
+        await self._require_node(repo, ws_id, node_id, allow_shared=True)
         content = await repo.get_content(node_id)
         if content is None:
             raise HTTPException(status_code=404, detail="Content not found")
@@ -222,7 +260,6 @@ class DocsService(BaseRepository):
 
         node.version = new_version
         node.updated_by = user_id
-        node.label = label
         await repo.upsert_content(node_id, label, blocks_data)
         await repo.insert_version(node_id, new_version, label, blocks_data, user_id)
         await self.db.commit()
@@ -237,7 +274,7 @@ class DocsService(BaseRepository):
 
     async def list_versions(self, ws_id: uuid.UUID, node_id: uuid.UUID) -> list[VersionSummary]:
         repo = DocsRepository(self.db)
-        await self._require_node(repo, ws_id, node_id)
+        await self._require_node(repo, ws_id, node_id, allow_shared=True)
         versions = await repo.list_versions(node_id)
         return [
             VersionSummary(
@@ -254,7 +291,7 @@ class DocsService(BaseRepository):
         self, ws_id: uuid.UUID, node_id: uuid.UUID, version: int
     ) -> VersionDetail:
         repo = DocsRepository(self.db)
-        await self._require_node(repo, ws_id, node_id)
+        await self._require_node(repo, ws_id, node_id, allow_shared=True)
         v = await repo.get_version(node_id, version)
         if v is None:
             raise HTTPException(status_code=404, detail="Version not found")
@@ -273,25 +310,41 @@ class DocsService(BaseRepository):
         new_version = node.version + 1
         node.version = new_version
         node.updated_by = user_id
-        node.label = snap.label
         await repo.upsert_content(node_id, snap.label, snap.blocks)
         await repo.insert_version(node_id, new_version, snap.label, snap.blocks, user_id)
         await self.db.commit()
         return {"version": new_version}
 
     # ---------- helpers ----------
-    async def _require_workspace(self, repo: DocsRepository, ws_id: uuid.UUID, user_id: uuid.UUID) -> Workspace:
+    async def _require_workspace(
+        self, repo: DocsRepository, ws_id: uuid.UUID, user_id: uuid.UUID, account_id: uuid.UUID
+    ) -> Workspace:
         ws = await repo.get_workspace(ws_id)
         if ws is None:
             raise HTTPException(status_code=404, detail="Workspace not found")
-        role = await repo.resolve_role(ws_id, user_id)
+        role = await repo.resolve_role(ws_id, user_id, account_id)
         if role is None:
             raise HTTPException(status_code=403, detail="Not a member of this workspace")
         return ws
 
-    async def _require_node(self, repo: DocsRepository, ws_id: uuid.UUID, node_id: uuid.UUID) -> Node:
+    async def _require_node(
+        self, repo: DocsRepository, ws_id: uuid.UUID, node_id: uuid.UUID, allow_shared: bool = False
+    ) -> Node:
         node = await repo.get_node(node_id)
-        if node is None or node.workspace_id != ws_id:
+        if node is None:
+            raise HTTPException(status_code=404, detail="Node not found")
+        if node.workspace_id == ws_id:
+            return node
+        # Shared nodes are readable across workspaces in the same account only.
+        if not (allow_shared and node.shared):
+            raise HTTPException(status_code=404, detail="Node not found")
+        caller_ws = await repo.get_workspace(ws_id)
+        owner_ws = await repo.get_workspace(node.workspace_id)
+        if (
+            caller_ws is None
+            or owner_ws is None
+            or caller_ws.account_id != owner_ws.account_id
+        ):
             raise HTTPException(status_code=404, detail="Node not found")
         return node
 
@@ -333,7 +386,9 @@ def _node_response(node: Node) -> KnowledgeNode:
         parent_id=node.parent_id,
         type=node.type.value if hasattr(node.type, "value") else node.type,
         label=node.label,
+        title=node.title,
         version=node.version,
+        shared=node.shared,
         updated_at=node.updated_at,
         updated_by=node.updated_by,
     )

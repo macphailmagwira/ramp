@@ -19,6 +19,16 @@ class UserCreateSchema(BaseModel):
     last_name: str = Field(max_length=255)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    company_name: str = Field(min_length=1, max_length=255)
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserMemberCreateSchema(BaseModel):
+    first_name: str = Field(max_length=255)
+    last_name: str = Field(max_length=255)
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -51,6 +61,8 @@ class UserWithGitHubSchema(BaseModel):
     last_name: str
     email: str
     github: Optional[GitHubConnectionStatusSchema] = None
+    account_id: Optional[uuid.UUID] = None
+    account_role: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

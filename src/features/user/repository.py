@@ -9,7 +9,7 @@ from src.features.user.schema import UserCreateSchema, UserProfileUpdateSchema
 
 class UserRepository(BaseRepository):
     async def create(self, data: UserCreateSchema) -> User:
-        user = User(**data.model_dump())
+        user = User(**data.model_dump(exclude={"password", "company_name"}))
         self.db.add(user)
         await self.db.commit()
         await self.db.refresh(user)
@@ -36,6 +36,10 @@ class UserRepository(BaseRepository):
     async def get_by_email(self, email: str) -> User | None:
         result = await self.db.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
+
+    async def get_by_account_id(self, account_id: uuid.UUID) -> list[User]:
+        result = await self.db.execute(select(User).where(User.account_id == account_id))
+        return list(result.scalars().all())
 
     async def get_all(self):
         result = await self.db.execute(select(User))

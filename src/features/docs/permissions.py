@@ -1,5 +1,6 @@
-from fastapi import Depends, HTTPException
 from uuid import UUID
+
+from fastapi import Depends, HTTPException
 
 from src.db.session import get_db_session
 from src.features.docs.enums import ROLE_RANK, WorkspaceRole
@@ -19,7 +20,7 @@ def require_workspace_role(min_role: WorkspaceRole):
         user=Depends(get_current_user),
         db=Depends(get_db_session),
     ) -> WorkspaceRole:
-        role = await DocsRepository(db).resolve_role(workspace_id, user.id)
+        role = await DocsRepository(db).resolve_role(workspace_id, user.id, user.account_id)
         if role is None:
             raise HTTPException(status_code=403, detail="Not a member of this workspace")
         if ROLE_RANK[role] < ROLE_RANK[min_role]:

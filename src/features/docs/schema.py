@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-from enum import Enum
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -65,11 +64,13 @@ class PutContentRequest(BaseModel):
 class WorkspaceCreate(BaseModel):
     label: str = Field(..., min_length=1, max_length=MAX_WORKSPACE_LABEL)
     icon: str | None = Field(None, max_length=32)
+    repo: str | None = Field(None, max_length=512)
 
 
 class WorkspaceUpdate(BaseModel):
     label: str | None = Field(None, min_length=1, max_length=MAX_WORKSPACE_LABEL)
     icon: str | None = Field(None, max_length=32)
+    repo: str | None = Field(None, max_length=512)
 
 
 class WorkspaceResponse(BaseModel):
@@ -77,6 +78,7 @@ class WorkspaceResponse(BaseModel):
     owner_id: uuid.UUID
     label: str
     icon: str | None
+    repo: str | None = None
     role: str
     created_at: datetime
     updated_at: datetime
@@ -108,14 +110,22 @@ class NodeCreate(BaseModel):
     parent_id: uuid.UUID | None = None
     type: NodeType
     label: str = Field(..., min_length=1, max_length=MAX_LABEL_LEN)
+    title: str | None = None
+    shared: bool = False
 
 
 class NodeRename(BaseModel):
-    label: str = Field(..., min_length=1, max_length=MAX_LABEL_LEN)
+    label: str | None = Field(None, min_length=1, max_length=MAX_LABEL_LEN)
+    title: str | None = None
+    shared: bool | None = None
 
 
 class MoveRequest(BaseModel):
     new_parent_id: uuid.UUID | None = None
+
+
+class NodeShareToggle(BaseModel):
+    shared: bool
 
 
 class KnowledgeNode(BaseModel):
@@ -124,7 +134,9 @@ class KnowledgeNode(BaseModel):
     parent_id: uuid.UUID | None = None
     type: str
     label: str
+    title: str
     version: int
+    shared: bool = False
     updated_at: datetime
     updated_by: uuid.UUID | None = None
 
